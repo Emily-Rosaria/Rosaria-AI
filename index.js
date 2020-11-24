@@ -155,9 +155,9 @@ client.on('message', async message => {
       if(message.channel.type == "dm") {
         if(['admin','dev'].includes(command.perms) && (message.author.id != perms.dev)) {
           reply = 'You do not have permission to use this command!';
-          return message.reply(reply);          
+          return message.reply(reply);
         }
-      } else if (message.channel.guild.id != '749880737712308274') {
+      } else if (message.channel.guild.id != '749880737712308274' && message.channel.guild.id != '439874403849863169') {
         if(!(message.author.id == perms[command.perms])) {
           if(!(message.member.roles.cache.find(r => r.id == perms[command.perms]))) {
             reply = 'You do not have permission to use this command!';

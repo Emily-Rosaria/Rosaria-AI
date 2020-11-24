@@ -14,7 +14,7 @@ var TrainersSchema = new Schema({ // Create Schema
     id: String, // ID of user on Discord
     nickname: {type: String, default: ""},  // User set trainer-based alias.
     tagline: {type: String, default: ""}, // Trainer quote.
-    registrationDate: {type: Number, default: Date.now().getTime()}, // unix time of signup/first catch
+    registrationDate: {type: Number, default: new Date.now().getTime()}, // unix time of signup/first catch
     pokemon: {type: [TrainerPokemonSchema], default: []} //array of all their pokemon
 });
 

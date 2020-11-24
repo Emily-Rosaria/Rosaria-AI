@@ -56,5 +56,5 @@ for (poke of PokedexData) {
         console.log("#"+poke.id+" "+poke.name+" added with a rarity of "+rare);
         mongoose.disconnect() // disconnect connection from database once document is saved
     });
-  }
+  });
 }

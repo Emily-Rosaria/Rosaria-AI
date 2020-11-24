@@ -3,7 +3,7 @@
  *
  */
 const fetch = require('node-fetch'); // This lets me get stuff from api.
-const Discord = require('discord.js'); // For Embeds 
+const Discord = require('discord.js'); // For Embeds
 const Canvas = require('canvas'); // Drawings
 
 module.exports = {
@@ -137,7 +137,7 @@ module.exports = {
           }
         }
       }
-      if (docData.inlineObjects) {  
+      if (docData.inlineObjects) {
         const inlineKeys = Object.keys(docData.inlineObjects);
         for (var i = 0; i<length.posKeys && img != null; i++) {
           const embedObj2 = docData.inlineObjects[key].inlineObjectProperties.embeddedObject;

@@ -1,4 +1,4 @@
-const Trainers = require('./../../database/modules/trainers.js');
+const Trainers = require('./../../database/models/trainers.js');
 
 module.exports = {
   name: 'removepokemon', // The name of the command

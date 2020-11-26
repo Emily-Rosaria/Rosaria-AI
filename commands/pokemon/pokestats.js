@@ -1,5 +1,5 @@
 const Discord = require('discord.js'); // Image embed
-const PokeSpawns = require('./../../database/modules/spawnedpokemon.js');
+const PokeSpawns = require('./../../database/models/spawnedpokemon.js');
 
 module.exports = {
   name: 'pokestats', // The name of the command

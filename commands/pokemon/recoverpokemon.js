@@ -1,5 +1,5 @@
-const Trainers = require('./../../database/modules/trainers.js');
-const Pokedex = require('./../../database/modules/pokedex.js');
+const Trainers = require('./../../database/models/trainers.js');
+const Pokedex = require('./../../database/models/pokedex.js');
 
 module.exports = {
   name: 'recoverpokemon', // The name of the command

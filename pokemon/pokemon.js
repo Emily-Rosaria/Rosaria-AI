@@ -1,9 +1,9 @@
 const Canvas = require('canvas'); // Drawings
 const Discord = require('discord.js'); // Image embed
-const Trainers = require('./database/modules/trainers.js');
-const Pokedex = require('./database/modules/pokedex.js');
-const Legends = require('./database/modules/legends.js');
-const PokeSpawns = require('./database/modules/spawnedpokemon.js');
+const Trainers = require('../database/modules/trainers.js');
+const Pokedex = require('../database/modules/pokedex.js');
+const Legends = require('../database/modules/legends.js');
+const PokeSpawns = require('../database/modules/spawnedpokemon.js');
 
 module.exports = {
   name: 'pokemon', // The name of the interval
@@ -27,7 +27,7 @@ module.exports = {
       });
       return LegendSpawn(legend, channel);
     }
-    const toDuration = require('./misc_functions/toDuration.js');
+    const toDuration = require('../misc_functions/toDuration.js');
     const imgPath = channel.client.pokeConfig.get("imgPath");
     var pokemonName = name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
     console.log(pokemonName+" just spawned on "+channel.guild.name+".");

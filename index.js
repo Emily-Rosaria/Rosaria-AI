@@ -24,7 +24,7 @@ const dev = "247344219809775617"; // my ID on Discord
 
 const mongoose = require("mongoose"); //database library
 
-const GuildData = require(".database/models/guilds.js"); // database with server configs
+const GuildData = require("./database/models/guilds.js"); // database with server configs
 const connectDB = require("./database/connectDB.js"); // Database connection
 var database = "rose"; // Database name
 
@@ -54,7 +54,7 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 }
 
-const client.pokeConfig = new Discord.Collection(); // for global config options about the pokemon shiz
+client.pokeConfig = new Discord.Collection(); // for global config options about the pokemon shiz
 for (const i of Object.entries(globalconfig.pokemon)) {
     client.pokeConfig.set(i[0],i[1]);
 }

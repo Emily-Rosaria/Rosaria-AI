@@ -1,6 +1,6 @@
 const Discord = require('discord.js'); // Image embed
-const Trainers = require('./../../database/modules/trainers.js');
-const Pokedex = require('./../../database/modules/pokedex.js');
+const Trainers = require('./../../database/models/trainers.js');
+const Pokedex = require('./../../database/models/pokedex.js');
 
 module.exports = {
     name: 'dexsearch', // The name of the command

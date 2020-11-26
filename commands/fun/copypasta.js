@@ -1,6 +1,6 @@
 const Reddit = require('reddit'); // Redditz
 const Discord = require('discord.js'); // Image embed
-const { perms } = require('./../../config.json'); // Perms
+const dev = "247344219809775617";
 
 module.exports = {
   name: 'copypasta', // The name of the command
@@ -13,8 +13,8 @@ module.exports = {
     const timeframe = [args.join(' ').match(/(day|week|month|year|all)/g) || 'week'][0];
     const numMatch = Number([args.join(' ').match(/\d+/) || 1][0]);
     let postCount = (numMatch > 5) ? 5 : numMatch;
-    if (message.author.id == perms.dev) {postCount = numMatch};
-    const nsfw = (message.channel.type == 'text') ? ((message.channel.nsfw && (!args.includes('safe') || !args.includes('sfw'))) || (message.author.id == perms.dev)) : ((message.channel.type == 'dm') && args.includes('nsfw'));
+    if (message.author.id == dev) {postCount = numMatch};
+    const nsfw = (message.channel.type == 'text') ? ((message.channel.nsfw && (!args.includes('safe') || !args.includes('sfw'))) || (message.author.id == dev)) : ((message.channel.type == 'dm') && args.includes('nsfw'));
     const rating = nsfw ? 'NSFW posts are enabled.' : 'All posts should be (relatively) SFW.';
     const plural = (postCount==1) ? 'post' : 'posts';
     message.reply('Fetching '+postCount.toString()+' '+plural+' from r/copypasta/top?t='+timeframe+'. '+rating);

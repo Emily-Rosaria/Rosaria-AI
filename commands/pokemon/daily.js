@@ -1,8 +1,8 @@
 const Canvas = require('canvas'); // Drawings
 const Discord = require('discord.js'); // Image embed
-const Trainers = require('./../../database/modules/trainers.js');
-const Pokedex = require('./../../database/modules/pokedex.js');
-const PokeSpawns = require('./../../database/modules/spawnedpokemon.js');
+const Trainers = require('./../../database/models/trainers.js');
+const Pokedex = require('./../../database/models/pokedex.js');
+const PokeSpawns = require('./../../database/models/spawnedpokemon.js');
 
 module.exports = {
   name: 'daily', // The name of the command
@@ -54,7 +54,7 @@ module.exports = {
             await message.reply('We think you might have heard of it before!');
           }
         }, 7500, message,legendaryCatch);
-        setTimeout(async (message, msg, trainerPokemon) => {
+        setTimeout(async (message, msg, dailyPokemon) => {
           const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
           trainer.cooldowns.daily = nextReset.getTime();
           const embed = new Discord.MessageEmbed()
@@ -85,7 +85,7 @@ module.exports = {
           } else {
             console.log(message.author.username+" claimed a SHINY "+trainerPokemon.name+ " for their daily bonus at "+message.channel.guild.name)
           }
-        }, 10000, message, msg, trainerPokemon);
+        }, 10000, message, msg, dailyPokemon);
       }).catch ((err) => {console.error(err); message.reply('Something went wrong...')})
     } else {
       const timeDiff = dailyTimer - now.getTime();

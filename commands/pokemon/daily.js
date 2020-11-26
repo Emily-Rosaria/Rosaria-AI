@@ -26,9 +26,8 @@ module.exports = {
     if (dailyTimer > now.getTime()) {
       trainer.cooldowns.daily = now.getTime();
       const {dailyPokemon, unique, tier} = await Pokedex.randomDaily(trainer);
-      const shinychance = (tier+1)*message.client.pokeConfig.shinyOdds;
+      const shinychance = (tier+1)*message.client.pokeConfig.get("shinyOdds");
       const legendaryCatch = dailyPokemon.legend;
-      const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Daily Roulette!')
@@ -56,6 +55,8 @@ module.exports = {
           }
         }, 7500, message,legendaryCatch);
         setTimeout(async (message, msg, trainerPokemon) => {
+          const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
+          trainer.cooldowns.daily = nextReset.getTime();
           const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Daily Pokémon: #'+trainerPokemon.id+' '+trainerPokemon.name+'!')
@@ -67,7 +68,7 @@ module.exports = {
           await msg.edit(embed);
           shinyText = trainerPokemon.shiny ? '\n... wait a second! Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`' : '';
           await message.reply('Your Pokémon has arrived! We hope '+trainerPokemon.name+' has a good time in your care.'+shinyText);
-          await trainer = trainer.save();
+          trainer = await trainer.save();
           await PokeSpawns.create({
             id: trainerPokemon.id,
             name: trainerPokemon.name,
@@ -79,7 +80,6 @@ module.exports = {
             guild: message.guild.id, // server ID on discord where it appeared
             catcherID: message.author.id // discord id of user who caught pokemon
           });
-
           if (!shiny) {
             console.log(message.author.username+" claimed a "+trainerPokemon.name+ " for their daily bonus at "+message.channel.guild.name)
           } else {

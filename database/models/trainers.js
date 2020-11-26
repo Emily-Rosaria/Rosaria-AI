@@ -30,7 +30,7 @@ var TrainersSchema = new Schema({ // Create Schema
     tokens: {type: Number, default: 0}, // Number of tokens, for use with the bot in shops and such
     pokeballs: {type: Number, default: 0}, // Number of extra pokeballs to allow for catches while on cooldown
     cooldowns: {  // this is a map, so use .get() and .set()
-      type: Map,  // Example: {pokecatch: {time: Number, cooldown: Number}, daily: {time: Number, cooldown: Number}}
+      type: Map,  // Example: [{pokecatch: Number}, {daily: Number}]
       of: Number // numbers are Unix time and correspond to when the cooldown will expire
     },
     nickname: {type: String, default: ""},  // User set trainer-based alias.
@@ -73,7 +73,7 @@ TrainersSchema.virtual('unique').get(function() {
 });
 
 TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
-  const shinyNum = shinyOdds || 0.0025;
+  const shinyNum = shinyOdds || 0.0005;
   const addToParty = this.party.length<6;
   let newPoke = {
     id: PokemonDoc.id,

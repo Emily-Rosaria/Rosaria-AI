@@ -4,9 +4,10 @@
   "description": "Fun bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node ./database/poketest.js",
     "start": "node index.js",
-    "mongo": "node ./database/mongo-init.js"
+    "mongo": "node ./database/mongo-init.js",
+    "mongo-get": "node ./database/mongo-readall.js"
   },
   "author": "Emily Rose",
   "license": "MIT",

@@ -6,8 +6,7 @@ module.exports = function(uri) {
         useUnifiedTopology: true // Recommended, uses new MongoDB topology engine
     }).catch(error => console.log(error)) // Error handling
 
-
     mongoose.connection.on('connected', function () { // On connection
-        console.log('Successful connection with database: ' + uri); // Callback for successful connection
+      console.log('Successful connection with database: ' + uri); // Callback for successful connection
     });
 }

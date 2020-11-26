@@ -1,3 +1,5 @@
+require('dotenv').config(); //for .env file
+
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -179,7 +181,8 @@ client.on('message', async message => {
         const devUser = client.users.cache.get(dev);
         const msg = (message.content.length > 200) ? message.content.slice(0,200) + ' [...]' : message.content;
         const errmsg = (error.stack.toString().length > 1500) ? error.stack.toString().slice(0,1500) + '...' : error.stack;
-        devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` from `'+message.guild.name+'`\nError Report:\n```'+errmsg+'```');
+        const errLocation = message.channel.type == "dm" ? 'from `Direct Messages`' : 'from `'+message.guild.name+'`';
+        devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` '+errLocation+'\nError Report:\n```'+errmsg+'```');
     }
 });
 connectDB("mongodb://localhost:27017/"+database);

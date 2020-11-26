@@ -23,10 +23,12 @@ var EggsSchema = new Schema({
 
 var TrainersSchema = new Schema({ // Create Schema
     _id: {type: String, required: true}, // ID of user on Discord
-    tokens: {type: Number, default: 0}, // Number of tokens, for use with the bot in shops and such
-    pokeballs: {type: Number, default: 0}, // Number of extra pokeballs to allow for catches while on cooldown
+    counters: {
+      type: Map,
+      of: Number
+    }, // E.g. {pokeballs: 5}, {tokens: 2}, etc.
     cooldowns: {  // this is a map, so use .get() and .set()
-      type: Map,  // Example: [{pokecatch: Number}, {daily: Number}]
+      type: Map,  // Example: {pokecatch: Number}, {daily: Number}
       of: Number // numbers are Unix time and correspond to when the cooldown will expire
     },
     nickname: {type: String, default: ""},  // User set trainer-based alias.
@@ -74,6 +76,7 @@ TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
   let newPoke = {
     id: PokemonDoc.id,
     name: PokemonDoc.name,
+    nickname: PokemonDoc.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-'),
     gender: PokemonDoc.randomGender(),
     legend: PokemonDoc.legend,
     party: addToParty,

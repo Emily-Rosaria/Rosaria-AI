@@ -42,9 +42,9 @@ module.exports = {
       }
 
       console.log('Commands updated and cleaned! Now starting on misc functions.');
-
+misc_functions
       // Reset cache of misc function
-      const miscFunctions = fs.readdirSync('./../../misc_functions',{ withFileTypes: true }).filter((f)=>f.endsWith('.js'));
+      const miscFunctions = fs.readdirSync('../../../misc_functions',{ withFileTypes: true }).filter((f)=>f.endsWith('.js'));
       miscFunctions.forEach((miscF) => {
         delete require.cache[require.resolve(miscF)];
       });

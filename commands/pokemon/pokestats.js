@@ -83,8 +83,8 @@ module.exports = {
     }
     var title = user.username + '\'s ' + 'Pokédex';
     if (pages != 1) {title = title + " - Page ["+pageNum+"] of ["+pages+"]"}
-    var col1 = dexList.slice((pageNum-1)*50,((pageNum-1)*50)+colSize[0]).join('\n');
-    var col2 = dexList.slice(((pageNum-1)*50)+colSize[0],((pageNum-1)*50)+colSize[0]+colSize[1]).join('\n');
+    var col1 = textArray.slice((pageNum-1)*50,((pageNum-1)*50)+colSize[0]).join('\n');
+    var col2 = textArray.slice(((pageNum-1)*50)+colSize[0],((pageNum-1)*50)+colSize[0]+colSize[1]).join('\n');
     if (!col1) { col1 = "Empty" }
     if (!col2) { col2 = "Empty" }
     const dexEmbed = new Discord.MessageEmbed()

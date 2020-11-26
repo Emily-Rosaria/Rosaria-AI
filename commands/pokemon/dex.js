@@ -105,9 +105,9 @@ module.exports = {
     const foot = unique == pokedexSize ? 'Wow! You\'ve caught every Pokémon! That\'s phenomenal!' : 'Keep training and one day you\'ll catch \'em all!'
     var title = user.username + '\'s ' + 'Pokédex';
     if (pages != 1) {title = title + " - Page ["+pageNum+"] of ["+pages+"]"}
-    var col1 = dexList.slice((pageNum-1)*45,((pageNum-1)*45)+colSize[0]).join('\n');
-    var col2 = dexList.slice(((pageNum-1)*45)+colSize[0],((pageNum-1)*45)+colSize[0]+colSize[1]).join('\n');
-    var col3 = dexList.slice(((pageNum-1)*45)+colSize[0]+colSize[1],((pageNum-1)*45)+colSize[0]+colSize[1]+colSize[2]).join('\n');
+    var col1 = textArray.slice((pageNum-1)*45,((pageNum-1)*45)+colSize[0]).join('\n');
+    var col2 = textArray.slice(((pageNum-1)*45)+colSize[0],((pageNum-1)*45)+colSize[0]+colSize[1]).join('\n');
+    var col3 = textArray.slice(((pageNum-1)*45)+colSize[0]+colSize[1],((pageNum-1)*45)+colSize[0]+colSize[1]+colSize[2]).join('\n');
     if (!col1) { col1 = "Empty" }
     if (!col2) { col2 = "Empty" }
     if (!col3) { col3 = "Empty" }

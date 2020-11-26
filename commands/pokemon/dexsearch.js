@@ -14,7 +14,7 @@ module.exports = {
       const pokeCount = await Pokedex.countDocuments({});
       let query = (args.length == 0 || args[0] == 'random' || args[0] == 'r' || args[0] == '0') ? (Math.ceil(Math.random() * pokeCount)) : (isNaN(args.join('-')) ? args.join('-').toLowerCase() : Number(args[0]));
       const noResult = isNaN(query) ? {name: query, id: "#???"} : {name: "??????", id: ("#"+query)}
-      const pokemon = isNaN(query) ? await Pokedex.findOne({name: query}).exec() : await Pokedex.findOneByID(query).exec();
+      const pokemon = isNaN(query) ? await Pokedex.findOne({name: query}).exec() : await Pokedex.findByID(query).exec();
       const trainer = await Trainers.findById(message.author.id).exec();
 
       const pokemonName = pokemon ? pokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-') : noResult.name;

@@ -20,11 +20,10 @@ module.exports = {
     if (!trainer) {
       return message.reply("Please register as a Pokémon Trainer before using this command. You can do so by using `r!starter` or `r!register`.");
     }
-    const dailyTimer = trainer.cooldowns.daily ? trainer.cooldowns.daily : 1;
+    const dailyTimer = trainer.cooldowns.get("daily") ? trainer.cooldowns.get("daily") : 1;
     const now = new Date();
     const nextReset = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
     if (dailyTimer > now.getTime()) {
-      trainer.cooldowns.daily = now.getTime();
       const {dailyPokemon, unique, tier} = await Pokedex.randomDaily(trainer);
       const shinychance = (tier+1)*message.client.pokeConfig.get("shinyOdds");
       const legendaryCatch = dailyPokemon.legend;
@@ -56,7 +55,7 @@ module.exports = {
         }, 7500, message,legendaryCatch);
         setTimeout(async (message, msg, dailyPokemon) => {
           const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
-          trainer.cooldowns.daily = nextReset.getTime();
+          trainer.cooldowns.set("daily", nextReset.getTime());
           const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Daily Pokémon: #'+trainerPokemon.id+' '+trainerPokemon.name+'!')

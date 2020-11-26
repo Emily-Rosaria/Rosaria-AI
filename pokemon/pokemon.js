@@ -1,9 +1,9 @@
 const Canvas = require('canvas'); // Drawings
 const Discord = require('discord.js'); // Image embed
-const Trainers = require('../database/modules/trainers.js');
-const Pokedex = require('../database/modules/pokedex.js');
-const Legends = require('../database/modules/legends.js');
-const PokeSpawns = require('../database/modules/spawnedpokemon.js');
+const Trainers = require('../database/models/trainers.js');
+const Pokedex = require('../database/models/pokedex.js');
+const Legends = require('../database/models/legends.js');
+const PokeSpawns = require('../database/models/spawnedpokemon.js');
 
 module.exports = {
   name: 'pokemon', // The name of the interval
@@ -70,8 +70,8 @@ module.exports = {
           return false;
         }
         const cooldowns = trainer.cooldowns;
-        if (!cooldowns.pokecatch) {return true}
-        const timeDiff = cooldowns.pokecatch - now;
+        if (!cooldowns.get("pokecatch")) {return true}
+        const timeDiff = cooldowns.get("pokecatch") - now;
         if (timeDiff < 0) { return true; }
         const timePhrase = toDuration(timeDiff);
         m.reply('Don\'t wear yourself out. You can only catch one Pokémon per '+cooldown.toString()+' minutes! You\'ve got about `' + timePhrase + '` left until you can catch again.');
@@ -82,7 +82,7 @@ module.exports = {
         const winner = collected.first().author;
         let wtrainer = await Trainers.findById(winner.id).exec();
         const {trainerPokemon} = wtrainer.addPokemon(wildPokemon, shinyOdds);
-        wtrainer.cooldowns.pokecatch = new Date().getTime() + cooldown;
+        wtrainer.cooldowns.set("pokecatch", new Date().getTime() + cooldown);
         const shiny = trainerPokemon.shiny;
         embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         wtrainer = await wtrainer.save();

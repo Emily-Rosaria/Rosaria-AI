@@ -9,11 +9,10 @@ const Canvas = require('canvas'); // Drawings
 module.exports = {
   name: 'test', // The name of the command
   description: 'Tests stuff.', // The description of the command (for help text)
-  args: false, // Specified that this command doesn't need any data other than the command
+  args: true, // Specified that this command doesn't need any data other than the command
   perms: 'dev', //restricts to bot dev only (me)
-  client: true,
   usage: '', // Help text to explain how to use the command (if it had any arguments)
-  async execute(message, client, args) {
+  async execute(message, args) {
     getGdocs = require('./../misc_functions/readgdocs.js');
     toHex = require('./../misc_functions/rgbtohex.js');
     const postNums = args.join(' ').match(/(^| )(count=)?d+( |$)/i);

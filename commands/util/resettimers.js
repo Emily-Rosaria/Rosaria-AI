@@ -1,4 +1,4 @@
-const Trainers = require("./models/trainers.js");
+const Trainers = require('./../../database/models/trainers.js');
 
 module.exports = {
   name: 'resettimers', // The name of the command

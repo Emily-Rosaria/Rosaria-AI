@@ -7,6 +7,7 @@
     "test": "node ./database/poketest.js",
     "start": "node index.js",
     "mongo": "node ./database/mongo-init.js",
+    "mongo-poke": "node ./database/poke-init.js",
     "mongo-get": "node ./database/mongo-readall.js"
   },
   "author": "Emily Rose",

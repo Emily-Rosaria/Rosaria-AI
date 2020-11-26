@@ -15,7 +15,7 @@ const options = {new: true, upsert: true, setDefaultsOnInsert: true}
 const x = async () => {
   for (const guildData of oldguilddata) {
     const query = {id: guildData.id};
-    let newGuild = await Guilds.findOneAndUpdate(query, guildData, options).exec();
+    let newGuild = await Guilds.findByIdAndUpdate(guildData.id, guildData, options).exec();
     console.log(newGuild);
   }
   console.log("Done, guild configs should be updated!");

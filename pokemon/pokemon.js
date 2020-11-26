@@ -1,7 +1,6 @@
 const Canvas = require('canvas'); // Drawings
 const Discord = require('discord.js'); // Image embed
 const fetch = require('node-fetch'); // This lets me get stuff from api.
-const { pokemon } = require('../config.json'); // Pokemon config
 
 module.exports = {
   name: 'pokemon', // The name of the interval

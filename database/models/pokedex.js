@@ -45,7 +45,7 @@ WildPokemonSchema.virtual('id').get(function() {
 
 WildPokemonSchema.statics.randomWild = async function (allowLegends) {
   let acc = 0;
-  const query = (typeof allowLegends !== 'undefined' || allowLegends) ? {} : {legend: false};
+  const query = (typeof allowLegends !== 'undefined') ? (allowLegends ? {} : {legend: false}) : {};
   chances = await this.find(query).then((data) =>
     data.map((el) => {
       let temp = {};
@@ -101,7 +101,7 @@ WildPokemonSchema.statics.randomEgg = async function () {
   const sum = chances.slice(-1)[0].chance;
   const rand = Math.random() * sum;
   const id = chances.find(el => el.chance > rand).id;
-  return this.find( { id: id });
+  return this.findById( { id: id }).exec();
 }
 
 WildPokemonSchema.statics.randomDaily = async function (trainer) {
@@ -133,7 +133,7 @@ WildPokemonSchema.statics.nameOf = async function (id) {
 }
 
 WildPokemonSchema.statics.nameToID = async function (name) {
-  let cleanName = name.replace(' ','-'),replace(/\./,'').toLowerCase();
+  let cleanName = name.replace(' ','-').replace('.','').toLowerCase();
   let temp = await this.findOne({ name: cleanName }).exec();
   if (!temp) {
     return null;

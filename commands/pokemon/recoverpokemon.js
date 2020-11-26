@@ -10,7 +10,7 @@ module.exports = {
   usage: '<user> <pokemonIDs>',
   async execute(message, args) {
     user = !!args[0] ? message.client.users.cache.get(args[0].match(/\d+/)[0]) || message.author : message.author;
-    var trainer = await Trainers.find({id: user.id}).exec();
+    var trainer = await Trainers.findById(user.id).exec();
     const wants = args.map((a)=>a.replace(/[.#+"':;]/g,"").toLowerCase());
     var pokes = await Pokedex.find({}).exec();
     pokes = pokes.filter(p=>wants.includes(p.id) || wants.includes(p.name));

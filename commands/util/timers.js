@@ -10,7 +10,7 @@ module.exports = {
   allowDM: true,
   async execute(message, args) {
     const user = !!args[0] ? message.client.users.cache.get(args[0].match(/\d+/)[0]) || message.author : message.author;
-    const timers = await Trainers.findOne({ id: user.id }).exec().then(d=>d.timers).catch((err)=>{
+    const timers = await Trainers.findById(user.id).exec().then(d=>d.timers).catch((err)=>{
       message.reply("There are no stored timers for "+user.username+'#'+user.discriminator+".");
     })
     const now = new Time.now().getTime();

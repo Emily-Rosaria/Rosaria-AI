@@ -41,7 +41,7 @@ const NewPokeData = PokedexData.map((poke)=>{
     genderOdds = 1;
   }
   let temp = {};
-  temp.id = poke.id;
+  temp._id = poke.id;
   temp.name = poke.name;
   temp.img = poke.img;
   temp.sprites = poke.sprites;

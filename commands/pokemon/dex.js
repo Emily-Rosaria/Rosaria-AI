@@ -60,7 +60,7 @@ module.exports = {
           }
         }
         total += 1;
-        if dexFormat[p.id+"_"+p.name].count += 1;
+        dexFormat[p.id+"_"+p.name].count += 1;
       });
       textArray = dexFormat.entries.map(p=>{
         let shiny = p[1].shiny ? '✨' : '';
@@ -102,7 +102,7 @@ module.exports = {
         desc = "Showing "+unique.toString()+" of all theoretical "+pokedexSize.toString()+" Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is ~"+ (100*unique/pokedexSize).toFixed(1).toString() +"% complete.";
       }
     }
-    const foot = unique == pokedexSize : 'Wow! You\'ve caught every Pokémon! That\'s phenomenal!' ? 'Keep training and one day you\'ll catch \'em all!'
+    const foot = unique == pokedexSize ? 'Wow! You\'ve caught every Pokémon! That\'s phenomenal!' : 'Keep training and one day you\'ll catch \'em all!'
     var title = user.username + '\'s ' + 'Pokédex';
     if (pages != 1) {title = title + " - Page ["+pageNum+"] of ["+pages+"]"}
     var col1 = dexList.slice((pageNum-1)*45,((pageNum-1)*45)+colSize[0]).join('\n');

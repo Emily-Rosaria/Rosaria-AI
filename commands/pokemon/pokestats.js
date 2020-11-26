@@ -33,7 +33,7 @@ module.exports = {
         }
         if (p.escaped) {
           dexFormat[p.id+"_"+p.name].escaped += 1;
-        }
+        } else {
           dexFormat[p.id+"_"+p.name].caught += 1;
           caught += 1;
         }

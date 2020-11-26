@@ -18,7 +18,7 @@ module.exports = {
       else if (toTake.includes(p.id.toString())) {
         removed.push(p.id);
         return false;
-      } else if (toTake.includes(p.name) {
+      } else if (toTake.includes(p.name)) {
         removed.push(p.id);
         return false;
       } else {
@@ -26,6 +26,6 @@ module.exports = {
       }
     });
     trainer = await trainer.save();
-    message.reply('Done! One of each pokemon with the following IDs have been removed:\n```\n'+removed+'\n```');
+    message.reply('Done! One of each Pokémon with the following IDs have been removed:\n```\n'+removed+'\n```');
   },
 };

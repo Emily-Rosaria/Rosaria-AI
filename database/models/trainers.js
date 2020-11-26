@@ -21,10 +21,6 @@ var EggsSchema = new Schema({
     startedIncubating: {type: Number, default: -1} // when incubation began, unix time, -1 if never started
 });
 
-var TimersSchema = new Schema({
-
-})
-
 var TrainersSchema = new Schema({ // Create Schema
     _id: {type: String, required: true}, // ID of user on Discord
     tokens: {type: Number, default: 0}, // Number of tokens, for use with the bot in shops and such

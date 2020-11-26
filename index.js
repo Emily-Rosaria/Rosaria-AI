@@ -151,7 +151,7 @@ client.on('message', async message => {
         }
       } else {
         const roleCache = message.member.roles.cache; // get role cache
-        if (gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
+        if (gID == "727569853405200474" && gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
           return message.reply(command.reject);
         }
         // check perms for admin commands

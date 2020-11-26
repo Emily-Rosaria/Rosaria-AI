@@ -12,7 +12,7 @@ module.exports = {
     async execute(message, args) {
       const imgPath = message.client.pokeConfig.get("imgPath");
       const pokeCount = await Pokedex.countDocuments({});
-      let query = (args.length == 0 || args[0] == 'random' || args[0] == 'r' || args[0] == '0') ? (Math.ceil(Math.random() * pokeCount)) : (isNaN(args.join('-')) ? args.join('-').toLowerCase()) : Number(args[0]);
+      let query = (args.length == 0 || args[0] == 'random' || args[0] == 'r' || args[0] == '0') ? (Math.ceil(Math.random() * pokeCount)) : (isNaN(args.join('-')) ? args.join('-').toLowerCase() : Number(args[0]));
       const noResult = isNaN(query) ? {name: query, id: "#???"} : {name: "??????", id: ("#"+query)}
       const pokemon = isNaN(query) ? await Pokedex.findOne({name: query}).exec() : await Pokedex.findOneByID(query).exec();
       const trainer = await Trainers.findById(message.author.id).exec();
@@ -26,7 +26,7 @@ module.exports = {
       const pokemonWeight = pokemon ? pokemon.weight.toString()+'kg' : '???';
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
-        .setTitle('Pokedex Entry #'+pokemonID+' - '+pokemonName)
+        .setTitle('Pokédex Entry #'+pokemonID+' - '+pokemonName)
         .setAuthor(message.author.username, message.author.displayAvatarURL())
         .setThumbnail('https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
         .addField('Pokémon Abilities',pokemonName+' can have the following abiliies: '+pokemonAbilities.join(', ')+'.',false)

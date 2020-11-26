@@ -4,7 +4,7 @@ const Discord = require('discord.js'); // Image embed
 
 module.exports = {
   name: 'legends', // The name of the command
-  description: 'Gets a list of users with legendary pokemon!', // The description of the command (for help text)
+  description: 'Gets a list of users with legendary Pokémon!', // The description of the command (for help text)
   args: false, // Specified that this command doesn't need any data other than the command
   perms: 'basic',
   allowDM: true,

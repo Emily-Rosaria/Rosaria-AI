@@ -30,8 +30,8 @@ var WildPokemonSchema = new Schema({
     sprites: SpriteSchema,
     types: [String], // e.g. ["grass","fighting"]
     abilities: [AbilitySchema],// ability list
-    height: [Number], // height in metres
-    weight: [Number], // weight in kg
+    height: Number, // height in metres
+    weight: Number, // weight in kg
     stats: StatsSchema, // base stats
     rarity: Number, // same as 100/weighting
     legend: Boolean, // if the pokemon is "legendary"
@@ -55,6 +55,48 @@ WildPokemonSchema.statics.randomWild = async function () {
   const id = chances.find(el => el.chance > rand).id;
   return this.find( { id: id });
 }
+
+WildPokemonSchema.statics.randomEgg = async function () {
+  let acc = 0;
+  chances = await this.find({ egg: true }).then((data) =>
+    data.map((el) => {
+      let temp = {};
+      acc = (100/el.rarity) + acc;
+      temp.chance = acc;
+      temp.id = el.id;
+      return temp;
+    })
+  );
+  const sum = chances.slice(-1)[0].chance;
+  const rand = Math.random() * sum;
+  const id = chances.find(el => el.chance > rand).id;
+  return this.find( { id: id });
+}
+
+WildPokemonSchema.statics.nameOf = async function (id) {
+  let temp = await this.findOne({ id: Number(id) }).exec();
+  if (!temp) {
+    return null;
+  } else {
+    return temp.name;
+  }
+}
+
+WildPokemonSchema.statics.nameToID = async function (name) {
+  let cleanName = name.replace(' ','-'),replace(/\./,'').toLowerCase();
+  let temp = await this.findOne({ name: cleanName }).exec();
+  if (!temp) {
+    return null;
+  } else {
+    return temp.id;
+  }
+}
+
+WildPokemonSchema.method('randomGender', function() {
+  if (this.gender < 0) {return "genderless"}
+  else if (Matt.random() < this.gender) {return "female"}
+  else {return "male"}
+});
 
 var WildPokemon = mongoose.model("WildPokemon", WildPokemonSchema); // Create collection model from schema
 

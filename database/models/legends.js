@@ -3,8 +3,8 @@ const Schema = mongoose.Schema; // Define Schema method
 
 // Schema
 var LegendSchema = new Schema({
-    id: Number, // pokedex ID of the legendary
-    guildid: String, //discord guild ID where it's "lurking"
+    id: {type: Number, required: true}, // pokedex ID of the legendary
+    guildid: {type: String, required: true}, //discord guild ID where it's "lurking"
     appearances: {type: [Number], default: [new Date().getTime()]}, // array of times it spawned, in unix time
 });
 

@@ -5,17 +5,25 @@ const Schema = mongoose.Schema; // Define Schema method
 
 
 var PermissionsSchema = new Schema({ // Create Schema
-    allowAll: {type: Boolean, default: true}, //whether all users are given status of "basic/advanced" for command usage
-    basic: {type: [String], default: []}, // ID of role(s) that grant basic bot perms
-    advanced: {type: [String], default: []}, // ID of role(s) that grant bot perms for bonus stuff, like the daily command
-    trusted: {type: [String], default: []}, // ID of role(s) that grant bot perms for simple management stuff
-    botcommander: {type: [String], default: []} // ID of role(s) that grant perms for advanced server management stuff (some ability is auto-given by server management or admin roles)
+    allowAll: {type: Boolean, default: true, required: true}, //whether all users are given status of "basic/advanced" for command usage
+    basic: {type: [String], default: []}, // IDs of role(s) that grant basic bot perms
+    advanced: {type: [String], default: []}, // IDs of role(s) that grant bot perms for bonus stuff, like the daily command
+    trusted: {type: [String], default: []}, // IDs of role(s) that grant bot perms for simple management stuff
+    botcommander: {type: [String], default: []} // IDs of role(s) that grant perms for advanced server management stuff (some ability is auto-given by server management or admin roles)
 });
 
+const defaultPerms = {
+  allowAll: true,
+  basic: [],
+  advanced: [],
+  trusted: [],
+  botcommander: [],
+}
+
 var GuildSchema = new Schema({
-    id: String, //discord server ID
+    id: {type: String, required: true}, //discord server ID
     prefix: {type: [String], default: ["r!"]}, // command prefix - array of accepted prefixes
-    perms: PermissionsSchema,
+    perms: {type: PermissionsSchema, required: true},
     pokemonspawns: {type: String, default: ""}, // channel to use for pokemon spawns
     rpgzones: {type: [String], default: []} // channels where xp can be gained from rpg stuff (if enabled)
 });

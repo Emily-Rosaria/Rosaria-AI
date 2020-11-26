@@ -15,7 +15,7 @@ module.exports = {
   async execute(message, db, args) {
     user = message.author;
     if (message.channel.type == 'dm') {message.reply('This command only works in servers.'); return;}
-    if (!(message.member.roles.cache.find(r => r.id == perms['verified+']) || (message.guild.id == '749880737712308274'))) {message.reply('Please write an introduction over at <#729760752898146336> to gain access to this command.'); return;}
+    if (!(message.member.roles.cache.find(r => r.id == perms['verified+']) || (message.guild.id == '749880737712308274' || message.guild.id == '439874403849863169'))) {message.reply('Please write an introduction over at <#729760752898146336> to gain access to this command.'); return;}
     let initT = (jsonT) => {let temp = jsonT; jsonT.daily = 1; return jsonT};
     var userTimers = await db.get("timers_" + user.id)
     .then( (timersString) => JSON.parse(timersString)).catch(()=>{daily: 1}) || {daily: 1};
@@ -129,7 +129,7 @@ module.exports = {
           if (pokeJSON === null || pokeJSON === undefined || JSON.stringify(pokeJSON) === '{}') {
             let temp = {};
             temp[pokeKey] = { "normal": 0, "shiny": 0 };
-            pokeKey = temp;
+            pokeJSON = temp;
           }
           if (!pokeJSON[pokeKey]) {pokeJSON[pokeKey] = { "normal": 0, "shiny": 0 }};
           if (newPokemon.shiny) {

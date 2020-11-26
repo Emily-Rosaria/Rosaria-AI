@@ -8,7 +8,7 @@ module.exports = {
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
   delay: 20*60, //min time in seconds between intervals
   delayChaos: 15*60, //variation
-  channels: ['728284939992301588','778663413374386236'], //channels to repeat interval
+  channels: ['728284939992301588','778663413374386236','713108903688273921'], //channels to repeat interval
   database: true,
   async execute(channel, db) {
     let initT = (jsonT) => {let temp = jsonT; temp.pokecatch = 1; return temp;};
@@ -75,33 +75,35 @@ module.exports = {
       }
       channel.awaitMessages(filter, { max: 1, time: 20*60*1000, errors: ['time'] })
       .then( async (collected) => {
-        const winner = collected.first().author;
-        const shiny = (Math.random()+pokemon.shinyOdds > 1);
-        embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
-        const pokeKey = pokemonID + '_' + pokemonName;
-        var timerJSON = await db.get("timers_"+winner.id).then((timer) => !JSON.parse(timer).pokecatch ? init(JSON.parse(timer)) : JSON.parse(timer)).catch(()=>{daily: 1}) || {daily: 1};
-        var pokeJSON = await db.get("poke_" + winner.id).then((pokeStuff)=> !JSON.parse(pokeStuff)[pokeKey] ? initP(JSON.parse(pokeStuff),pokeKey) : JSON.parse(pokeStuff)).catch(()=>{initP({},pokekey)}) || initP({},pokekey);
-        currentTime = new Date();
-        timerJSON.pokecatch = currentTime.getTime();
-        if (shiny) {
-          pokeJSON[pokeKey].shiny += 1;
-        } else {
-          pokeJSON[pokeKey].normal += 1;
-        }
-        channel.send({files: [attachment2], embed: embed2});
-        if (shiny) {
-          channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
-        }
-        await db.set("poke_" + winner.id, JSON.stringify(pokeJSON));
-        await db.set("timers_" + winner.id, JSON.stringify(timerJSON));
-        if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
-        let initB = (tempJ,k) => {let temp = tempJ; temp[k] = {caught: 0, escaped: 0}; return temp;}
-        var botJSON = await db.get("poke_bot").then((pokeStuff)=>!JSON.parse(pokeStuff)[pokeKey] ? initB(JSON.parse(pokeStuff),pokeKey) : JSON.parse(pokeStuff)).catch(()=>initB({},pokeKey));
-        if (JSON.stringify(botJSON) === '{}' || botJSON === null || botJSON === undefined) {
-          botJSON = initB(botJSON,pokeKey);
-        }
-        botJSON[pokeKey].caught += 1;
-        await db.set("poke_bot", JSON.stringify(botJSON));
+        try {
+          const winner = collected.first().author;
+          const shiny = (Math.random()+pokemon.shinyOdds > 1);
+          embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
+          const pokeKey = pokemonID + '_' + pokemonName;
+          var timerJSON = await db.get("timers_"+winner.id).then((timer) => !JSON.parse(timer).pokecatch ? init(JSON.parse(timer)) : JSON.parse(timer)).catch(()=>{daily: 1}) || {daily: 1};
+          var pokeJSON = await db.get("poke_" + winner.id).then((pokeStuff)=> !JSON.parse(pokeStuff)[pokeKey] ? initP(JSON.parse(pokeStuff),pokeKey) : JSON.parse(pokeStuff)).catch(()=>{initP({},pokeKey)}) || initP({},pokeKey);
+          currentTime = new Date();
+          timerJSON.pokecatch = currentTime.getTime();
+          if (shiny) {
+            pokeJSON[pokeKey].shiny += 1;
+          } else {
+            pokeJSON[pokeKey].normal += 1;
+          }
+          channel.send({files: [attachment2], embed: embed2});
+          if (shiny) {
+            channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
+          }
+          await db.set("poke_" + winner.id, JSON.stringify(pokeJSON));
+          await db.set("timers_" + winner.id, JSON.stringify(timerJSON));
+          if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
+          let initB = (tempJ,k) => {let temp = tempJ; temp[k] = {caught: 0, escaped: 0}; return temp;}
+          var botJSON = await db.get("poke_bot").then((pokeStuff)=>!JSON.parse(pokeStuff)[pokeKey] ? initB(JSON.parse(pokeStuff),pokeKey) : JSON.parse(pokeStuff)).catch(()=>initB({},pokeKey));
+          if (JSON.stringify(botJSON) === '{}' || botJSON === null || botJSON === undefined) {
+            botJSON = initB(botJSON,pokeKey);
+          }
+          botJSON[pokeKey].caught += 1;
+          await db.set("poke_bot", JSON.stringify(botJSON));
+        } catch (err) {throw err}
       })
       .catch( async (collected) => {
         embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');

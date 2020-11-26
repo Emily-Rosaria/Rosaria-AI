@@ -1,17 +1,19 @@
-const { pokemon } = require('./../../config.json'); // Pokemon config
+const Trainers = require('./../../database/modules/trainers.js');
 const Discord = require('discord.js'); // Image embed
+const Pokedex = require('./../../database/modules/pokedex.js');
 
 module.exports = {
   name: 'dex', // The name of the command
   description: 'Shows you your pokedex.', // The description of the command (for help text)
-  perms: 'verified', //restricts to bot dev only (me)
-  database: true,
+  perms: 'basic', //restricts to bot dev only (me)
+  allowDM: true,
   aliases: ['pokedex'],
   usage: '[user] [page-number]', // Help text to explain how to use the command (if it had any arguments)
-  async execute(message, db, args) {
+  async execute(message, args) {
     var user = message.author;
     var pageNum = 1;
     var log = false;
+    const pokedexSize = await Pokedex.countDocuments({});
     if (args.length > 0) {
       if (!isNaN(args[0]) && Number(args[0]) < 10000) {
         pageNum = Number(args[0]);
@@ -38,47 +40,36 @@ module.exports = {
         }
       }
     }
-    var dexJSON = await db.get('poke_' + user.id);
-    dexJSON = JSON.parse(dexJSON);
-    if (log) {console.log(dexJSON)};
+    var trainer = await Trainers.findById(user.id).exec();
     var desc = 'Looks like this is empty... keep on training!';
-    var normals = 0;
+    var total = 0;
     var shinies = 0;
     var unique = 0;
-    var dexList = [];
-    if (dexJSON) {
-      const keys = Array.from(Object.keys(dexJSON)).sort(function (a, b) {
-        if (a.split('_')[0].length > b.split('_')[0].length) {
-          return 1;
-        } else if (a.split('_')[0].length < b.split('_')[0].length) {
-          return -1;
-        } else {
-          if (a < b) {
-            return -1;
-          } else if (a > b) {
-            return 1;
-          } else {
-            return 0;
+    var dexFormat = {};
+    var textArray = [];
+    if (trainer) {
+      const pokes = trainer.pokemon.sort((p1,p2)=>p1.id-p2.id);
+      pokes.forEach((p) => {
+        if (!dexFormat[p.id+"_"+p.name]) {
+          dexFormat[p.id+"_"+p.name] = {count: 0, shiny: false};
+        }
+        if (p.shiny) {
+          shinies += 1;
+          if (!dexFormat[p.id+"_"+p.name].shiny) {
+            dexFormat[p.id+"_"+p.name].shiny = true;
           }
         }
+        total += 1;
+        if dexFormat[p.id+"_"+p.name].count += 1;
       });
-      for (const key of keys) {
-        const counts = dexJSON[key];
-        normals = normals + counts.normal;
-        shinies = shinies + counts.shiny;
-        var details = key.split('_');
-        if ((counts.normal+counts.shiny) > 1) {
-          var tempSum = (counts.normal+counts.shiny).toString();
-          if ((counts.normal+counts.shiny) > 9) {
-            tempSum = '9+';
-          }
-          details[1] = details[1] + '('+tempSum+')'
-        }
-        if (counts.shiny != 0) { details[1] = details[1] + '✨'}
-          dexList = dexList.concat([details[0] + '. ' + details[1]]);
-      }
-      unique = dexList.length;
+      textArray = dexFormat.entries.map(p=>{
+        let shiny = p[1].shiny ? '✨' : '';
+        let nameID = p[0].split('_')
+        nameID[1] = nameID[1].split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
+        return nameID[0]+'. '+nameID[1] + shiny;
+      });
     }
+    unique = textArray.length;
     const pages = Math.ceil(unique/45);
     if (pageNum < 1) {pageNum = 1}
     else if (pageNum > pages) {pageNum = pages};
@@ -99,19 +90,20 @@ module.exports = {
       };
     };
     if (unique) {
-        if (unique == pokemon.count) {
-          desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokedex entries. This Pokedex is 100% complete!";
-        } else if (unique == pokemon.count-1) {
-          desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokedex entries. This Pokedex is only one Pokémon away from being completed!";         
-        } else if (unique > pokemon.count-25) {
-          desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokedex entries. This bot supports Pokémon up to Gen 4, meaning this Pokedex is "+(100*unique/pokemon.count).toFixed(1)+"% complete. Only "+(pokemon.count-unique).toString()+" more Pokémon remain!";
-        } else if (unique > 45) {
-          desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokedex entries. This bot supports Pokémon up to Gen 4, meaning this Pokedex is ~"+ (100*unique/pokemon.count).toFixed(1).toString() +"% complete.";
-        } else {
-          desc = "Showing "+unique.toString()+" of all theoretical "+pokemon.count.toString()+" Pokedex entries. This bot supports Pokémon up to Gen 4, meaning this Pokedex is ~"+ (100*unique/pokemon.count).toFixed(1).toString() +"% complete.";
-        }
+      if (unique == pokedexSize) {
+        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This Pokédex is 100% complete!";
+      } else if (unique == pokedexSize-1) {
+        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This Pokédex is only one Pokémon away from being completed!";
+      } else if (unique > pokedexSize-25) {
+        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is "+(100*unique/pokedexSize).toFixed(1)+"% complete. Only "+(pokedexSize-unique).toString()+" more Pokémon remain!";
+      } else if (unique > 45) {
+        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is ~"+ (100*unique/pokedexSize).toFixed(1).toString() +"% complete.";
+      } else {
+        desc = "Showing "+unique.toString()+" of all theoretical "+pokedexSize.toString()+" Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is ~"+ (100*unique/pokedexSize).toFixed(1).toString() +"% complete.";
+      }
     }
-    var title = user.username + '\'s ' + 'Pokedex';
+    const foot = unique == pokedexSize : 'Wow! You\'ve caught every Pokémon! That\'s phenomenal!' ? 'Keep training and one day you\'ll catch \'em all!'
+    var title = user.username + '\'s ' + 'Pokédex';
     if (pages != 1) {title = title + " - Page ["+pageNum+"] of ["+pages+"]"}
     var col1 = dexList.slice((pageNum-1)*45,((pageNum-1)*45)+colSize[0]).join('\n');
     var col2 = dexList.slice(((pageNum-1)*45)+colSize[0],((pageNum-1)*45)+colSize[0]+colSize[1]).join('\n');
@@ -119,7 +111,6 @@ module.exports = {
     if (!col1) { col1 = "Empty" }
     if (!col2) { col2 = "Empty" }
     if (!col3) { col3 = "Empty" }
-    normals = normals + shinies;
     const dexEmbed = new Discord.MessageEmbed()
       .setColor('#3b4cca')
       .setTitle(title)
@@ -129,11 +120,11 @@ module.exports = {
       .addField('\u200b',col1,true)
       .addField('\u200b',col2,true)
       .addField('\u200b',col3,true)
-      .addField('Total Pokémon',normals.toString(),true)
-      .addField('Unique Pokémon',unique.toString()+'/'+pokemon.count.toString(),true)
+      .addField('Total Pokémon',total.toString(),true)
+      .addField('Unique Pokémon',unique.toString()+'/'+pokedexSize.toString(),true)
       .addField('Shiny Pokémon',shinies.toString(),true)
       .setTimestamp()
-      .setFooter('Keep training and one day you\'ll catch \'em all!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
+      .setFooter(foot, 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
     message.channel.send(dexEmbed);
   },
 };

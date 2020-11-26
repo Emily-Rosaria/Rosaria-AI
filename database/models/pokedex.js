@@ -24,7 +24,7 @@ var StatsSchema = new Schema({
 //base pokemon img path = https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/
 
 var WildPokemonSchema = new Schema({
-    id: Number, //pokedex Number
+    _id: Number, //pokedex Number
     name: String, // species name
     img: String, // e.g.  other/official-artwork/X.png
     sprites: SpriteSchema,
@@ -39,9 +39,14 @@ var WildPokemonSchema = new Schema({
     gender: Number // will be -1 for genderless, 1 for all female, 0 for all male, 0.5 for even spread
 });
 
-WildPokemonSchema.statics.randomWild = async function () {
+WildPokemonSchema.virtual('id').get(function() {
+  return this._id;
+});
+
+WildPokemonSchema.statics.randomWild = async function (allowLegends) {
   let acc = 0;
-  chances = await this.find({}).then((data) =>
+  const query = (typeof allowLegends !== 'undefined' || allowLegends) ? {} : {legend: false};
+  chances = await this.find(query).then((data) =>
     data.map((el) => {
       let temp = {};
       acc = (100/el.rarity) + acc;
@@ -53,7 +58,33 @@ WildPokemonSchema.statics.randomWild = async function () {
   const sum = chances.slice(-1)[0].chance;
   const rand = Math.random() * sum;
   const id = chances.find(el => el.chance > rand).id;
-  return this.find( { id: id });
+  return await this.findById(id).exec();
+}
+
+WildPokemonSchema.statics.randomWilds = async function (number, allowLegends) {
+  let loops = !number || isNaN(number) ? 1 : number;
+  const query = (typeof allowLegends !== 'undefined' || allowLegends) ? {} : {legend: false};
+  if (loops < 1) {loops = 1}
+  else if (loops > 10) {loops = 10}
+  let acc = 0;
+  chances = await this.find({}).then((data) =>
+    data.map((el) => {
+      let temp = {};
+      acc = (100/el.rarity) + acc;
+      temp.chance = acc;
+      temp.id = el.id;
+      return temp;
+    })
+  );
+  const sum = chances.slice(-1)[0].chance;
+  let array = [];
+  for (var i = 0; i < loops; i++) {
+    const rand = Math.random() * sum;
+    const id = chances.find(el => el.chance > rand).id;
+    const newPoke = await this.findById(id).exec();
+    array.push(newPoke);
+  }
+  return array;
 }
 
 WildPokemonSchema.statics.randomEgg = async function () {
@@ -73,8 +104,27 @@ WildPokemonSchema.statics.randomEgg = async function () {
   return this.find( { id: id });
 }
 
+WildPokemonSchema.statics.randomDaily = async function (trainer) {
+  const pokeCount = await this.countDocuments({});
+  const allPokemon = trainer.unique >= pokeCount;
+  if (pokeCount < trainer.unique) {console.log("ERROR: Check the commands. `pokeCount count < user's unique count`.")};
+  if (allPokemon) {
+    const dailyPokemonArray = randomWilds(5, legendary);
+    const rare = dailyPokemonArray.filter(p=>p.legend);
+    if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
+  }
+  const legendIDs = await this.find({ legendary: true }).then((data) => data.id);
+  const caughtLegends = trainer.legends;
+  const legendary = caughtLegends.length > 0 ? legends.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
+  const tierVal = legendary ? 2 : 1;
+  const dailyPokemonArray = randomWilds(3, legendary);
+  const newPokes = dailyPokemonArray.filter(p => !trainer.pokemon.includes(p.id));
+  if (newPokes.length > 0) {return {dailyPokemon: newPokes[0], unique: true, tier: tierVal}}
+  else {return {dailyPokemon: dailyPokemonArray[0], unique: true, tier: tierVal}}
+}
+
 WildPokemonSchema.statics.nameOf = async function (id) {
-  let temp = await this.findOne({ id: Number(id) }).exec();
+  let temp = await this.findById(Number(id)).exec();
   if (!temp) {
     return null;
   } else {

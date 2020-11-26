@@ -6,11 +6,8 @@ const { pokemon } = require('../config.json'); // Pokemon config
 module.exports = {
   name: 'pokemon', // The name of the interval
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
-  delay: 20*60, //min time in seconds between intervals
   delayChaos: 15*60, //variation
-  channels: ['728284939992301588','778663413374386236','713108903688273921'], //channels to repeat interval
-  database: true,
-  async execute(channel, db) {
+  async execute(channel) {
     let initT = (jsonT) => {let temp = jsonT; temp.pokecatch = 1; return temp;};
     let initP = (jsonP,key) => {let temp = jsonP; temp[key] = {"normal": 0, "shiny": 0}; return jsonP};
     const allIDs = Array.from({length: pokemon.count}, (_, i) => (i + 1));

@@ -1,4 +1,4 @@
-const { prefix } = require('../config.json');
+const GuildData = require("../database/models/guilds.js"); // database with server configs
 
 /**
  * Runs the help command, explaining each available command to the user.
@@ -7,11 +7,18 @@ module.exports = {
     name: 'help',
     description: 'List all available commands, or info about a specific command.',
     aliases: ['commands','info'],
-    perms: '', //no user-based restrictions
+    perms: false, //no user-based restrictions
     usage: '<command name>',
     cooldown: 5,
-    execute(message, args) {
-        const data = [];
+    allowDM: true,
+    async execute(message, args) {
+        let gID = "dm";
+        let gData = {prefix: ["r!"]};
+        if (message.channel.type != "dm") {
+          gID = message.guild.id;
+          gData = await GuildData.findById(gID).exec();
+        }
+        const prefix = gData.prefix[0];
         const { commands } = message.client;
 
         // Send help data about ALL commands

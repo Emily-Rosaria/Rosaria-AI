@@ -14,14 +14,14 @@ module.exports = {
   client: true,
   usage: '', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, client, args) {
-    gdocs = require('./../misc_functions/readgdocs.js');
+    getGdocs = require('./../misc_functions/readgdocs.js');
     toHex = require('./../misc_functions/rgbtohex.js');
     const postNums = args.join(' ').match(/(^| )(count=)?d+( |$)/i);
     const postCount = postNums ? ((Math.number(postNums[0]) > 5) ? 5 : Math.number(postNums[0])) : 3;
     const splitPosts = !!args.join(' ').match(/(^| )(true|split|split=true)( |$)/i);
     const docLink = args.join(' ').match(/(^| )(\S*\/)?[a-zA-Z0-9-_]{20,}(\/\S*)?( |$)/);
     if (!docLink) { message.reply("Error. Could not find a document link."); return; }
-    const docData = await gdocs.execute(docLink[0]).catch((err) => {
+    const docData = await getGdocs(docLink[0]).catch((err) => {
       message.reply("Could not access the document. Make sure it's public, then submit it again.");
       console.error(err);
       return;
@@ -33,7 +33,7 @@ module.exports = {
       color = "#f5f5f5";
     } else {
       if (color.rgbColor && color.rgbColor != {}) {
-        color = toHex.execute(256 * color.rgbColor.red - 1, 256 * color.rgbColor.green - 1, 256 * color.rgbColor.blue - 1);
+        color = toHex(256 * color.rgbColor.red - 1, 256 * color.rgbColor.green - 1, 256 * color.rgbColor.blue - 1);
       } else {
         color = "#f5f5f5";
       }

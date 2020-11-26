@@ -1,43 +1,31 @@
-const fetch = require('node-fetch'); // This lets me get stuff from api.
-const { pokemon } = require('./../../config.json'); // Pokemon config
+const Trainers = require('./../../database/modules/trainers.js');
 
 module.exports = {
   name: 'removepokemon', // The name of the command
   description: 'Takes a bunch of Pokémon away from the target.', // The description of the command (for help text)
   perms: 'dev', //restricts to bot dev only (me)
-  database: true,
   aliases: ['purgepokemon'],
-  args: true,
+  args: 2,
   usage: '<user> <pokemonIDs>',
-  async execute(message, db, args) {
+  async execute(message, args) {
     user = !!args[0] ? message.client.users.cache.get(args[0].match(/\d+/)[0]) || message.author : message.author;
-    const pokeJSON = await db.get("poke_"+user.id).then((pokedex) => JSON.parse(pokedex)).catch(() => {});
-    const { results } = await fetch('https://pokeapi.co/api/v2/pokemon?limit=' + pokemon.count).then(response => response.json());
-    const toTake = args.map((a)=>{
-      const id = a.match(/\d+/);
-      if (id != null) {
-        return id[0];
+    //const recursive = (args[0] === "true" || args[1] === "true" || args[0] === "recursive" || args[1] === "recursive") ? true : false;
+    var trainer = await Trainers.findById(user.id).exec();
+    const toTake = args.map((a)=>a.replace(/[.#+"':;]/g,"").toLowerCase());
+    let removed = [];
+    trainer = trainer.pokemon.filter(p=>{
+      if (removed.includes(p.id)) {return true}
+      else if (toTake.includes(p.id.toString())) {
+        removed.push(p.id);
+        return false;
+      } else if (toTake.includes(p.name) {
+        removed.push(p.id);
+        return false;
       } else {
-        const name = a.match(/[\w-]+/);
-        if (name != null) {
-          return name[0].toLowerCase();
-        } else {
-          return "0";
-        };
+        return true;
       }
     });
-    const takes = results.filter((poke, index) => toTake.includes(poke.name) || toTake.includes((index+1).toString())).map((cur)=>{
-      return cur.url.match(/\d+/g).slice(-1)[0];
-    });
-    let newJSON = pokeJSON;
-    const keys = Object.keys(newJSON);
-    for (const key of keys) {
-      if (toTake.includes(key.split('_')[0])) {
-        delete newJSON[key];
-      }
-    }
-    console.log(newJSON);
-    await db.set("poke_" + user.id, JSON.stringify(newJSON));
-    message.reply('Done! Pokemon have been removed.');
+    trainer = await trainer.save();
+    message.reply('Done! One of each pokemon with the following IDs have been removed:\n```\n'+removed+'\n```');
   },
 };

@@ -5,9 +5,9 @@ module.exports = {
   description: 'Assigns a role to all users that have posted in this channel.', // The description of the command (for help text)
   args: true, // Specified that this command doesn't need any data other than the command
   perms: 'admin', //restricts to admins
-  client: true,
   usage: '<role-to-assign> [search itterations]', // Help text to explain how to use the command (if it had any arguments)
-  async execute(message, client, args) {
+  async execute(message, args) {
+    client = message.client;
     var messages = [{id: message.id, userID: message.author.id}];
     const role = message.guild.roles.cache.get(args[0].match(/\d+/g)[0]);
     //if (!role) {message.reply('Invalid Role ID.'); return;}

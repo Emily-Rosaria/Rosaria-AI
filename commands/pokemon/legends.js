@@ -1,4 +1,4 @@
-const { pokemon } = require('./../../config.json'); // Pokemon config
+const Trainers = require('./../../database/modules/trainers.js');
 const Discord = require('discord.js'); // Image embed
 
 
@@ -6,33 +6,20 @@ module.exports = {
   name: 'legends', // The name of the command
   description: 'Gets a list of users with legendary pokemon!', // The description of the command (for help text)
   args: false, // Specified that this command doesn't need any data other than the command
-  perms: 'verified', //restricts to bot dev only (me)
-  database: true,
+  perms: 'basic',
+  allowDM: true,
   cooldown: 30,
   aliases: ['getlegends'],
   usage: '', // Help text to explain how to use the command (if it had any arguments)
-  async execute(message, db, args) {
-    var data = await db.getAll();
-    const keys = Object.keys(data);
-    const arr = keys.map((key)=>[key,JSON.parse(data[key])]).filter((d)=>d[0].split('_')[0]=="poke");
-    const legendKeepers = arr.map((dex)=>{
-      const pokes = Object.keys(dex[1]).filter((k)=>{
-        return pokemon.legends.includes(Number(k.split('_')[0]));
-      });
-      return [dex[0].split('_')[1],pokes];
-    }).filter((a)=>a[1].length!=0);
-    let msg = legendKeepers.length>0 ? "" : "Looks like no one has caught any legendary pokemon yet...";
-    for (const keeper of legendKeepers) {
-      let newLine = '<@' + keeper[0] + '> has captured:\n'
-      for (const caught of keeper[1]) {
-        const idName = caught.split('_');
-        newLine = newLine + '> #' + idName[0] +' '+idName[1]+'\n';
+  async execute(message, args) {
+    var data = await Trainers.find({pokemon: {legendary: true}}).exec();
+    var msg = "";
+    if (data != null) {
+      for (const d of data) {
+        msg = msg + "<@" + d.id + "> has captured:\n"+d.legends.map((t)=>"> #"+t.id+" "+t.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-')).join('\n')+'\n';
       }
-      if (msg.length+newLine.length <2020) {
-        msg = msg + newLine;
-      } else {
-        break;
-      }
+    } else {
+      msg = "Looks like this list is empty...";
     }
     const embed = new Discord.MessageEmbed()
     .setColor('#ff0000')

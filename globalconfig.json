@@ -1,0 +1,8 @@
+{"pokemon":
+  {"imgPath": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"},
+  {"cooldown": 30000},
+  {"minDelay": 1200000},
+  {"randomDelay": 900000},
+  {"lingerTime": 1200000},
+  {"shinyOdds": 0.0025}
+}

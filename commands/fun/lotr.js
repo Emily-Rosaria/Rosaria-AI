@@ -5,6 +5,7 @@ module.exports = {
     description: 'Get random lotr quotes!', // The description of the command (for help text)
     args: false, // Specified that this command doesn't need any data other than the command
     cooldown: 15, // 15s cooldown so I don't overload the website's API
+    allowDM: true,
     perms: 'verified', //restricts to users with the "verifed" role noted at config.json
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {

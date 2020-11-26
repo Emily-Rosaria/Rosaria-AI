@@ -21,12 +21,18 @@ var EggsSchema = new Schema({
     startedIncubating: {type: Number, default: -1} // when incubation began, unix time, -1 if never started
 });
 
+var TimersSchema = new Schema({
+
+})
+
 var TrainersSchema = new Schema({ // Create Schema
-    id: {type: String, required: true}, // ID of user on Discord
+    _id: {type: String, required: true}, // ID of user on Discord
     tokens: {type: Number, default: 0}, // Number of tokens, for use with the bot in shops and such
     pokeballs: {type: Number, default: 0}, // Number of extra pokeballs to allow for catches while on cooldown
-    lastcatch: {type: Number, default: 0}, // unix time of last catch
-    lastdaily: {type: Number, default: 0}, // unix time of last daily
+    cooldowns: {  // this is a map, so use .get() and .set()
+      type: Map,  // Example: {pokecatch: {time: Number, cooldown: Number}, daily: {time: Number, cooldown: Number}}
+      of: Number // numbers are Unix time and correspond to when the cooldown will expire
+    },
     nickname: {type: String, default: ""},  // User set trainer-based alias.
     tagline: {type: String, default: ""}, // Trainer quote.
     registrationDate: {type: Number, default: new Date().getTime()}, // unix time of signup/first catch
@@ -34,8 +40,16 @@ var TrainersSchema = new Schema({ // Create Schema
     eggs: {type: [EggsSchema], default: []}
 });
 
+TrainersSchema.virtual('id').get(function() {
+  return this._id;
+});
+
 TrainersSchema.virtual('caught').get(function() {
   return this.pokemon.length;
+});
+
+TrainersSchema.virtual('incubating').get(function() {
+  return this.eggs.filter(e=>e.inclubating);
 });
 
 TrainersSchema.virtual('party').get(function() {
@@ -50,18 +64,28 @@ TrainersSchema.virtual('legends').get(function() {
   return this.pokemon.filter(p=>p.legend);
 });
 
-TrainersSchema.method('catchPokemon', function(PokemonDoc) {
+TrainersSchema.virtual('unique').get(function() {
+  let arr = [];
+  this.pokemon.forEach(p=>{
+    if (!arr.includes(p.id)) {arr.push(p.id)}
+  });
+  return arr.length;
+});
+
+TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
+  const shinyNum = shinyOdds || 0.0025;
+  const addToParty = this.party.length<6;
   let newPoke = {
     id: PokemonDoc.id,
     name: PokemonDoc.name,
-    gender: PokemonDoc.randomGender,
-    nickname: PokemonDoc.name,
+    gender: PokemonDoc.randomGender(),
     legend: PokemonDoc.legend,
-    party: false,
-    shiny: (Math.random()+0.0025)>1
+    party: addToParty,
+    shiny: (Math.random()+shinyNum)>1,
+    captureDate: new Date().getTime()
   };
-  this.pokemon.push(newPoke);
-  return newPoke;
+  const newCount = this.pokemon.push(newPoke);
+  return {trainerPokemon: newPoke, newCount: newCount};
 });
 
 // Model

@@ -21,11 +21,16 @@ const defaultPerms = {
 }
 
 var GuildSchema = new Schema({
-    id: {type: String, required: true}, //discord server ID
+    _id: {type: String, required: true}, //discord server ID
     prefix: {type: [String], default: ["r!"]}, // command prefix - array of accepted prefixes
     perms: {type: PermissionsSchema, required: true},
     pokemonspawns: {type: String, default: ""}, // channel to use for pokemon spawns
+    lastspawn: {type: Number, default: 1}, // unix time
     rpgzones: {type: [String], default: []} // channels where xp can be gained from rpg stuff (if enabled)
+});
+
+GuildSchema.virtual('id').get(function() {
+  return this._id;
 });
 
 // Model

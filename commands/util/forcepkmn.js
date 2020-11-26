@@ -4,9 +4,8 @@ module.exports = {
   cooldown: 10,
   args: false, // Specified that this command doesn't need any data other than the command
   perms: 'dev', //restricts to bot dev only (me)
-  database: true,
   usage: '', // Help text to explain how to use the command (if it had any arguments)
-  async execute(message, db, args) {
+  async execute(message, args) {
     message.reply("This command is WIP.");
   },
 };

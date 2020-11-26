@@ -17,9 +17,18 @@ const Discord = require('discord.js');                  // Loads the discord API
 const Canvas = require('canvas'); // Pretty pictures
 const readline = require('readline');
 const {google} = require('googleapis');
-const { prefix, perms } = require('./config.json');
-const data = require("@replit/database");
-const db = new data();
+
+const globalconfig = require('./globalconfig.json')
+
+const dev = "247344219809775617"; // my ID on Discord
+
+const mongoose = require("mongoose"); //database library
+
+const GuildData = require(".database/models/guilds.js"); // database with server configs
+const connectDB = require("./database/connectDB.js"); // Database connection
+var database = "rose"; // Database name
+
+const spawnPokemon = require('./pokemon/loadspawners.js');
 
 const client = new Discord.Client(); // Initiates the client
 
@@ -45,63 +54,39 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 }
 
+const client.pokeConfig = new Discord.Collection(); // for global config options about the pokemon shiz
+for (const i of Object.entries(globalconfig.pokemon)) {
+    client.pokeConfig.set(i[0],i[1]);
+}
+
 const cooldowns = new Discord.Collection(); // Creates an empty list for storing timeouts so people can't spam with commands
 
 // Starts the bot and makes it begin listening for commands.
 client.on('ready', async function() {
     client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
-    client.intervals = new Discord.Collection(); // Creates list for running intervals
-    const intervalFiles = fs.readdirSync('./intervals').filter(file => file.endsWith('.js')); // collects the intervals
-    for (const file of intervalFiles) {
-        const interval = require(`./intervals/${file}`); //cycles through and initialises the intervals
-        for (const c of interval.channels) {
-            console.log('Setting up '+interval.name+c+'.');
-            const ic = client.channels.cache.get(c);
-            if (interval.delayChaos) {
-              if (interval.database) {
-                let loop = (interval,ic,db) => {
-                  interval.execute(ic,db);
-                  const nextDelay = (interval.delay*1000) + Math.ceil(Math.random()*interval.delayChaos*1000);
-                  const timeout = client.setTimeout(loop,nextDelay,interval,ic,db);
-                  client.intervals.set(interval.name+c,timeout);
-                };
-                loop(interval,ic,db);
-              } else {
-                let loop = (interval,ic) => {
-                  interval.execute(ic);
-                  const timeout = client.setTimeout(loop,(interval.delay*1000) + Math.ceil(Math.random()*interval.delayChaos*1000),interval,ic,db);
-                  client.intervals.set(interval.name+c,timeout);
-                };
-                loop(interval,ic);
-              }
-            } else {
-              if (interval.database) {
-                const timeout = client.setInterval(() => {
-                  interval.execute(ic,db);
-                },db,ic,interval);
-                client.intervals.set(interval.name+c,timeout)
-              } else {
-                const timeout = client.setInterval(() => {
-                  interval.execute(ic);
-                },ic,interval);
-                client.intervals.set(interval.name+c,timeout)
-              }
-            }
-        }
-    }
     console.log(`${client.user.username} is up and running!`);
+    await spawnPokemon(client);
 });
 
 /**
  * This function controls how the bot reacts to messages it receives
  */
 client.on('message', async message => {
-    // Ignore bot messages and messages that dont start with the prefix defined in the config file
-    if(!message.content.startsWith(prefix) || message.author.bot) return;
+    const botPing = ["<@" + message.client.user.id + ">","<@" + message.client.user.id + "> "]; // with and without a space
+    let gID = "dm";
+    let gData = {prefix: ["r!","!","?","p!"]};
+    if (message.channel.type != "dm") {
+      gID = message.guild.id;
+      gData = await GuildData.findById(gID).exec();
+    }
+
+    // Ignore bot messages and messages that dont start with the prefix defined in the config data
+    const prefix = gData.prefix.concat(botPing).filter(p => message.content.startsWith(p));
+    if (prefix.length == 0 || message.author.bot) return;
 
     // Split commands and arguments from message so they can be passed to functions
-    const args = message.content.slice(prefix.length).split(/ +/);
-    const commandName = args.shift().toLowerCase();
+    const args = message.content.slice(prefix[0].length).split(/ +/);
+    const commandName = args.shift().toLowerCase().replace(/-_/,'');
 
     // If the command isn't in the  command folder, move on
     const command = client.commands.get(commandName)
@@ -145,47 +130,57 @@ client.on('message', async message => {
         }
 
         timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount)
+        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
     }
+
     /**
-     * End cooldown code, begin checking if the user has the right permissions.
+     * End cooldown code, begin checking if the user has the right permissions. Possible perms include:
+     * User - all users may use it
+     * Basic - only users with basic access
+     * Advanced - only users with "verified" access
+     * Trusted - only users "trusted" by the server owner (i.e. given a role)
+     * Botcommander - given ability to use all commands
+     * Dev - only usable by me
+     * Owner - only useable by server owner
      */
 
-    if(command.perms) {
-      if(message.channel.type == "dm") {
-        if(['admin','dev'].includes(command.perms) && (message.author.id != perms.dev)) {
-          reply = 'You do not have permission to use this command!';
-          return message.reply(reply);
+    if(command.perms && message.author.id != dev) {
+      if (message.channel.type == "dm") {
+        if (!command.allowDM) {
+          return message.reply("This command is not available for use in DMs.")
         }
-      } else if (message.channel.guild.id != '749880737712308274' && message.channel.guild.id != '439874403849863169') {
-        if(!(message.author.id == perms[command.perms])) {
-          if(!(message.member.roles.cache.find(r => r.id == perms[command.perms]))) {
-            reply = 'You do not have permission to use this command!';
-            return message.reply(reply);
-          }
+      } else {
+        const roleCache = message.member.roles.cache; // get role cache
+        if (gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
+          return message.reply(command.reject);
+        }
+        // check perms for admin commands
+        if ((command.perms == "botcommander" || command.perms == "admin") && (!gData.perms.botcommander.some(r => roleCache.has(r)) || !message.member.hasPermission("ADMINISTRATOR") || !message.member.hasPermission("MANAGE_GUILD"))) {
+          return message.reply("You do not have the required permissions to use this command; this command is only for moderators.");
+        }
+
+        // check perms for "allAll" applicable commands
+        else if (gData.perms.allowAll === false && ((command.perms == "basic" && !gData.perms.basic.some(r=>roleCache.has(r))) || (command.perms == "advanced" && !gData.perms.advanced.some(r=>roleCache.has(r))))) {
+          return message.reply("You do not have the required permissions to use this command.");
+        }
+
+        else if (command.perms == "owner" && message.guild.ownerID != message.author.id) {
+          return message.reply("You do not have the required permissions to use this command; only the guild owner can use this command.");
         }
       }
     }
 
     try {
         // Run the command
-        if (command.database == true) {
-            await command.execute(message, db, args);
-        } else {
-            if (command.client == true) {
-                await command.execute(message, client, args);
-            } else {
-                await command.execute(message, args);
-            }
-        }
+        await command.execute(message, args);
     } catch(error) {
         console.error(error);
         message.reply('Sorry! I ran into an error trying to do that!');
-        const dev = client.users.cache.get(perms.dev);
+        const devUser = client.users.cache.get(dev);
         const msg = (message.content.length > 200) ? message.content.slice(0,200) + ' [...]' : message.content;
         const errmsg = (error.stack.toString().length > 1500) ? error.stack.toString().slice(0,1500) + '...' : error.stack;
-        dev.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` from `'+message.guild.name+'`\nError Report:\n```'+errmsg+'```');
+        devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` from `'+message.guild.name+'`\nError Report:\n```'+errmsg+'```');
     }
 });
-
-client.login(process.env.TOKEN).catch((err)=>console.error(err)); // Log the bot in using the token provided in the .env file
+connectDB("mongodb://localhost:27017/"+database);
+client.login(process.env.TOKEN); // Log the bot in using the token provided in the .env file

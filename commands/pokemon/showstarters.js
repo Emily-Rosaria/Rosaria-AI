@@ -8,6 +8,7 @@ module.exports = {
   perms: 'basic',
   aliases: ['liststarters'],
   args: false,
+  allowDM: true,
   usage: '',
   async execute(message, args) {
     var trainer = await Trainers.findById(message.author.id).exec();

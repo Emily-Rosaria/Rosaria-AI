@@ -146,12 +146,12 @@ client.on('message', async message => {
      * Owner - only useable by server owner
      */
 
-    if(command.perms && message.author.id != dev) {
+    if(command.perms) {
       if (message.channel.type == "dm") {
         if (!command.allowDM) {
           return message.reply("This command is not available for use in DMs.")
         }
-      } else {
+      } else if (message.author.id != dev) {
         const roleCache = message.member.roles.cache; // get role cache
         if (gID == "727569853405200474" && gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
           return message.reply(command.reject);
@@ -181,7 +181,7 @@ client.on('message', async message => {
         const devUser = client.users.cache.get(dev);
         const msg = (message.content.length > 200) ? message.content.slice(0,200) + ' [...]' : message.content;
         const errmsg = (error.stack.toString().length > 1500) ? error.stack.toString().slice(0,1500) + '...' : error.stack;
-        const errLocation = message.channel.type == "dm" ? 'from `Direct Messages`' : 'from `'+message.guild.name+'`';
+        const errLocation = message.channel.type == "dm" ? 'in `Direct Messages`' : 'from `'+message.guild.name+'`';
         devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` '+errLocation+'\nError Report:\n```'+errmsg+'```');
     }
 });

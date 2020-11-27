@@ -9,6 +9,7 @@ module.exports = {
     perms: 'dev', //restricts to bot dev only (me)
     usage: '<interval-to-kill>', // Help text to explain how to use the command (if it had any arguments)
     args: true,
+    allowDM: true,
     execute(message, args) {
       let client = message.client;
       const keys = Array.from(client.spawnloops.keys());

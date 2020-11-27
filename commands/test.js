@@ -12,6 +12,7 @@ module.exports = {
   args: true, // Specified that this command doesn't need any data other than the command
   perms: 'dev', //restricts to bot dev only (me)
   usage: '', // Help text to explain how to use the command (if it had any arguments)
+  allowDM: true,
   async execute(message, args) {
     getGdocs = require('./../misc_functions/readgdocs.js');
     toHex = require('./../misc_functions/rgbtohex.js');

@@ -7,6 +7,7 @@ module.exports = {
     perms: 'dev', //restricts to bot dev only (me)
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     execute(message, args) {
+      var client = message.client;
       console.log("Updating commands and functions...");
       const getAllCommands = function(dir, cmds) {
           files = fs.readdirSync(dir,{ withFileTypes: true });
@@ -26,40 +27,40 @@ module.exports = {
       for (const file of commandFiles) {
           delete require.cache[require.resolve(file)];
           const command = require(file);
-          message.client.commands.set(command.name, command);
+          client.commands.set(command.name, command);
       }
 
       // Deletes commands that don't exist
-      const keys = Array.from(message.client.commands.keys());
+      const keys = Array.from(client.commands.keys());
       const validCommands = commandFiles.map(x => require(x).name);
       console.log('New valid command list:');
       console.log(validCommands);
       for (const key of keys) {
           if (!validCommands.includes(key)) {
             console.log('Removing command '+key+' from cache.');
-            delete message.client.commands.delete(key);
+            delete client.commands.delete(key);
           }
       }
 
       console.log('Commands updated and cleaned! Now starting on misc functions.');
-misc_functions
+
       // Reset cache of misc function
-      const miscFunctions = fs.readdirSync('../../../misc_functions',{ withFileTypes: true }).filter((f)=>f.endsWith('.js'));
+      const miscFunctions = fs.readdirSync('./misc_functions',{ withFileTypes: true }).filter((f)=>f.name.endsWith('.js'));
       miscFunctions.forEach((miscF) => {
-        delete require.cache[require.resolve(miscF)];
+        delete require.cache[require.resolve('./../../misc_functions/'+miscF.name)];
       });
 
       console.log('Misc functions updated and cleaned! Now starting function loops (namely pokemon spawns).');
 
       // Time to reset the pokemon command!
       delete require.cache[require.resolve('./../../pokemon/pokemon.js')];
-      delete require.cache[require.resolve('./../../pokemon/loadspawner.js')];
+      delete require.cache[require.resolve('./../../pokemon/loadspawners.js')];
       const spawns = Object.keys(client.spawnloops);
       for (const spawn of spawns) {
         client.clearTimeout(client.spawnloops[spawn]);
         client.spawnloops.delete(spawn);
       }
-      const reSpawn = require('./../../pokemon/pokemon.js');
+      const reSpawn = require('./../../pokemon/loadspawners.js');
       x = async () => {
         await reSpawn(client);
         console.log('Done! Pokemon and looping functions should begin shortly...');

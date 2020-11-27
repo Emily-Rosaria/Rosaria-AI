@@ -8,6 +8,7 @@ module.exports = {
     description: 'Lists all running timeouts and intervals.', // The description of the command (for help text)
     perms: 'dev', //restricts to verified users
     usage: '', // Help text to explain how to use the command (if it had any arguments)
+    allowDM: true,
     execute(message, args) {
       keys = Array.from(message.client.spawnloops.keys());
       message.channel.send('Current running intervals include...\n'+keys.join(', ')+'.');

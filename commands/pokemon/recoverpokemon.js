@@ -6,6 +6,7 @@ module.exports = {
   description: 'Gives a user a bunch of Pokémon that they don\'t already have! Namely to recover something for them should the bot not save it.', // The description of the command (for help text)
   perms: 'dev', //restricts to bot dev only (me)
   aliases: ['recover','award','awardpokemon'],
+  allowDM: true,
   args: true,
   usage: '<user> <pokemonIDs>',
   async execute(message, args) {

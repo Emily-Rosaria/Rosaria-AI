@@ -1,6 +1,6 @@
 const Discord = require('discord.js'); // Image embed
-const Trainers = require('../database/models/trainers.js');
-const Pokedex = require('../database/models/pokedex.js');
+const Trainers = require('./../database/models/trainers.js');
+const Pokedex = require('./../database/models/pokedex.js');
 
 module.export = async function (msg, user) {
   const starters = [1,4,7,152,155,158,252,255,258,387,390,393];
@@ -36,5 +36,4 @@ module.export = async function (msg, user) {
 
   collector.on('collect', (r, u) => {
     */
-  };
-}
+};

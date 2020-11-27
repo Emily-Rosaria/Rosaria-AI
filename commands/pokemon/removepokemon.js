@@ -5,6 +5,7 @@ module.exports = {
   description: 'Takes a bunch of Pokémon away from the target.', // The description of the command (for help text)
   perms: 'dev', //restricts to bot dev only (me)
   aliases: ['purgepokemon'],
+  allowDM: true,
   args: 2,
   usage: '<user> <pokemonIDs>',
   async execute(message, args) {

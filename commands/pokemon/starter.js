@@ -16,7 +16,7 @@ module.exports = {
     const starters = [1,4,7,152,155,158,252,255,258,387,390,393];
     const starterPokemon = await Pokedex.find({ _id: { $in: starters }}).exec();
     const starterscreen = require('./../../pokemon/starter-selection.js');
-    if (args) {
+    if (args.length > 0) {
       let choice = {};
       if (starters.includes(Number(args[0]))) {
         choice = await Pokedex.findById(Number(args[0])).exec();

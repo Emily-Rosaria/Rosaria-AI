@@ -71,7 +71,7 @@ async function spawnPokemon(channel) {
   channel.send({files: [attachment1], embed: embed1})
   .then( () => {
     const filter = async (m) => {
-      if (!(m.content.toLowerCase().replace(/ /gi, '-').replace(/\./gi, '').startsWith(pokemonName.toLowerCase()))) { return false; }
+      if (!(m.content.toLowerCase().replace(/ /gi, '-').replace(/[.'":]/gi, '').startsWith(pokemonName.toLowerCase()))) { return false; }
       const now = (new Date()).getTime();
       const trainer = await Trainers.findById(m.author.id).exec();
       if (!trainer || !trainer.pokemon) {

@@ -18,17 +18,14 @@ module.exports = async function (client) {
         const ic = client.channels.cache.get(c.channel);
         if (ic) {
             console.log('Setting up '+pokemonspawner.name+c.channel+' at '+ic.guild.name+'.');
-            let loop = (pokemonspawner,ic) => {
-                const doubleLoop = async (pokemonspawner,ic) => {
-                  await pokemonspawner.execute(ic);
-                  loop(pokemonspawner,ic);
-                }
-                const nextDelay = minDelay + Math.floor(Math.random()*randomDelay);
-                const timeout = client.setTimeout(doubleLoop,nextDelay,pokemonspawner,ic,client,minDelay,randomDelay);
-                client.spawnloops.set(pokemonspawner.name+ic.id,timeout);
-                client.spawnloops.array();
-            };
-            loop(pokemonspawner,ic);
+            let initialBoot = (pokemonspawner,ic,nextDelay) => {
+              pokemonspawner.execute(ic,nextDelay);
+            }
+            const initialDelay = minDelay + Math.floor(Math.random()*randomDelay);
+            const nextDelay = minDelay + Math.floor(Math.random()*randomDelay);
+            const timeout = client.setTimeout(initialBoot,initialDelay,pokemonspawner,ic,nextDelay);
+            client.spawnloops.set(pokemonspawner.name+ic.id,timeout);
+            client.spawnloops.array();
         } else {
             console.log("Could not reach channel: "+c.channel+".");
         }

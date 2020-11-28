@@ -75,6 +75,7 @@ client.on('ready', async function() {
  * This function controls how the bot reacts to messages it receives
  */
 client.on('message', async message => {
+    if (message.author.bot) {return}
     const botPing = ["<@" + message.client.user.id + ">","<@" + message.client.user.id + "> "]; // with and without a space
     let gID = "dm";
     let gData = {prefix: ["r!","!","?","p!"]};
@@ -84,8 +85,8 @@ client.on('message', async message => {
     }
 
     // Ignore bot messages and messages that dont start with the prefix defined in the config data
-    const prefix = gData.prefix.concat(botPing).filter(p => message.content.startsWith(p));
-    if (prefix.length == 0 || message.author.bot) return;
+    const prefix = gData.prefix.concat(botPing).filter(p => message.content.toLowerCase().startsWith(p));
+    if (prefix.length == 0) {return}
 
     // Split commands and arguments from message so they can be passed to functions
     const args = message.content.slice(prefix[0].length).split(/ +/);

@@ -59,6 +59,9 @@ module.exports = {
       pokeFunctions.forEach((pokeF) => {
         delete require.cache[require.resolve('./../../pokemon/'+pokeF.name)];
       });
+
+      message.reply('Done! Pokemon and looping functions won\'t be updated and require a reboot. As do the database functions...');
+      /*
       const spawns = Object.keys(client.spawnloops);
       for (const spawn of spawns) {
         client.clearTimeout(client.spawnloops[spawn]);
@@ -72,5 +75,6 @@ module.exports = {
         message.reply('Done! Pokemon and looping functions should begin shortly...');
       }
       x();
+      */
     },
 };

@@ -120,7 +120,6 @@ module.exports = {
           escaped: true, // whether or not it escaped
           legend: wildPokemon.legend, // whether or not the pokemon was legendary
           source: "wild",
-          catcherID: winner.id,
           time: (new Date()).getTime(), // unix time of escape/capture
           guild: channel.guild.id // server ID on discord where it appeared
         });

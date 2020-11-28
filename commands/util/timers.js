@@ -14,7 +14,7 @@ module.exports = {
       return message.reply("There are no stored timers for "+user.username+'#'+user.discriminator+".");
     });
     const timerText1 = new Map([['pokecatch','You\'re well rested now! You can go out to catch some pokemon!'],['daily','Your daily bonus is ready: use `r!daily` to claim it!']]);
-    const timerText2 = new Map([['pokecatch',''],['daily','`r!daily`']]);
+    const timerText2 = new Map([['pokecatch','Rest a little before catching Pokémon again. You should relax for at least `$time$`.'],['daily','You\'ve already claimed your daily bonus today. It resets in `$time$`.']]);
     const now = (new Date()).getTime();
     const toDuration = require('./../../misc_functions/toDuration.js');
     timerArray = Array.from(userData.cooldowns).map(e => {
@@ -27,7 +27,7 @@ module.exports = {
         }
       } else {
         if (timerText2.has(e[0])) {
-          return ("⏲️ "+timerText2.get(e[0]).replace("$time",toDuration(timeDiff)));
+          return ("⏲️ "+timerText2.get(e[0]).replace("$time$",toDuration(timeDiff)));
         } else {
           return ("⏲️ "+e[0]+"'s cooldown will reset in ``"+toDuration(timeDiff)+"``.");
         }

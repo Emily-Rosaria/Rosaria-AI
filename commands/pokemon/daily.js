@@ -79,7 +79,7 @@ module.exports = {
             guild: message.guild.id, // server ID on discord where it appeared
             catcherID: message.author.id // discord id of user who caught pokemon
           });
-          if (!shiny) {
+          if (!trainerPokemon.shiny) {
             console.log(message.author.username+" claimed a "+trainerPokemon.name+ " for their daily bonus at "+message.channel.guild.name)
           } else {
             console.log(message.author.username+" claimed a SHINY "+trainerPokemon.name+ " for their daily bonus at "+message.channel.guild.name)

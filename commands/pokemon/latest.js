@@ -20,7 +20,7 @@ module.exports = {
     const now = (new Date()).getTime();
     const toDuration = require('./../../misc_functions/toDuration.js');
     const imgPath = message.client.pokeConfig.get("imgPath");
-    if (latestPokemon.length > 20) {latestPokemon = latestPokemon.slice(0,20)}
+    if (latestPokemon.length > 25) {latestPokemon = latestPokemon.slice(0,25)}
     const dexData = await Pokedex.find({ _id: { $in: latestPokemon.map(p=>p.id) }}).exec()
     const pokemonArray = latestPokemon.map((p,i) => {
       const dex = dexData.filter(d=>d.id==p.id)[0];

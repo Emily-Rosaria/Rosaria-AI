@@ -47,7 +47,6 @@ module.exports = {
     var unique = 0;
     var dexFormat = {};
     var textArray = [];
-    console.log(trainer);
     if (trainer && trainer.pokemon && trainer.pokemon.length > 0) {
       const pokes = trainer.pokemon.sort((p1,p2)=>p1.id-p2.id);
       pokes.forEach((p) => {

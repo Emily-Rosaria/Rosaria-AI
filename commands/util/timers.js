@@ -19,7 +19,7 @@ module.exports = {
     const toDuration = require('./../../misc_functions/toDuration.js');
     timerArray = Array.from(userData.cooldowns).map(e => {
       const timeDiff = e[1] - now;
-      if (e[1] < now) {
+      if (timeDiff < 0) {
         if (timerText1.has(e[0])) {
           return ("☑️ "+timerText1.get(e[0]));
         } else {

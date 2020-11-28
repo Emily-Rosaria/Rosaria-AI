@@ -89,7 +89,7 @@ module.exports = {
         let wtrainer = await Trainers.findById(winner.id).exec();
         const {trainerPokemon} = wtrainer.addPokemon(wildPokemon, shinyOdds);
         const caughtAt = trainerPokemon.captureDate;
-        wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt} }, {new: true}).exec();
+        wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
         const shiny = trainerPokemon.shiny;
         embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [attachment2], embed: embed2});

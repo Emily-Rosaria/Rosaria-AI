@@ -88,13 +88,7 @@ module.exports = {
       if (['⬅️'].includes(r.emoji.name)) {page = await left(page)}
       if (['➡️'].includes(r.emoji.name)) {page = await right(page)}
     });
-/*
-    collector.on('dispose', async (r) => {
-        if (['⬅️'].includes(r.emoji.name)) {page = await left(page)}
-        if (['➡️'].includes(r.emoji.name)) {page = await right(page)}
-        collector.resetTimer({ time: 300000 });
-    });
-*/
+
     collector.on('remove', async (r) => {
         if (['⬅️'].includes(r.emoji.name)) {page = await left(page)}
         if (['➡️'].includes(r.emoji.name)) {page = await right(page)}

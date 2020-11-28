@@ -6,7 +6,7 @@ const GuildData = require('./../database/models/guilds.js');
 const PokeSpawns = require('./../database/models/spawnedpokemon.js');
 
 
-async function spawnPokemon(channel,nextDelay) {
+async function spawnPokemon(channel) {
   var guildInfo = await GuildData.findById(channel.guild.id).exec();
   if (!guildInfo) {return channel.send("Could not find guild info. Please configure the bot.")}
   else if (!guildInfo.pokeData) {return channel.send("Could not find guild's pokemon spawning data. Please configure the bot.")}
@@ -128,19 +128,22 @@ async function spawnPokemon(channel,nextDelay) {
   return {minDelay: minDelay, randomDelay: randomDelay};
 }
 
+async function spawnLoop(channel,nextDelay) {
+  await spawnPokemon(channel).then((r)=>{
+    const nextDelay2 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
+    const timeout = channel.client.setTimeout(spawnLoop,nextDelay,channel,nextDelay2);
+    channel.client.spawnloops.set("pokemon"+channel.id,timeout);
+    channel.client.spawnloops.array();
+  });
+}
+
 module.exports = {
   name: 'pokemon', // The name of the interval
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
-  execute: async function (channel,nextDelay) {
-    await spawnPokemon(channel,nextDelay).then((r)=>{
-      const nextDelay2 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
-      const nextDelay3 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
-      const nextBoot = (spawnPokemon,channel,nextDelay3) => {
-        spawnPokemon(channel,nextDelay3);
-      }
-      const timeout = channel.client.setTimeout(nextBoot,nextDelay2,spawnPokemon,channel,nextDelay3);
-      channel.client.spawnloops.set("pokemon"+channel.id,timeout);
-      channel.client.spawnloops.array();
-    });
-  },
+  execute: async function(channel,nextDelay) {
+    const miniDelay = Math.floor(Math.random()*channel.client.spawnloops.get("minDelay"));
+    const timeout = channel.client.setTimeout(spawnLoop,miniDelay,channel,nextDelay);
+    channel.client.spawnloops.set("pokemon"+channel.id,timeout);
+    channel.client.spawnloops.array();
+  }
 };

@@ -5,6 +5,11 @@ const Pokedex = require('./../database/models/pokedex.js');
 const GuildData = require('./../database/models/guilds.js');
 const PokeSpawns = require('./../database/models/spawnedpokemon.js');
 
+async function nextSpawn(channel,nextDelay) {
+  const timeout = channel.client.setTimeout(spawnPokemon,nextDelay,channel);
+  channel.client.spawnloops.set("pokemon"+channel.id,timeout);
+  channel.client.spawnloops.array();
+}
 
 async function spawnPokemon(channel) {
   var guildInfo = await GuildData.findById(channel.guild.id).exec();
@@ -107,6 +112,7 @@ async function spawnPokemon(channel) {
           channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
         }
         if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
+        nextSpawn(channel,minDelay+Math.floor(Math.random()*randomDelay));
     } catch (err) {console.error(err)}
     })
     .catch( async (collected) => {
@@ -123,27 +129,15 @@ async function spawnPokemon(channel) {
         time: (new Date()).getTime(), // unix time of escape/capture
         guild: channel.guild.id // server ID on discord where it appeared
       });
+      nextSpawn(channel,minDelay+Math.floor(Math.random()*randomDelay));
     });
   })
-  return {minDelay: minDelay, randomDelay: randomDelay};
-}
-
-async function spawnLoop(channel,nextDelay) {
-  await spawnPokemon(channel).then((r)=>{
-    const nextDelay2 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
-    const timeout = channel.client.setTimeout(spawnLoop,nextDelay,channel,nextDelay2);
-    channel.client.spawnloops.set("pokemon"+channel.id,timeout);
-    channel.client.spawnloops.array();
-  });
 }
 
 module.exports = {
   name: 'pokemon', // The name of the interval
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
-  execute: async function(channel,nextDelay) {
-    const miniDelay = Math.floor(Math.random()*channel.client.spawnloops.get("minDelay"));
-    const timeout = channel.client.setTimeout(spawnLoop,miniDelay,channel,nextDelay);
-    channel.client.spawnloops.set("pokemon"+channel.id,timeout);
-    channel.client.spawnloops.array();
+  execute: async function(channel,firstDelay) {
+    await nextSpawn(channel,firstDelay);
   }
 };

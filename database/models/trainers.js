@@ -86,7 +86,7 @@ TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
     id: PokemonDoc.id,
     name: PokemonDoc.name,
     nickname: PokemonDoc.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-'),
-    gender: PokemonDoc.randomGender(),
+    gender: PokemonDoc.randomGender(Math.random()),
     legend: PokemonDoc.legend,
     party: addToParty,
     shiny: (Math.random()+shinyNum)>1,

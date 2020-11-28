@@ -43,7 +43,7 @@ WildPokemonSchema.virtual('id').get(function() {
   return this._id;
 });
 
-WildPokemonSchema.statics.randomWild = async function (allowLegends) {
+WildPokemonSchema.statics.randomWild = async function (allowLegends, randomNum) {
   let acc = 0;
   const query = (typeof allowLegends !== 'undefined') ? (allowLegends ? {} : {legend: false}) : {};
   chances = await this.find(query).then((data) =>
@@ -56,13 +56,13 @@ WildPokemonSchema.statics.randomWild = async function (allowLegends) {
     })
   );
   const sum = chances.slice(-1)[0].chance;
-  const rand = Math.random() * sum;
+  const rand = randomNum >= 0 && randomNum < 1 ? randomNum * sum : Math.random() * sum;
   const id = chances.find(el => el.chance > rand).id;
   return await this.findById(id).exec();
 }
 
-WildPokemonSchema.statics.randomWilds = async function (number, allowLegends) {
-  let loops = !number || isNaN(number) ? 1 : number;
+WildPokemonSchema.statics.randomWilds = async function (randomNums, allowLegends) {
+  let loops = randomNums.length || 3;
   const query = (typeof allowLegends !== 'undefined' || allowLegends) ? {} : {legend: false};
   if (loops < 1) {loops = 1}
   else if (loops > 10) {loops = 10}
@@ -79,7 +79,7 @@ WildPokemonSchema.statics.randomWilds = async function (number, allowLegends) {
   const sum = chances.slice(-1)[0].chance;
   let array = [];
   for (var i = 0; i < loops; i++) {
-    const rand = Math.random() * sum;
+    const rand = randomNums[i] ? randomNum[i] * sum : Math.random() * sum;
     const id = chances.find(el => el.chance > rand).id;
     const newPoke = await this.findById(id).exec();
     array.push(newPoke);
@@ -87,7 +87,7 @@ WildPokemonSchema.statics.randomWilds = async function (number, allowLegends) {
   return array;
 }
 
-WildPokemonSchema.statics.randomEgg = async function () {
+WildPokemonSchema.statics.randomEgg = async function (randomNum) {
   let acc = 0;
   chances = await this.find({ egg: true }).then((data) =>
     data.map((el) => {
@@ -99,17 +99,17 @@ WildPokemonSchema.statics.randomEgg = async function () {
     })
   );
   const sum = chances.slice(-1)[0].chance;
-  const rand = Math.random() * sum;
+  const rand = randomNum ? randomNum * sum : Math.random() * sum;
   const id = chances.find(el => el.chance > rand).id;
   return this.findById( { id: id }).exec();
 }
 
-WildPokemonSchema.statics.randomDaily = async function (trainer) {
+WildPokemonSchema.statics.randomDaily = async function (trainer, randomNums) {
   const pokeCount = await this.countDocuments({});
   const allPokemon = trainer.unique >= pokeCount;
   if (pokeCount < trainer.unique) {console.log("ERROR: Check the commands. `pokeCount count < user's unique count`.")};
   if (allPokemon) {
-    const dailyPokemonArray = await this.randomWilds(5, legendary);
+    const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,5), legendary);
     const rare = dailyPokemonArray.filter(p=>p.legend);
     if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
   }
@@ -117,7 +117,7 @@ WildPokemonSchema.statics.randomDaily = async function (trainer) {
   const caughtLegends = trainer.legends;
   const legendary = caughtLegends.length > 0 ? legends.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
   const tierVal = legendary ? 2 : 1;
-  const dailyPokemonArray = await this.randomWilds(3, legendary);
+  const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,3), legendary);
   const newPokes = dailyPokemonArray.filter(p => !trainer.pokemon.includes(p.id));
   if (newPokes.length > 0) {return {dailyPokemon: newPokes[0], unique: true, tier: tierVal}}
   else {return {dailyPokemon: dailyPokemonArray[0], unique: true, tier: tierVal}}
@@ -142,9 +142,10 @@ WildPokemonSchema.statics.nameToID = async function (name) {
   }
 }
 
-WildPokemonSchema.method('randomGender', function() {
+WildPokemonSchema.method('randomGender', function(randomNum) {
+  const r2 = randomNum || Math.random();
   if (this.gender < 0) {return "genderless"}
-  else if (Math.random() < this.gender) {return "female"}
+  else if (r2 < this.gender) {return "female"}
   else {return "male"}
 });
 

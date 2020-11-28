@@ -24,7 +24,7 @@ module.exports = {
     const now = new Date();
     const nextReset = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
     if (dailyTimer < now.getTime()) {
-      const {dailyPokemon, unique, tier} = await Pokedex.randomDaily(trainer);
+      const {dailyPokemon, unique, tier} = await Pokedex.randomDaily(trainer, [...new Array(5)].map(r=>Math.random()));
       const shinychance = (tier+1)*message.client.pokeConfig.get("shinyOdds");
       const legendaryCatch = dailyPokemon.legend;
       const embed = new Discord.MessageEmbed()

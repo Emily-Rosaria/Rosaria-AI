@@ -26,7 +26,7 @@ module.exports = {
     }
     const options = {new: true};
     const query = {"_id": guildInfo._id, "pokeData._id": guildInfo.pokeData._id};
-    const wildPokemon = await Pokedex.randomWild(spawnLegend);
+    const wildPokemon = await Pokedex.randomWild(spawnLegend, Math.random());
     if (wildPokemon.legend) {
       guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legend": wildPokemon.id} },options).exec();
       const LegendSpawn = require('./legendspawn.js');

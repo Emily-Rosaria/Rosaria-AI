@@ -11,6 +11,7 @@ async function spawnPokemon(channel,nextDelay) {
   if (!guildInfo) {return channel.send("Could not find guild info. Please configure the bot.")}
   else if (!guildInfo.pokeData) {return channel.send("Could not find guild's pokemon spawning data. Please configure the bot.")}
   const minDelay = channel.client.pokeConfig.get("minDelay");
+  const randomDelay = channel.client.pokeConfig.get("randomDelay");
   const startTime = (new Date()).getTime();
   const toDuration = require('../misc_functions/toDuration.js');
   //if (guildInfo.pokeData.lastSpawn + minDelay > startTime) {return console.log("Attempted to run pokemon spawn at "+channel.name+" - "+channel.id+" but cancelled to prevent spawn spam. Last spawn was: "+toDuration(startTime-guildInfo.pokeData.lastSpawn)+" ago.")}
@@ -125,15 +126,13 @@ async function spawnPokemon(channel,nextDelay) {
     });
   })
   .catch( () => {console.log("Pokémon broke at "+channel.id+" - "+channel.guild.name+". Fix pls")});
-  const minDelay = client.pokeConfig.get("minDelay");
-  const randomDelay = client.pokeConfig.get("randomDelay");
   const nextDelay2 = minDelay + Math.floor(Math.random()*randomDelay);
   const nextBoot = (spawnPokemon,channel,nextDelay) => {
     spawnPokemon(channel,nextDelay);
   }
-  const timeout = client.setTimeout(nextBoot,nextDelay,spawnPokemon,channel,nextDelay2);
-  client.spawnloops.set("pokemon"+channel.id,timeout);
-  client.spawnloops.array();
+  const timeout = channel.client.setTimeout(nextBoot,nextDelay,spawnPokemon,channel,nextDelay2);
+  channel.client.spawnloops.set("pokemon"+channel.id,timeout);
+  channel.client.spawnloops.array();
 }
 
 module.exports = {

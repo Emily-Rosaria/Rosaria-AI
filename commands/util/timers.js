@@ -13,7 +13,7 @@ module.exports = {
     const timers = await Trainers.findById(user.id).exec().then(d=>d.timers).catch((err)=>{
       return message.reply("There are no stored timers for "+user.username+'#'+user.discriminator+".");
     })
-    const now = new Time.now().getTime();
+    const now = (new Date()).getTime();
     const toDuration = require('./../../misc_functions/toDuration.js');
     timerArray = timers.entries().map(e => {
       const timeDiff = e[1] - now;

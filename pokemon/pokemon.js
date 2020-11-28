@@ -2,36 +2,41 @@ const Canvas = require('canvas'); // Drawings
 const Discord = require('discord.js'); // Image embed
 const Trainers = require('./../database/models/trainers.js');
 const Pokedex = require('./../database/models/pokedex.js');
-const Legends = require('./../database/models/legends.js');
+const GuildData = require('./../database/models/guilds.js');
 const PokeSpawns = require('./../database/models/spawnedpokemon.js');
 
 module.exports = {
   name: 'pokemon', // The name of the interval
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
   async execute(channel) {
-    const legend = Legends.findOne({guildid: channel.guild.id}).exec();
+    var guildInfo = await GuildData.findById(channel.guild.id).exec();
+    if (!guildInfo) {return channel.send("Could not find guild info. Please configure the bot.")}
+    if (!guildInfo.pokeData) {return channel.send("Could not find guild's pokemon spawning data. Please configure the bot.")}
+    const minDelay = channel.client.pokeConfig.get("minDelay");
+    const startTime = (new Date()).getTime();
+    const toDuration = require('../misc_functions/toDuration.js');
+    if (guildInfo.pokeData.lastSpawn + minDelay > startTime) {return console.log("Attempted to run pokemon spawn at "+channel.name+" - "+channel.id+" but cancelled to prevent spawn spam. Last spawn was: "+toDuration(startTime-guildInfo.pokeData.lastSpawn)+" ago.")}
     let spawnLegend = true;
-    if (legend && Math.random()+0.2>1) {
+    if (guildInfo.pokeData.legend != 0 && Math.random() > 0.8) {
       const LegendSpawn = require('./legendspawn.js');
-      return LegendSpawn(legend, channel);
-    } else {
+      const wildPokemon = await Pokedex.findById(pokeData.legend);
+      return LegendSpawn(wildPokemon, channel);
+    } else if (guildInfo.pokeData.legend != 0) {
       spawnLegend = false;
     }
+    const options = {new: true};
+    const query = {"_id": guildInfo._id, "pokeData._id": guildInfo.pokeData._id};
     wildPokemon = await Pokedex.randomWild(spawnLegend);
     if (wildPokemon.legend) {
+      guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legend": wildPokemon.id} },options).exec();
       const LegendSpawn = require('./legendspawn.js');
-      legend = await Legends.create({
-        id: wildPokemon.id,
-        guildid: channel.guild.id,
-        appearances: [new Date().getTime()]
-      });
-      return LegendSpawn(legend, channel);
+      return LegendSpawn(wildPokemon, channel);
     }
-    const toDuration = require('../misc_functions/toDuration.js');
+    guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime}},options).exec();
     const imgPath = channel.client.pokeConfig.get("imgPath");
-    var pokemonName = name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
+    var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
     console.log(pokemonName+" just spawned on "+channel.guild.name+".");
-    const pokemonURL = imgPath+pokemon.img;
+    const pokemonURL = imgPath+wildPokemon.img;
     const lingerTime = channel.client.pokeConfig.get("lingerTime");
     const cooldown = channel.client.pokeConfig.get("cooldown");
     const shinyOdds = channel.client.pokeConfig.get("shinyOdds");
@@ -63,36 +68,38 @@ module.exports = {
     .then( () => {
       const filter = async (m) => {
         if (!(m.content.toLowerCase().replace(/ /gi, '-').replace(/\./gi, '').startsWith(pokemonName.toLowerCase()))) { return false; }
-        const now = new Date().getTime();
+        const now = (new Date()).getTime();
         const trainer = await Trainers.findById(m.author.id).exec();
-        if (!trainer) {
+        if (!trainer || !trainer.pokemon) {
           m.reply("Please register as a Pokémon Trainer before venturing into the tall grass. You can do so by using the `r!starter` or `r!register` commands.");
           return false;
         }
         const cooldowns = trainer.cooldowns;
+        if (!cooldowns) {return true}
         if (!cooldowns.get("pokecatch")) {return true}
         const timeDiff = cooldowns.get("pokecatch") - now;
         if (timeDiff < 0) { return true; }
-        const timePhrase = toDuration(timeDiff);
-        m.reply('Don\'t wear yourself out. You can only catch one Pokémon per '+cooldown.toString()+' minutes! You\'ve got about `' + timePhrase + '` left until you can catch again.');
+        m.reply('Don\'t wear yourself out. You can only catch one Pokémon per '+toDuration(cooldown)+'! You\'ve got about `' + toDuration(timeDiff) + '` left until you can catch again.');
         return false;
       }
       channel.awaitMessages(filter, { max: 1, time: lingerTime, errors: ['time'] })
       .then( async (collected) => {
+        try {
         const winner = collected.first().author;
         let wtrainer = await Trainers.findById(winner.id).exec();
         const {trainerPokemon} = wtrainer.addPokemon(wildPokemon, shinyOdds);
-        wtrainer.cooldowns.set("pokecatch", new Date().getTime() + cooldown);
+        const caughtAt = trainerPokemon.captureDate;
+        wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt} }, {new: true}).exec();
         const shiny = trainerPokemon.shiny;
         embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
-        wtrainer = await wtrainer.save();
+        channel.send({files: [attachment2], embed: embed2});
         await PokeSpawns.create({
           id: wildPokemon.id,
           name: wildPokemon.name,
-          escaped: true, // whether or not it was caught
+          escaped: false, // whether or not it escaped
           legend: wildPokemon.legend, // whether or not the pokemon was legendary
           source: "wild",
-          time: new Date().getTime(), // unix time of escape/capture
+          time: caughtAt, // unix time of escape/capture
           guild: channel.guild.id, // server ID on discord where it appeared
           catcherID: winner.id, // discord id of user who caught pokemon
           shiny: shiny
@@ -101,6 +108,7 @@ module.exports = {
           channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
         }
         if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
+      } catch (err) {console.error(err)}
       })
       .catch( async (collected) => {
         embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
@@ -109,10 +117,11 @@ module.exports = {
         await PokeSpawns.create({
           id: wildPokemon.id,
           name: wildPokemon.name,
-          escaped: true, // whether or not it was caught
+          escaped: true, // whether or not it escaped
           legend: wildPokemon.legend, // whether or not the pokemon was legendary
           source: "wild",
-          time: new Date().getTime(), // unix time of escape/capture
+          catcherID: winner.id,
+          time: (new Date()).getTime(), // unix time of escape/capture
           guild: channel.guild.id // server ID on discord where it appeared
         });
       });

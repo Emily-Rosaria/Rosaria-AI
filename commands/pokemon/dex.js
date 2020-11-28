@@ -41,13 +41,14 @@ module.exports = {
       }
     }
     var trainer = await Trainers.findById(user.id).exec();
-    var desc = 'Looks like this is empty... keep on training!';
+    var desc = 'Looks like this is empty... keep on training! You can get started with `r!starter`.';
     var total = 0;
     var shinies = 0;
     var unique = 0;
     var dexFormat = {};
     var textArray = [];
-    if (trainer) {
+    console.log(trainer);
+    if (trainer && trainer.pokemon && trainer.pokemon.length > 0) {
       const pokes = trainer.pokemon.sort((p1,p2)=>p1.id-p2.id);
       pokes.forEach((p) => {
         if (!dexFormat[p.id+"_"+p.name]) {
@@ -62,7 +63,7 @@ module.exports = {
         total += 1;
         dexFormat[p.id+"_"+p.name].count += 1;
       });
-      textArray = dexFormat.entries.map(p=>{
+      textArray = Object.entries(dexFormat).map(p=>{
         let shiny = p[1].shiny ? '✨' : '';
         let nameID = p[0].split('_')
         nameID[1] = nameID[1].split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');

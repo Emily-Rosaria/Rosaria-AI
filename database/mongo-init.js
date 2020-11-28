@@ -11,7 +11,7 @@ connectDB("mongodb://localhost:27017/"+database);
 const oldguilddata = require("./olddata.json");
 
 const Guilds = require("./models/guilds.js");
-const options = {new: true, upsert: true, setDefaultsOnInsert: true}
+const options = {new: true, upsert: true, setDefaultsOnInsert: true, overwrite: true};
 const x = async () => {
   for (const guildData of oldguilddata) {
     const query = {id: guildData.id};

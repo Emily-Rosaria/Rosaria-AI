@@ -6,27 +6,27 @@ module.exports = async function (client) {
     client.spawnloops = new Discord.Collection(); // Creates list for running pokemon spawners
     const pokemonspawner = require('./pokemon.js'); // collects the intervals
     let channelData = await GuildData.find({}).exec();
-    channelData = channelData.filter(el => el.pokemonspawns).map((el) => {
+    channelData = channelData.filter(el => el.pokeData.spawnChannel != "").map((el) => {
         let temp = {};
-        temp.channel = el.pokemonspawns;
-        temp.last = el.lastspawn || 1;
+        temp.channel = el.pokeData.spawnChannel;
+        temp.last = el.pokeData.lastSpawn;
         return temp;
     });
     const minDelay = client.pokeConfig.get("minDelay");
     const randomDelay = client.pokeConfig.get("randomDelay");
-    console.log([minDelay,randomDelay])
     for (const c of channelData) {
         const ic = client.channels.cache.get(c.channel);
         if (ic) {
-          console.log('Setting up '+pokemonspawner.name+c.channel+' at '+ic.guild.name+'.');
+            console.log('Setting up '+pokemonspawner.name+c.channel+' at '+ic.guild.name+'.');
             let loop = (pokemonspawner,ic) => {
-                if (c.last && ((minDelay+c.last) < new Date().getTime())) {pokemonspawner.execute(ic)}
+                pokemonspawner.execute(ic);
                 const nextDelay = minDelay + Math.floor(Math.random()*randomDelay);
                 const timeout = client.setTimeout(loop,nextDelay,pokemonspawner,ic,c,minDelay,randomDelay);
-                client.spawnloops.set(pokemonspawner.name+c.channel,timeout);
+                client.spawnloops.set(pokemonspawner.name+ic.id,timeout);
             };
+            loop(pokemonspawner,ic);
         } else {
-          console.log("Could not reach channel: "+c.channel+".");
+            console.log("Could not reach channel: "+c.channel+".");
         }
     };
 }

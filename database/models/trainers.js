@@ -8,7 +8,7 @@ var TrainerPokemonSchema = new Schema({
     gender: {type: String, enum: ["male","female","genderless"]}, // male/female
     nickname: {type: String, default: this.name}, //User-set name. Defaults to the pokemon's species name
     friendship: {type: Number, default: 50},
-    captureDate: {type: Number, default: new Date().getTime()}, // unix time of capture
+    captureDate: {type: Number, default: (new Date()).getTime()}, // unix time of capture
     legend: {type: Boolean, default: false},
     shiny: {type: Boolean, default: false},
     party: {type: Boolean, default: false}
@@ -16,7 +16,7 @@ var TrainerPokemonSchema = new Schema({
 
 var EggsSchema = new Schema({
     id: {type: Number, required: true}, //pokedex Number of the pokemon it will be
-    dateObtained: {type: Number, default: new Date().getTime()}, // unix time of capture
+    dateObtained: {type: Number, default: (new Date()).getTime()}, // unix time of capture
     inclubating: {type: Boolean, default: false}, // if the egg is being incubated
     startedIncubating: {type: Number, default: -1} // when incubation began, unix time, -1 if never started
 });
@@ -33,7 +33,7 @@ var TrainersSchema = new Schema({ // Create Schema
     },
     nickname: {type: String, default: ""},  // User set trainer-based alias.
     tagline: {type: String, default: ""}, // Trainer quote.
-    registrationDate: {type: Number, default: new Date().getTime()}, // unix time of signup/first catch
+    registrationDate: {type: Number, default: (new Date()).getTime()}, // unix time of signup/first catch
     pokemon: {type: [TrainerPokemonSchema], default: []}, //array of all their pokemon
     eggs: {type: [EggsSchema], default: []}
 });
@@ -71,7 +71,7 @@ TrainersSchema.virtual('unique').get(function() {
 });
 
 TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
-  const shinyNum = shinyOdds || 0.0005;
+  const shinyNum = shinyOdds === 0 ? 0 : shinyOdds || 0.0005;
   const addToParty = this.party.length<6;
   let newPoke = {
     id: PokemonDoc.id,
@@ -81,7 +81,7 @@ TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
     legend: PokemonDoc.legend,
     party: addToParty,
     shiny: (Math.random()+shinyNum)>1,
-    captureDate: new Date().getTime()
+    captureDate: (new Date()).getTime()
   };
   const newCount = this.pokemon.push(newPoke);
   return {trainerPokemon: newPoke, newCount: newCount};

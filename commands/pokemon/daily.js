@@ -17,13 +17,13 @@ module.exports = {
   async execute(message, args) {
     user = message.author;
     trainer = await Trainers.findById(user.id).exec();
-    if (!trainer) {
+    if (!trainer || !trainer.pokemon || trainer.pokemon.length == 0) {
       return message.reply("Please register as a Pokémon Trainer before using this command. You can do so by using `r!starter` or `r!register`.");
     }
-    const dailyTimer = trainer.cooldowns.get("daily") ? trainer.cooldowns.get("daily") : 1;
+    const dailyTimer = trainer.cooldowns ? (trainer.cooldowns.get("daily") || 1) : 1;
     const now = new Date();
     const nextReset = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
-    if (dailyTimer > now.getTime()) {
+    if (dailyTimer < now.getTime()) {
       const {dailyPokemon, unique, tier} = await Pokedex.randomDaily(trainer);
       const shinychance = (tier+1)*message.client.pokeConfig.get("shinyOdds");
       const legendaryCatch = dailyPokemon.legend;
@@ -55,7 +55,8 @@ module.exports = {
         }, 7500, message,legendaryCatch);
         setTimeout(async (message, msg, dailyPokemon) => {
           const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
-          trainer.cooldowns.set("daily", nextReset.getTime());
+          let newCooldown = new Map();
+          newCooldown = newCooldown.set("daily",nextReset.getTime());
           const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Daily Pokémon: #'+trainerPokemon.id+' '+trainerPokemon.name+'!')
@@ -67,15 +68,15 @@ module.exports = {
           await msg.edit(embed);
           shinyText = trainerPokemon.shiny ? '\n... wait a second! Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`' : '';
           await message.reply('Your Pokémon has arrived! We hope '+trainerPokemon.name+' has a good time in your care.'+shinyText);
-          trainer = await trainer.save();
+          trainer = Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.daily": newCooldown} }, {new: true}).exec();
           await PokeSpawns.create({
             id: trainerPokemon.id,
             name: trainerPokemon.name,
-            escaped: false, // whether or not it was caught
+            escaped: false, // whether or not it escaped
             legend: trainerPokemon.legend, // whether or not the pokemon was legendary
             shiny: trainerPokemon.shiny,
             source: "daily",
-            time: new Date().getTime(), // unix time of escape/capture
+            time: (new Date()).getTime(), // unix time of escape/capture
             guild: message.guild.id, // server ID on discord where it appeared
             catcherID: message.author.id // discord id of user who caught pokemon
           });

@@ -1,5 +1,5 @@
 require('dotenv').config(); //for .env file
-
+/*
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -7,7 +7,7 @@ const port = 3000;
 app.get('/', (req, res) => res.send('Hello World!'));
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
-
+*/
 // Bot stuff below
 
 const Reddit = require('reddit'); // Reddit
@@ -65,6 +65,7 @@ const cooldowns = new Discord.Collection(); // Creates an empty list for storing
 
 // Starts the bot and makes it begin listening for commands.
 client.on('ready', async function() {
+    client.bootTime = (new Date()).getTime();
     client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
     console.log(`${client.user.username} is up and running!`);
     await spawnPokemon(client);

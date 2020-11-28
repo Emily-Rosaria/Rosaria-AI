@@ -9,14 +9,14 @@ module.exports = function ( ms ) {
       [Math.floor((seconds % 31536000) / 86400), 'day'],
       [Math.floor(((seconds % 31536000) % 86400) / 3600), 'hour'],
       [Math.floor((((seconds % 31536000) % 86400) % 3600) / 60), 'minute'],
-      [(((seconds % 31536000) % 86400) % 3600) % 60, 'second'],
+      [Math.floor(((seconds % 31536000) % 86400) % 3600) % 60, 'second'],
   ];
-  let timeString = timeArray.filter(t=>!t[0]!=1).map((t,i,a)=> {
-    let temp = ''+t[0]+' ';
-    if (i = a.length - 1 && a.length > 1) {temp = 'and '+temp}
-    if (t[0]==0) {temp = temp+t[1]+'s'}
-    else {temp = temp+t[1]}
-  }).join(', ');
-
-  return timeString.trim();
+  timeArray = timeArray.filter(t=>t[0]!=0).map((t,i,a)=> {
+    let temp = t[0].toString()+' '+t[1];
+    if (i == a.length - 1 && a.length > 1) {temp = 'and '+temp}
+    if (t[0]!=1) {temp = temp+'s'}
+    return temp;
+  });
+  if (timeArray.length == 2) {return timeArray.join(' ').trim()}
+  else {return timeArray.join(', ').trim()}
 }

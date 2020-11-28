@@ -5,6 +5,7 @@ module.exports = {
     aliases: ['refresh','reload'],
     description: 'Reloads all the commands and procedures!', // The description of the command (for help text)
     perms: 'dev', //restricts to bot dev only (me)
+    allowDM: true,
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     execute(message, args) {
       var client = message.client;
@@ -52,9 +53,11 @@ module.exports = {
 
       console.log('Misc functions updated and cleaned! Now starting function loops (namely pokemon spawns).');
 
-      // Time to reset the pokemon command!
-      delete require.cache[require.resolve('./../../pokemon/pokemon.js')];
-      delete require.cache[require.resolve('./../../pokemon/loadspawners.js')];
+      // Time to reset the pokemon stuff!
+      const pokeFunctions = fs.readdirSync('./pokemon/',{ withFileTypes: true }).filter((f)=>f.name.endsWith('.js'));
+      pokeFunctions.forEach((pokeF) => {
+        delete require.cache[require.resolve('./../../pokemon/'+pokeF.name)];
+      });
       const spawns = Object.keys(client.spawnloops);
       for (const spawn of spawns) {
         client.clearTimeout(client.spawnloops[spawn]);

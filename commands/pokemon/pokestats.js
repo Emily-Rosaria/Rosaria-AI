@@ -1,5 +1,6 @@
 const Discord = require('discord.js'); // Image embed
 const PokeSpawns = require('./../../database/models/spawnedpokemon.js');
+const Pokedex = require('./../../database/models/pokedex.js');
 
 module.exports = {
   name: 'pokestats', // The name of the command
@@ -8,16 +9,16 @@ module.exports = {
   allowDM: true,
   cooldown: 10,
   aliases: ['catchstats'],
-  usage: '[page-number]', // Help text to explain how to use the command (if it had any arguments)
+  usage: '[page-number] [source (e.g. "starter", "event", "daily", "wild", "egg") - defaults to "all"]', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, args) {
     const bot = message.client.user;
     var pageNum = !isNaN(args[0]) ? Number(args[0]) : 1;
 
     const pokedexSize = await Pokedex.countDocuments({});
 
-    const pokeData = await PokeSpawns.find({source: "wild"}).exec();
+    const pokeData = await PokeSpawns.find({}).exec();
 
-    var desc = 'Looks like this is empty... keep on training!';
+    var desc = 'Looks like this is empty... Keep on exploring and you\'ll be sure to fill this in no time!';
     var total = 0;
     var caught = 0;
     var shinies = 0;
@@ -41,10 +42,10 @@ module.exports = {
         if (p.legend) {legends += 1}
         total += 1;
       });
-      textArray = dexFormat.entries.map(p=>{
-        if (top[0] < p[1].caught) {top = [p[1].caught].concat(p[0].split('_'))}
-        let nameID = nameID.split('_');
+      textArray = Object.entries(dexFormat).map(p=>{
+        let nameID = p[0].split('_');
         nameID[1] = nameID[1].split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
+        if (top[0] < p[1].caught) {top = [p[1].caught].concat(nameID)}
         const stats = '('+ p[1].caught+', '+((p[1].caught/(p[1].caught+p[1].escaped)) * 100).toFixed(1) + '%'+')';
         return nameID[0]+'. '+ nameID[1] + stats;
       });
@@ -66,22 +67,16 @@ module.exports = {
       };
     };
 
-    const totalPers = ((caught/(total)) * 100).toFixed(1) + '%';
+    const totalPers = ((caught/total) * 100).toFixed(1) + '%';
+    const dexPers = ((caught/pokedexSize) * 100).toFixed(1) + '%';
 
     if (unique) {
-      if (unique == pokedexSize) {
-        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This Pokédex is 100% complete!";
-      } else if (unique == pokedexSize-1) {
-        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This Pokédex is only one Pokémon away from being completed!";
-      } else if (unique > pokedexSize-25) {
-        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is "+(100*unique/pokedexSize).toFixed(1)+"% complete. Only "+(pokedexSize-unique).toString()+" more Pokémon remain!";
-      } else if (unique > 50) {
-        desc = "Showing "+shownValues.toString()+" of <@"+user.id+">\'s "+unique.toString()+" unique Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is ~"+ (100*unique/pokedexSize).toFixed(1).toString() +"% complete.";
-      } else {
-        desc = "Showing "+unique.toString()+" of all theoretical "+pokedexSize.toString()+" Pokédex entries. This bot supports Pokémon up to Gen 4, meaning this Pokédex is ~"+ (100*unique/pokedexSize).toFixed(1).toString() +"% complete.";
+      desc = 'So far, a total of '+(total).toString()+' Pokémon have spawned, of which '+caught.toString() +' were caught.';
+      if (unique<pokedexSize) {
+        desc = desc + ' There are at least '+(pokedexSize-unique).toString()+' Pokémon that have yet to be discovered, so stay tuned and keep training!';
       }
     }
-    var title = user.username + '\'s ' + 'Pokédex';
+    var title = 'Pokémon Stats';
     if (pages != 1) {title = title + " - Page ["+pageNum+"] of ["+pages+"]"}
     var col1 = textArray.slice((pageNum-1)*50,((pageNum-1)*50)+colSize[0]).join('\n');
     var col2 = textArray.slice(((pageNum-1)*50)+colSize[0],((pageNum-1)*50)+colSize[0]+colSize[1]).join('\n');
@@ -90,11 +85,11 @@ module.exports = {
     const dexEmbed = new Discord.MessageEmbed()
       .setColor('#3b4cca')
       .setTitle(title)
-      .setAuthor(user.username, user.displayAvatarURL())
+      .setAuthor(bot.username, bot.displayAvatarURL())
       .setDescription(desc)
       .setThumbnail('https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
-      .addField('Pokémon Catch Rate',totalPers+' of '+total,true)
-      .addField('Global Pokédex Completion',''+unique+' of '+pokedexSize,true)
+      .addField('Pokémon Catch Rate',caught+' of '+total+', '+totalPers+'.',true)
+      .addField('Global Pokédex Completion',''+unique+' of '+pokedexSize+', '+dexPers+'.',true)
       .addField('Top Pokémon',top[2]+': x'+top[0],true)
       .addField('Column 1',col1,true)
       .addField('Column 2',col2,true)

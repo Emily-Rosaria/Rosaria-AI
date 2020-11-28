@@ -6,6 +6,7 @@ module.exports = {
   perms: 'dev', //restricts to bot dev only (me)
   usage: '', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, args) {
-    message.reply("This command is WIP.");
+      const pokemonspawner = require('./../../pokemon.js');
+      pokemonspawner(message.channel);
   },
 };

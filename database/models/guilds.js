@@ -12,6 +12,13 @@ var PermissionsSchema = new Schema({ // Create Schema
     botcommander: {type: [String], default: []} // IDs of role(s) that grant perms for advanced server management stuff (some ability is auto-given by server management or admin roles)
 });
 
+var PokeDataSchema = new Schema({
+    spawnChannel: {type: String, default: ""}, // discord spawn channel ID
+    lastSpawn: {type: Number, default: 0}, // unix time of last spawn
+    legend: {type: Number, default: 0}, // 0 = no legend, otherwise it's the pokedex ID of the legend currently spawning in a server.
+    legendSpawns: {type: [Number], default: []} // log of times when the current lurking legendary spawned
+});
+
 const defaultPerms = {
   allowAll: true,
   basic: [],
@@ -23,9 +30,8 @@ const defaultPerms = {
 var GuildSchema = new Schema({
     _id: {type: String, required: true}, //discord server ID
     prefix: {type: [String], default: ["r!"]}, // command prefix - array of accepted prefixes
-    perms: {type: PermissionsSchema, required: true},
-    pokemonspawns: {type: String, default: ""}, // channel to use for pokemon spawns
-    lastspawn: {type: Number, default: 1}, // unix time
+    perms: {type: PermissionsSchema, default: {allowAll: true}, required: true}, // gulid perm settings
+    pokeData: {type: PokeDataSchema, default: {spawnChannel: "", lastSpawn: 0}}, // info on guild's pokemon shizwiz
     rpgzones: {type: [String], default: []} // channels where xp can be gained from rpg stuff (if enabled)
 });
 

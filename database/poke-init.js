@@ -13,9 +13,12 @@ connectDB("mongodb://localhost:27017/"+database);
 
 const Pokemon = require("./models/pokedex.js");
 
+const Trainers = require("./models/trainers.js");
+
+Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
 Pokemon.db.dropDatabase(function(err, result) {console.log("Resetting wild pokemon database...")});
 
-const PokedexData = require("./Pokedex.json");
+const PokedexData = require("./../bot_assets/Pokedex.json");
 
 const starters = [1,2,3,4,5,6,7,8,9,152,153,154,155,156,157,158,159,160,252,253,254,255,256,257,258,259,260,387,388,389,390,391,392,393,394,395];
 

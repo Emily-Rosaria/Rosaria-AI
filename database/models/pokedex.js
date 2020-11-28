@@ -144,7 +144,7 @@ WildPokemonSchema.statics.nameToID = async function (name) {
 
 WildPokemonSchema.method('randomGender', function() {
   if (this.gender < 0) {return "genderless"}
-  else if (Matt.random() < this.gender) {return "female"}
+  else if (Math.random() < this.gender) {return "female"}
   else {return "male"}
 });
 

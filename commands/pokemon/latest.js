@@ -47,7 +47,7 @@ module.exports = {
       const nameString = (poke.name == poke.nickname) ? (shinyTest + poke.name) : `${shinyTest}${poke.name} (AKA: ${shinyTest}${poke.nickname})`
       const embed = new Discord.MessageEmbed()
         .setColor('#ff5959')
-        .setTitle(nameString)
+        .setTitle(nick+"'s "+nameString)
         .setDescription(desc)
         .setImage(poke.img)
         .setTimestamp(poke.date)

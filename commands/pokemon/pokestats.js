@@ -46,7 +46,7 @@ module.exports = {
         let nameID = p[0].split('_');
         nameID[1] = nameID[1].split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
         if (top[0] < p[1].caught) {top = [p[1].caught].concat(nameID)}
-        const stats = '('+ p[1].caught+', '+((p[1].caught/(p[1].caught+p[1].escaped)) * 100).toFixed(1) + '%'+')';
+        const stats = ' ('+ p[1].caught+' of '+(p[1].caught+p[1].escaped)+')';
         return nameID[0]+'. '+ nameID[1] + stats;
       });
     }

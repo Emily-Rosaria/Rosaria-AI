@@ -15,7 +15,7 @@ module.exports = {
     const minDelay = channel.client.pokeConfig.get("minDelay");
     const startTime = (new Date()).getTime();
     const toDuration = require('../misc_functions/toDuration.js');
-    if (guildInfo.pokeData.lastSpawn + minDelay > startTime) {return console.log("Attempted to run pokemon spawn at "+channel.name+" - "+channel.id+" but cancelled to prevent spawn spam. Last spawn was: "+toDuration(startTime-guildInfo.pokeData.lastSpawn)+" ago.")}
+    //if (guildInfo.pokeData.lastSpawn + minDelay > startTime) {return console.log("Attempted to run pokemon spawn at "+channel.name+" - "+channel.id+" but cancelled to prevent spawn spam. Last spawn was: "+toDuration(startTime-guildInfo.pokeData.lastSpawn)+" ago.")}
     let spawnLegend = true;
     if (guildInfo.pokeData.legend != 0 && Math.random() > 0.8) {
       const LegendSpawn = require('./legendspawn.js');
@@ -26,7 +26,7 @@ module.exports = {
     }
     const options = {new: true};
     const query = {"_id": guildInfo._id, "pokeData._id": guildInfo.pokeData._id};
-    wildPokemon = await Pokedex.randomWild(spawnLegend);
+    const wildPokemon = await Pokedex.randomWild(spawnLegend);
     if (wildPokemon.legend) {
       guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legend": wildPokemon.id} },options).exec();
       const LegendSpawn = require('./legendspawn.js');
@@ -113,7 +113,7 @@ module.exports = {
       .catch( async (collected) => {
         embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [attachment2], embed: embed2});
-        console.log(pokemonName+" fled from " +channel.guild.name+ " before it could be caught...");
+        console.log(wildPokemon.name+" fled from " +channel.guild.name+ " before it could be caught...");
         const spawnData = await PokeSpawns.create({
           id: wildPokemon.id,
           name: wildPokemon.name,

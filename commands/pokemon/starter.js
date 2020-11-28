@@ -55,7 +55,7 @@ module.exports = {
           legend: choice.legend, // whether or not the pokemon was legendary
           shiny: trainerPokemon.shiny,
           source: "starter",
-          time: (new Date()).getTime(), // unix time of escape/capture
+          time: trainerPokemon.captureDate, // unix time of escape/capture
           guild: message.guild.id, // server ID on discord where it appeared
           catcherID: message.author.id // discord id of user who caught pokemon
         });

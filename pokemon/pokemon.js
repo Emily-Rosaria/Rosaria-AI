@@ -90,7 +90,7 @@ async function spawnPokemon(channel,nextDelay) {
         const caughtAt = trainerPokemon.captureDate;
         wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
         const shiny = trainerPokemon.shiny;
-        embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '!').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
+        embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [attachment2], embed: embed2});
         await PokeSpawns.create({
           id: wildPokemon.id,
@@ -125,18 +125,22 @@ async function spawnPokemon(channel,nextDelay) {
       });
     });
   })
-  .catch( () => {console.log("Pokémon broke at "+channel.id+" - "+channel.guild.name+". Fix pls")});
-  const nextDelay2 = minDelay + Math.floor(Math.random()*randomDelay);
-  const nextBoot = (spawnPokemon,channel,nextDelay) => {
-    spawnPokemon(channel,nextDelay);
-  }
-  const timeout = channel.client.setTimeout(nextBoot,nextDelay,spawnPokemon,channel,nextDelay2);
-  channel.client.spawnloops.set("pokemon"+channel.id,timeout);
-  channel.client.spawnloops.array();
+  return {minDelay: minDelay, randomDelay: randomDelay};
 }
 
 module.exports = {
   name: 'pokemon', // The name of the interval
   description: 'Who\'s that Pokémon?', // The description of the interval (for help text)
-  execute: spawnPokemon
+  execute: async function (channel,nextDelay) {
+    await spawnPokemon(channel,nextDelay).then((r)=>{
+      const nextDelay2 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
+      const nextDelay3 = r.minDelay + Math.floor(Math.random()*r.randomDelay);
+      const nextBoot = (spawnPokemon,channel,nextDelay3) => {
+        spawnPokemon(channel,nextDelay3);
+      }
+      const timeout = channel.client.setTimeout(nextBoot,nextDelay2,spawnPokemon,channel,nextDelay3);
+      channel.client.spawnloops.set("pokemon"+channel.id,timeout);
+      channel.client.spawnloops.array();
+    });
+  },
 };

@@ -79,7 +79,7 @@ WildPokemonSchema.statics.randomWilds = async function (randomNums, allowLegends
   const sum = chances.slice(-1)[0].chance;
   let array = [];
   for (var i = 0; i < loops; i++) {
-    const rand = randomNums[i] ? randomNum[i] * sum : Math.random() * sum;
+    const rand = randomNums[i] ? randomNums[i] * sum : Math.random() * sum;
     const id = chances.find(el => el.chance > rand).id;
     const newPoke = await this.findById(id).exec();
     array.push(newPoke);

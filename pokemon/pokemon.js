@@ -114,10 +114,11 @@ module.exports = {
         embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [attachment2], embed: embed2});
         console.log(pokemonName+" fled from " +channel.guild.name+ " before it could be caught...");
-        await PokeSpawns.create({
+        const spawnData = await PokeSpawns.create({
           id: wildPokemon.id,
           name: wildPokemon.name,
           escaped: true, // whether or not it escaped
+          shiny: false,
           legend: wildPokemon.legend, // whether or not the pokemon was legendary
           source: "wild",
           time: (new Date()).getTime(), // unix time of escape/capture

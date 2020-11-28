@@ -7,11 +7,11 @@ var PokemonSpawnSchema = new Schema({
   name: {type: String, required: true}, // pokemon name
   escaped: {type: Boolean, required: true}, // whether or not it was caught
   legend: {type: Boolean, required: true}, // whether or not the pokemon was legendary
-  shiny: {type: Boolean, required: !this.escaped, default: false},
+  shiny: {type: Boolean, default: false},
   source: {type: String, required: true, enum: ["wild","daily","egg","starter","event"], default: "wild"},
   time: {type: Number, default: (new Date()).getTime(), required: true}, // unix time of escape/capture
   guild: {type: String, required: true}, // server ID on discord where it appeared
-  catcherID: {type: String, required: !this.escaped} // discord id of user who caught pokemon
+  catcherID: {type: String, default: ""} // discord id of user who caught pokemon
 });
 
 // Model

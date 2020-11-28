@@ -19,9 +19,12 @@ module.exports = async function (client) {
         if (ic) {
             console.log('Setting up '+pokemonspawner.name+c.channel+' at '+ic.guild.name+'.');
             let loop = (pokemonspawner,ic) => {
-                pokemonspawner.execute(ic);
+                const doubleLoop = (pokemonspawner,ic) => {
+                  await pokemonspawner.execute(ic);
+                  loop(pokemonspawner,ic);
+                }
                 const nextDelay = minDelay + Math.floor(Math.random()*randomDelay);
-                const timeout = client.setTimeout(loop,nextDelay,pokemonspawner,ic,client,c,minDelay,randomDelay);
+                const timeout = client.setTimeout(doubleLoop,nextDelay,pokemonspawner,ic,client,minDelay,randomDelay);
                 client.spawnloops.set(pokemonspawner.name+ic.id,timeout);
                 client.spawnloops.array();
             };

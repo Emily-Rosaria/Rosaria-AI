@@ -11,6 +11,7 @@ module.exports = {
     allowDM: true,
     execute(message, args) {
       keys = Array.from(message.client.spawnloops.keys());
-      message.channel.send('Current running intervals include...\n'+keys.join(', ')+'.');
+      if (keys && keys.length > 0) {message.reply('Current running intervals include...\n`'+keys.join(', ')+'``.')}
+      else {message.reply('There are currently no running processes.')}
     },
 };

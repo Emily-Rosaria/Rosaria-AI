@@ -26,16 +26,25 @@ var TrainersSchema = new Schema({ // Create Schema
     counters: {
       type: Map,
       of: Number
-    }, // E.g. {pokeballs: 5}, {tokens: 2}, etc.
+    }, // E.g. {pokeballs: 5}, etc.
     cooldowns: {  // this is a map, so use .get() and .set()
       type: Map,  // Example: {pokecatch: Number}, {daily: Number}
       of: Number // numbers are Unix time and correspond to when the cooldown will expire
     },
+    currency: {
+      type: Map,  // currency "name", like tokens, coins, etc.
+      of: Number // amount of currency
+    },
+    documents: {
+      type: Map,  // documents "names" - like a character name or copypasta name.
+      of: String // document "keys (for use with a document model)"
+    },
+    exp: {type: Number, default: 0},
     nickname: {type: String, default: ""},  // User set trainer-based alias.
-    tagline: {type: String, default: ""}, // Trainer quote.
+    tagline: {type: String, default: ""}, // Trainer/user quote.
     registrationDate: {type: Number, default: (new Date()).getTime()}, // unix time of signup/first catch
     pokemon: {type: [TrainerPokemonSchema], default: []}, //array of all their pokemon
-    eggs: {type: [EggsSchema], default: []}
+    eggs: {type: [EggsSchema], default: []} //array of all their eggs
 });
 
 TrainersSchema.virtual('id').get(function() {

@@ -13,11 +13,11 @@ module.exports = {
   async execute(message, args) {
     var trainer = await Trainers.findById(message.author.id).exec();
     const starterscreen = require('./../../pokemon/starter-selection.js');
-    if (trainer && trainer.pokemon) {
-      const msg = message.reply("Ah... you wish to reminise? I'm afraid we can't hand you another starter Pokémon, but you may still browse the selection.");
+    if (trainer && trainer.pokemon && trainer.pokemon.length > 0) {
+      const msg = await message.reply("Ah... you wish to reminise? I'm afraid we can't hand you another starter Pokémon, but you may still browse the selection.");
       return await starterscreen(msg, message.author);
     } else {
-      const msg = message.reply("Ah! A new prospective trainer... Why don't you take a look at the Pokémon we have available? I'm sure you'll be able to give one of them a good home!");
+      const msg = await message.reply("Ah! A new prospective trainer... Why don't you take a look at the Pokémon we have available? I'm sure you'll be able to give one of them a good home!");
       return await starterscreen(msg, message.author);
     }
   },

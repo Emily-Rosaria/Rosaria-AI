@@ -31,7 +31,7 @@ module.exports = {
         }
       }
       if (!choice) {
-        const msg = message.reply("I'm afraid we don't have that Pokémon available... Why don't you take a look at what we have in stock instead?");
+        const msg = await message.reply("I'm afraid we don't have that Pokémon available... Why don't you take a look at what we have in stock instead?");
         return await starterscreen(msg, message.author);
       } else {
         const options = {new: true, upsert: true, setDefaultsOnInsert: true, overwrite: true};

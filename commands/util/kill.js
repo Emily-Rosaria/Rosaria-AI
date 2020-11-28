@@ -19,8 +19,10 @@ module.exports = {
         client.spawnloops.array();
         message.channel.send('Press F to pay respects... RIP for '+args[0]+'.');
       } else {
-        if (keys.length == 1) {
+        if (keys.length > 0) {
           message.channel.send('Invalid interval. Current running intervals include...\n'+keys.join(', ')+'.');
+        } else {
+          message.channel.send('No intervals are currently running.');
         }
       }
     },

@@ -8,7 +8,7 @@ module.exports = {
   allowDM: true,
   async execute(message, args) {
     user = !!args[0] ? message.client.users.cache.get(args[0].match(/\d+/)[0]) || message.author : message.author;
-    const res = await Trainers.findByIdAndUpdate(user.id, {cooldowns: {}}).exec();
+    const res = await Trainers.findByIdAndUpdate(user.id, {cooldowns: new Map()}).exec();
     message.reply("Done! Reset the timers of: "+user.username+"#"+user.discriminator+" (ID: "+user.id+").");
   },
 };

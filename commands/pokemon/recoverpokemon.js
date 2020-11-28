@@ -18,9 +18,9 @@ module.exports = {
     arr = [];
     for (const poke of pokes) {
       arr.push(poke.id);
-      trainer.catchPokemon(poke);
+      trainer.addPokemon(poke);
     }
     trainer = await trainer.save();
-    message.reply('Done! Maybe this command will have a pretty message later... who knows!');
+    message.reply('Done! Pokemon with the following IDs have been added:\n```\n'+arr+'\n```');
   },
 };

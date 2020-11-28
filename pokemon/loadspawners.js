@@ -21,8 +21,9 @@ module.exports = async function (client) {
             let loop = (pokemonspawner,ic) => {
                 pokemonspawner.execute(ic);
                 const nextDelay = minDelay + Math.floor(Math.random()*randomDelay);
-                const timeout = client.setTimeout(loop,nextDelay,pokemonspawner,ic,c,minDelay,randomDelay);
+                const timeout = client.setTimeout(loop,nextDelay,pokemonspawner,ic,client,c,minDelay,randomDelay);
                 client.spawnloops.set(pokemonspawner.name+ic.id,timeout);
+                client.spawnloops.array();
             };
             loop(pokemonspawner,ic);
         } else {

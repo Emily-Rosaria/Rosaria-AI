@@ -13,9 +13,9 @@ connectDB("mongodb://localhost:27017/"+database);
 
 const Pokemon = require("./models/pokedex.js");
 
-const Trainers = require("./models/trainers.js");
+//const Trainers = require("./models/trainers.js");
 
-Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
+//Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
 Pokemon.db.dropDatabase(function(err, result) {console.log("Resetting wild pokemon database...")});
 
 const PokedexData = require("./../bot_assets/Pokedex.json");

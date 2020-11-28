@@ -11,7 +11,7 @@ module.exports = {
   async execute(channel) {
     var guildInfo = await GuildData.findById(channel.guild.id).exec();
     if (!guildInfo) {return channel.send("Could not find guild info. Please configure the bot.")}
-    if (!guildInfo.pokeData) {return channel.send("Could not find guild's pokemon spawning data. Please configure the bot.")}
+    else if (!guildInfo.pokeData) {return channel.send("Could not find guild's pokemon spawning data. Please configure the bot.")}
     const minDelay = channel.client.pokeConfig.get("minDelay");
     const startTime = (new Date()).getTime();
     const toDuration = require('../misc_functions/toDuration.js');
@@ -21,7 +21,7 @@ module.exports = {
       const LegendSpawn = require('./legendspawn.js');
       const wildPokemon = await Pokedex.findById(pokeData.legend);
       return LegendSpawn(wildPokemon, channel);
-    } else if (guildInfo.pokeData.legend != 0) {
+    } else if (guildInfo.pokeData.legend != 0 || guildInfo.pokeData.spawnChannel != channel.id) {
       spawnLegend = false;
     }
     const options = {new: true};

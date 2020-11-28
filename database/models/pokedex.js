@@ -109,7 +109,7 @@ WildPokemonSchema.statics.randomDaily = async function (trainer) {
   const allPokemon = trainer.unique >= pokeCount;
   if (pokeCount < trainer.unique) {console.log("ERROR: Check the commands. `pokeCount count < user's unique count`.")};
   if (allPokemon) {
-    const dailyPokemonArray = randomWilds(5, legendary);
+    const dailyPokemonArray = await this.randomWilds(5, legendary);
     const rare = dailyPokemonArray.filter(p=>p.legend);
     if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
   }
@@ -117,7 +117,7 @@ WildPokemonSchema.statics.randomDaily = async function (trainer) {
   const caughtLegends = trainer.legends;
   const legendary = caughtLegends.length > 0 ? legends.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
   const tierVal = legendary ? 2 : 1;
-  const dailyPokemonArray = randomWilds(3, legendary);
+  const dailyPokemonArray = await this.randomWilds(3, legendary);
   const newPokes = dailyPokemonArray.filter(p => !trainer.pokemon.includes(p.id));
   if (newPokes.length > 0) {return {dailyPokemon: newPokes[0], unique: true, tier: tierVal}}
   else {return {dailyPokemon: dailyPokemonArray[0], unique: true, tier: tierVal}}

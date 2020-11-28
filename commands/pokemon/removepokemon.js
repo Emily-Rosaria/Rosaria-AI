@@ -14,7 +14,7 @@ module.exports = {
     var trainer = await Trainers.findById(user.id).exec();
     const toTake = args.map((a)=>a.replace(/[.#+"':;]/g,"").toLowerCase());
     let removed = [];
-    trainer = trainer.pokemon.filter(p=>{
+    trainer.pokemon = trainer.pokemon.filter(p=>{
       if (removed.includes(p.id)) {return true}
       else if (toTake.includes(p.id.toString())) {
         removed.push(p.id);

@@ -12,9 +12,9 @@ module.exports = {
   aliases: ['getlegends'],
   usage: '', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, args) {
-    var data = await Trainers.find({pokemon: {legendary: true}}).exec();
+    var data = await Trainers.find({"pokemon.$.legendary": true}).exec();
     var msg = "";
-    if (data != null) {
+    if (data != null && data != undefined && data.length != 0) {
       for (const d of data) {
         msg = msg + "<@" + d.id + "> has captured:\n"+d.legends.map((t)=>"> #"+t.id+" "+t.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-')).join('\n')+'\n';
       }

@@ -40,6 +40,7 @@ module.exports = {
           if (!validCommands.includes(key)) {
             console.log('Removing command '+key+' from cache.');
             delete client.commands.delete(key);
+            client.commands.array();
           }
       }
 
@@ -62,6 +63,7 @@ module.exports = {
       for (const spawn of spawns) {
         client.clearTimeout(client.spawnloops[spawn]);
         client.spawnloops.delete(spawn);
+        client.spawnloops.array();
       }
       const reSpawn = require('./../../pokemon/loadspawners.js');
       x = async () => {

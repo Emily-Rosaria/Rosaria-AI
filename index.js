@@ -67,7 +67,7 @@ const cooldowns = new Discord.Collection(); // Creates an empty list for storing
 client.on('ready', async function() {
     client.bootTime = (new Date()).getTime();
     client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
-    console.log(`${client.user.username} is up and running!`);
+    console.log(`${client.user.username} is up and running! Launched at: ${(new Date()).toUTCString()}.`);
     await spawnPokemon(client);
 });
 
@@ -89,7 +89,7 @@ client.on('message', async message => {
 
     // Split commands and arguments from message so they can be passed to functions
     const args = message.content.slice(prefix[0].length).split(/ +/);
-    const commandName = args.shift().toLowerCase().replace(/-_/,'');
+    const commandName = args.shift().toLowerCase().replace(/[-_]/,'');
 
     // If the command isn't in the  command folder, move on
     const command = client.commands.get(commandName)

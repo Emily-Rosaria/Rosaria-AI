@@ -18,7 +18,7 @@ module.exports = {
       if (!isNaN(arg) && Number(args[0]) < 10000) {
         pageNum = Number(args[0]);
       } else {
-        const tempU = message.client.users.cache.get(arg.match(/\d{10,}/)[0]);
+        const tempU = message.client.users.fetch(arg.match(/\d{10,}/)[0]);
         if (tempU) {
           user = tempU;
         }

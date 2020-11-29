@@ -1,4 +1,4 @@
-const GuildData = require('./../database/models/guilds.js');
+const GuildData = require('./../../database/models/guilds.js');
 
 module.exports = {
     name: 'prune', // The name of the command

@@ -15,6 +15,10 @@ var ShopItemSchema = new Schema({
   price: [CurrencyCostSchema] // values and IDs of currencies
 });
 
+ShopItemSchema.virtual('id').get(function() {
+  return this._id;
+})
+
 // Model
 var ShopItems = mongoose.model("ShopItems", ShopItemSchema); // Create collection model from schema
 module.exports = ShopItems; // export model

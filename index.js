@@ -27,6 +27,7 @@ const dev = "247344219809775617"; // my ID on Discord
 const mongoose = require("mongoose"); //database library
 
 const GuildData = require("./database/models/guilds.js"); // database with server configs
+const LurkerData = require("./database/models/lurkers.js");
 const connectDB = require("./database/connectDB.js"); // Database connection
 var database = "rose"; // Database name
 
@@ -187,5 +188,19 @@ client.on('message', async message => {
         devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` '+errLocation+'\nError Report:\n```'+errmsg+'```');
     }
 });
+
+client.on('guildMemberAdd', async member => {
+    const guildConfig = await GuildData.findById(member.guild.id).exec();
+    if (guildConfig && guildConfig.perms && guildConfig.perms.allowAll === false && (guildConfig.perms.basic.length != 0 || guildConfig.perms.advanced.length != 0)) {
+        await LurkerData.findByIdAndUpdate(member.user.id,{
+            _id: member.user.id,
+            guildID: member.guild.id,
+            joinedAt: member.joinedAt.getTime(),
+            pings: 0
+        },{new: true, upsert: true, setDefaultsOnInsert: true}).exec();
+    };
+});
+
+
 connectDB("mongodb://localhost:27017/"+database);
 client.login(process.env.TOKEN); // Log the bot in using the token provided in the .env file

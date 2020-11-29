@@ -9,7 +9,8 @@ var PermissionsSchema = new Schema({ // Create Schema
     basic: {type: [String], default: []}, // IDs of role(s) that grant basic bot perms
     advanced: {type: [String], default: []}, // IDs of role(s) that grant bot perms for bonus stuff, like the daily command
     trusted: {type: [String], default: []}, // IDs of role(s) that grant bot perms for simple management stuff
-    botcommander: {type: [String], default: []} // IDs of role(s) that grant perms for advanced server management stuff (some ability is auto-given by server management or admin roles)
+    botcommander: {type: [String], default: []}, // IDs of role(s) that grant perms for advanced server management stuff (some ability is auto-given by server management or admin roles)
+    purgeImmune: {type: [String], default: []} // IDs of roles that prevent being flagged as a lurker
 });
 
 var PokeDataSchema = new Schema({

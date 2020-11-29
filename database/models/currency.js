@@ -9,6 +9,10 @@ var CurrencySchema = new Schema({
   emoteGuild: {type: String, default: ""} // ID of discord guild with the emote (if it's a custom emote)
 });
 
+CurrencySchema.virtual('id').get(function() {
+  return this._id;
+})
+
 // Model
 var Currencies = mongoose.model("Currencies", CurrencySchema); // Create collection model from schema
 module.exports = Currencies; // export model

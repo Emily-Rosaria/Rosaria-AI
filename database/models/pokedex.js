@@ -112,10 +112,11 @@ WildPokemonSchema.statics.randomDaily = async function (trainer, randomNums) {
     const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,5), legendary);
     const rare = dailyPokemonArray.filter(p=>p.legend);
     if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
+    else {return {dailyPokemon: dailyPokemonArray[0], unique: false, tier: 3}}
   }
   const legendIDs = await this.find({ legendary: true }).then((data) => data.id);
   const caughtLegends = trainer.legends;
-  const legendary = caughtLegends.length > 0 ? legends.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
+  const legendary = caughtLegends.length > 0 ? legendIDs.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
   const tierVal = legendary ? 2 : 1;
   const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,3), legendary);
   const newPokes = dailyPokemonArray.filter(p => !trainer.pokemon.includes(p.id));

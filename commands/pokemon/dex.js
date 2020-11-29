@@ -17,10 +17,15 @@ module.exports = {
     for (const arg of [].concat(args).reverse()) {
       if (!isNaN(arg) && Number(args[0]) < 10000) {
         pageNum = Number(args[0]);
-      } else {
-        const tempU = message.client.users.fetch(arg.match(/\d{10,}/)[0]);
+      } else if (arg.match(/\d{10,}/)) {
+        const tempU = message.client.users.cache.get(arg.match(/\d{10,}/)[0]);
         if (tempU) {
           user = tempU;
+        } else {
+          const tempU2 = await message.client.users.fetch(arg.match(/\d{10,}/)[0]);
+          if (tempU2) {
+            user = tempU2;
+          }
         }
       }
     }

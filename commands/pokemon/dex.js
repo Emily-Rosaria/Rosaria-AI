@@ -14,29 +14,13 @@ module.exports = {
     var pageNum = 1;
     var log = false;
     const pokedexSize = await Pokedex.countDocuments({});
-    if (args.length > 0) {
-      if (!isNaN(args[0]) && Number(args[0]) < 10000) {
+    for (const arg of [].concat(args).reverse()) {
+      if (!isNaN(arg) && Number(args[0]) < 10000) {
         pageNum = Number(args[0]);
-        if (args.length > 1 && (args[1].toLowerCase() == 'true' || args[1].toLowerCase() == 't')) {
-          log = true;
-        }
-        else if (args.length > 1) {
-          user = message.client.users.cache.get(args[1].match(/\d+/)[0]) || user;
-          if (args.length > 2) {
-             log = (args[2].toLowerCase() == 'true' || args[2].toLowerCase() == 't');
-          }
-        }
-      } else if (args[0].toLowerCase() == 'true' || args[0].toLowerCase() == 't') {
-        log = true;
       } else {
-        user = message.client.users.cache.get(args[0].match(/\d+/)[0]) || user;
-        if (args.length > 1 && !isNaN(args[1])) {
-          pageNum = Number(args[1]);
-          if (args.length > 2) {
-            log = (args[2].toLowerCase() == 'true' || args[2].toLowerCase() == 't');
-          }
-        } else if (args.length > 1) {
-          log = (args[1].toLowerCase() == 'true' || args[1].toLowerCase() == 't');
+        const tempU = message.client.users.cache.get(arg.match(/\d{10,}/)[0]);
+        if (tempU) {
+          user = tempU;
         }
       }
     }

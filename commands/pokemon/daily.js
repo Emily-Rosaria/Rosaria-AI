@@ -89,7 +89,7 @@ module.exports = {
     } else {
       const timeDiff = dailyTimer - now.getTime();
       const toDuration = require('./../../misc_functions/toDuration.js');
-      message.reply('You can\'t claim for roughly `'+toDuration(timeDiff)+'`.`');
+      message.reply('You can\'t claim for roughly `'+toDuration(timeDiff)+'`.');
     }
   },
 };

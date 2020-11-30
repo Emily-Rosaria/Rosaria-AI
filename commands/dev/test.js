@@ -14,8 +14,8 @@ module.exports = {
   usage: '', // Help text to explain how to use the command (if it had any arguments)
   allowDM: true,
   async execute(message, args) {
-    getGdocs = require('./../misc_functions/readgdocs.js');
-    toHex = require('./../misc_functions/rgbtohex.js');
+    getGdocs = require('./../../misc_functions/readgdocs.js');
+    toHex = require('./../../misc_functions/rgbtohex.js');
     const postNums = args.join(' ').match(/(^| )(count=)?d+( |$)/i);
     const postCount = postNums ? ((Math.number(postNums[0]) > 5) ? 5 : Math.number(postNums[0])) : 3;
     const splitPosts = !!args.join(' ').match(/(^| )(true|split|split=true)( |$)/i);

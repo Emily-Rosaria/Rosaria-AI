@@ -27,7 +27,6 @@ const dev = "247344219809775617"; // my ID on Discord
 const mongoose = require("mongoose"); //database library
 
 const GuildData = require("./database/models/guilds.js"); // database with server configs
-const LurkerData = require("./database/models/lurkers.js");
 const connectDB = require("./database/connectDB.js"); // Database connection
 var database = "rose"; // Database name
 
@@ -191,16 +190,48 @@ client.on('message', async message => {
 
 client.on('guildMemberAdd', async member => {
     const guildConfig = await GuildData.findById(member.guild.id).exec();
-    if (guildConfig && guildConfig.perms && guildConfig.perms.allowAll === false && (guildConfig.perms.basic.length != 0 || guildConfig.perms.advanced.length != 0)) {
-        await LurkerData.findByIdAndUpdate(member.user.id,{
-            _id: member.user.id,
-            guildID: member.guild.id,
-            joinedAt: member.joinedAt.getTime(),
-            pings: 0
-        },{new: true, upsert: true, setDefaultsOnInsert: true}).exec();
+    if (guildConfig && guildConfig.perms && guildConfig.perms.purge >= 0) {
+        try {
+            if (guildConfig.lurkers && guildConfig.lurkers.length > 0) {
+              const oldLurker = guildConfig.lurkers.find(L=>L._id == member.user.id);
+              if (oldLurker) {
+                const newWarns = Math.min(oldLurker.warnings, guildConfig.perms.purge);
+                const newLastWarn = member.joinedAt.getTime();
+                const update = {"lurkers.$.warnings" : newWarns, "lurkers.$.lastPing" : newLastWarn};
+                const newGuildConfig = await GuildData.findOneAndUpdate({_id: member.guild.id, "lurkers._id" : member.user.id},{"$set": update},{new: true}).exec();
+              } else {
+                const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$push": { lurkers: {_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}}},{new: true}).exec();
+              }
+            } else if (guildConfig.lurkers && guildConfig.lurkers.length == 0) {
+              const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$push": { lurkers: {_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}}},{new: true}).exec();
+            } else {
+              const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$set": {lurkers: [{_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}]}},{new: true}).exec();
+            }
+        } catch (err) {
+          console.error(err);
+          const devUser = client.users.cache.get(dev);
+          const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
+          devUser.send('Error adding lurker data on `guildMemberAdd. Fully error report:\n```'+errmsg+'```');
+        }
     };
 });
 
+client.on('guildMemberRemove', async member => {
+    const guildConfig = await GuildData.findById(member.guild.id).exec();
+    if (guildConfig && guildConfig.lurkers && guildConfig.lurkers.length > 0) {
+        const oldLurker = guildConfig.lurkers.find(L=>L._id == member.user.id);
+        if (oldLurker) {
+            try {
+                const newGuildConfig = await GuildData.findByIdAndUpdate({_id: member.guild.id},{"$pull": {"lurkers": {"_id": oldLurker.id}}},{new: true}).exec();
+            } catch (err) {
+              console.error(err);
+              const devUser = client.users.cache.get(dev);
+              const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
+              devUser.send('Error deleting lurker data on `guildMemberRemove. Fully error report:\n```'+errmsg+'```');
+            }
+        }
+    };
+});
 
 connectDB("mongodb://localhost:27017/"+database);
 client.login(process.env.TOKEN); // Log the bot in using the token provided in the .env file

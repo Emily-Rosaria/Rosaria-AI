@@ -48,15 +48,15 @@ module.exports = {
     unFound = unFound.filter(async (id) => {
       m = await guild.member(id) //.then((g)=>g).catch((err)=>{console.error(err); return false;});
       if (m && !m.deleted) {
-        if (roleChecks.filter(r=>m.roles.cache.has(r.id)).length == 0) {
+        if (roleChecks.filter(r=>m.roles.cache.has(r.id)).length > 0) {
+          noLurk.push(id);
+          return false;
+        } else {
           let temp = {};
           temp._id = m.id;
           temp.joinedAt = m.joinedAt.getTime();
           temp.warnings = 0;
           temp.lastPing = m.joinedAt.getTime();
-          noLurk.push(temp);
-          return false;
-        } else {
           fetched.push(temp);
           return false;
         }
@@ -69,19 +69,26 @@ module.exports = {
     });
     const lastFetch = await guild.members.fetch({ user: unFound, force: true}).then((members)=>members.map(m=>{
       if (m && !m.deleted) {
-        let temp = {};
-        temp._id = m.id;
-        temp.joinedAt = m.joinedAt.getTime();
-        temp.warnings = 0;
-        temp.lastPing = m.joinedAt.getTime();
-        return temp;
-      } else {
+        if (roleChecks.filter(r=>m.roles.cache.has(r.id)).length > 0) {
+          noLurk.push(m.id);
+          return false;
+        } else {
+          let temp = {};
+          temp._id = m.id;
+          temp.joinedAt = m.joinedAt.getTime();
+          temp.warnings = 0;
+          temp.lastPing = m.joinedAt.getTime();
+          return temp;
+        }
+      } else if (m && m.deleted) {
         left.push(m.id);
         return false;
+      } else {
+        return false;
       }
-    })).catch((err)=>{console.error(err); return [];});
+    }).filter(m => m != false)).catch((err)=>{console.error(err); return [];});
     unFound = unFound.filter(u=>!(lastFetch && lastFetch.find(f=>f._id == u)));
-    fetched = !!lastFetch ? fetched.concat(lastFetch) : fetched;
+    fetched = !!lastFetch && lastFetch.length > 0 ? fetched.concat(lastFetch) : fetched;
     if (unFound.length > 0) {
       message.reply("Could not fetch member data for the users pinged below.\n>>> "+unFound.map(id => `<@${id}>`).join('\n'));
     }
@@ -93,6 +100,26 @@ module.exports = {
     }
     let dupe = [];
     let added = [];
+
+    fetched.filter(f=>{
+      if (guildConfig.lurkers.find(L=>L._id == f._id)) {
+        dupe.push(f._id);
+        return false;
+      } else {
+        added.push(f._id);
+        return true;
+      }
+    })
+
     newGuildConfig = await GuildData.findByIdAndUpdate(guild.id, {"$push": {lurkers: fetched}},{new: true})
+
+    if (dupe.length > 0) {
+      message.reply("The following users were already registered as lurkers:\n>>> "+dupe.map(id => `<@${id}>`).join('\n'));
+    }
+    if (added.length > 0) {
+      message.reply("The following users were added as lurkers:\n>>> "+added.map(id => `<@${id}>`).join('\n'));
+    } else {
+      message.reply("No valid users were found to be added as lurkers.");
+    }
   },
 };

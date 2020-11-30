@@ -208,10 +208,10 @@ client.on('guildMemberAdd', async member => {
               const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$set": {lurkers: [{_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}]}},{new: true}).exec();
             }
         } catch (err) {
-          console.error(err);
-          const devUser = client.users.cache.get(dev);
-          const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
-          devUser.send('Error adding lurker data on `guildMemberAdd. Fully error report:\n```'+errmsg+'```');
+            console.error(err);
+            const devUser = client.users.cache.get(dev);
+            const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
+            devUser.send('Error adding lurker data on `guildMemberAdd. Fully error report:\n```'+errmsg+'```');
         }
     };
 });

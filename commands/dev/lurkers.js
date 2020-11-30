@@ -12,7 +12,7 @@ module.exports = {
     const guild = message.guild;
     const guildConfig = await GuildData.findById(message.guild.id).exec();
     if (!guildConfig || !guildConfig.lurkers || guildConfig.lurkers.length == 0) {message.reply("This guild has no logged lurkers."); return;}
-    const lurkers = guildConfig.lurkers.map(L=>`<@${L._id}>`);
+    const lurkers = guildConfig.lurkers.map(L=>`<@${L._id}> - ${L.warnings}`);
     message.reply("This guild has the following lurkers:\n>>> "+lurkers.join('\n'));
   },
 };

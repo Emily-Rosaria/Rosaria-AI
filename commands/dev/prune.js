@@ -56,23 +56,38 @@ module.exports = {
         return true;
       }
     });
+    const lastFetch = await guild.members.fetch({ user: unFound, force: true}).then((members)=>members.map(m=>{
+      if (m && !m.deleted) {
+        let temp = {};
+        temp._id = m.id;
+        temp.joinedAt = m.joinedAt.getTime();
+        temp.warnings = 0;
+        temp.lastPing = m.joinedAt.getTime();
+        return [m,temp];
+      } else if (m && m.deleted) {
+        left.push(m.id);
+        return false;
+      } else {
+        return false;
+      }
+    }).filter(m => m != false)).catch((err)=>{console.error(err); return [];});
+
+    unFound = unFound.filter(u=>!(lastFetch && lastFetch.find(f=>f._id == u)));
+    fetched = !!lastFetch && lastFetch.length > 0 ? fetched.concat(lastFetch) : fetched;
+
     if (unFound.length > 0) {
       message.reply("Could not fetch data for the users listed below. If they've left the discord, you can remove them from the lurker list via the `r!unlurk <userIDs>` command. If not, then here is their lurker data:\n>>> "+unFound.map(u => {
         const joinedAt = toDuration(now - u.joinedAt, 2);
         const lastPing = u.joinedAt != u.lastPing ? ` and they were last notified \`${toDuration(now - u.lastPing, 2)}\` ago` : '';
-        let warnings = (u.warnings + 1).toString();
-        switch (warnings) {
-          case warnings.endsWith("1"):
-            warnings = warnings+"st";
-            break;
-          case warnings.endsWith("2"):
-            warnings = warnings+"nd";
-            break;
-          case warnings.endsWith("3"):
-            warnings = warnings+"rd";
-            break;
-          default:
-            warnings = warnings+"th";
+        let warnText = (u.warnings + 1).toString();
+        if (warnText.endsWith("1")) {
+          warnText = warnText+"st";
+        } else if (warnText.endsWith("2")) {
+          warnText = warnText+"nd";
+        } else if (warnText.endsWith("3")) {
+          warnText = warnText+"rd";
+        } else {
+          warnText = warnText+"th";
         }
         return `<@${u._id}> joined \`${joinedAt}\` ago${lastPing}. This would be their \`${warnings}\` activity ping.`;
       }).join('\n'),{split: true});
@@ -82,33 +97,40 @@ module.exports = {
       if (roleChecks.filter(r=>m[0].roles.cache.has(r.id)).length == 0) {
         return true;
       } else {
-        noLurk.push(m[0]);
+        noLurk.push(m);
         return false;
       }
     });
 
     const lurkerText = finalLurkers.map(m => {
       let warnText = (m[1].warnings + 1).toString();
-      switch (warnText) {
-        case warnText.endsWith("1"):
-          warnText = warnText+"st";
-          break;
-        case warnText.endsWith("2"):
-          warnText = warnText+"nd";
-          break;
-        case warnings.endsWith("3"):
-          warnText = warnText+"rd";
-          break;
-        default:
-          warnText = warnText+"th";
+      if (warnText.endsWith("1")) {
+        warnText = warnText+"st";
+      } else if (warnText.endsWith("2")) {
+        warnText = warnText+"nd";
+      } else if (warnText.endsWith("3")) {
+        warnText = warnText+"rd";
+      } else {
+        warnText = warnText+"th";
       }
       const lastPing = m[1].joinedAt != m[1].lastPing ? `, and your were last notified \`${toDuration(now - m[1].lastPing, 2)}\` ago.` : '';
-      return `<@${m.user.id}>: You've been flagged for inactivity. You joined about \`${toDuration(now - m[1].joinedAt, 2)}\` ago and have yet to post at <#72807025107756646>. This is your \`${warnText}\` recorded activity ping${lastPing}.`
+      return `<@${m[1]._id}>: You've been flagged for inactivity. You joined about \`${toDuration(now - m[1].joinedAt, 2)}\` ago and have yet to post at <#728070251077566464>. This is your \`${warnText}\` recorded activity ping${lastPing}.`
     }).join('\n');
     const warningText = guildConfig.perms.purge > 0 ? `You typically have about \`${guildConfig.perms.purge}\` reminders before being kicked. `: '';
-    const msgText = memberText+'\n\n---\n\nPlease read <#728070078008000592> if you need help gaining access, and post your writing sample at <#728070251077566464>. If you need further assistance, ask at <#728072324372365362> and a member or staffer will assist you. '+warningText+'If you\'re currently too busy to write what\'s required, save our disboard link from <#728361945299681332> and leave before you\'re purged so that you can come back later.';
+    const msgText = lurkerText+'\n\n---\n\nPlease read <#728070078008000592> if you need help gaining access, and post your writing sample at <#728070251077566464>. If you need further assistance, ask at <#728072324372365362> and a member or staffer will assist you. '+warningText+'If you\'re currently too busy to write what\'s required, save our disboard link from <#728361945299681332> and leave before you\'re purged so that you can come back later.';
     await channel.send(msgText,{split: true});
-    await message.author.send("Here are the IDs of users who left the server: `"+left.map(m.user.id).join(' ')+"`.");
-    await message.author.send("Here are the IDs of users who are no longer lurkers: `"+noLurk.join(' ')+"`.");
+    if (left.length > 0) {
+      await message.author.send("Here are the IDs of users who left the server: `"+left.map(id => `<@${id}>`).join(' ')+"`.");
+    }
+    if (noLurk.filter(m => m[1].warnings > 0).length > 0) {
+      await message.author.send("Here are the IDs of previously warned users who are no longer lurkers: `"+noLurk.map(m => `<@${m[0].user.id}>`).join(' ')+"`.");
+    }
+
+    const remove = left.concat(noLurk);
+    await GuildData.findByIdAndUpdate({_id: guild.id},{"$pull": {"lurkers": {"_id": {"$in": remove}}}}).exec();
+
+    const pinged = unFound.concat(finalLurkers.map(m => m[1]._id));
+    const newData = await GuildData.findByIdAndUpdate({_id: guild.id},{"lurkers": {"_id": {"$in": pinged}}, {"$inc": {warnings: 1}}, {"$set": {lastPing: (new Date()).getTime()}}},{new: true}).exec();
+    console.log(newData.lurkers);
   },
 };

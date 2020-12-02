@@ -101,7 +101,7 @@ WildPokemonSchema.statics.randomEgg = async function (randomNum) {
   const sum = chances.slice(-1)[0].chance;
   const rand = randomNum ? randomNum * sum : Math.random() * sum;
   const id = chances.find(el => el.chance > rand).id;
-  return this.findById( { id: id }).exec();
+  return this.findById(id).exec();
 }
 
 WildPokemonSchema.statics.randomDaily = async function (trainer, randomNums) {

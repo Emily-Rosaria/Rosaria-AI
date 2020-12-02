@@ -9,7 +9,7 @@ module.exports = {
   async execute(message, args) {
     var client = message.client;
     const guild = message.guild;
-    const guildConfig = await GuildData.findByIdAndUpdate(guild.id,{"lurkers": [],"perms.purge": 3, "perms.spectator":['776927641789661204']},{new: true}).exec();
+    const guildConfig = await GuildData.findByIdAndUpdate(guild.id,{"perms.purge": 2, "perms.spectator":['776927641789661204']},{new: true}).exec();
     console.log(guildConfig);
   },
 };

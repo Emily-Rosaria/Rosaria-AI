@@ -17,6 +17,7 @@ var TrainerPokemonSchema = new Schema({
 var EggsSchema = new Schema({
     id: {type: Number, required: true}, //pokedex Number of the pokemon it will be
     dateObtained: {type: Number, default: (new Date()).getTime()}, // unix time of capture
+    shinyOdds: {type: Number, default: 0.0025}, // shiny chance, as a decimal
     inclubating: {type: Boolean, default: false}, // if the egg is being incubated
     startedIncubating: {type: Number, default: -1} // when incubation began, unix time, -1 if never started
 });

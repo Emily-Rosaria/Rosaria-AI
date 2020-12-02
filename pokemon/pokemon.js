@@ -19,22 +19,31 @@ async function spawnPokemon(channel) {
   const randomDelay = channel.client.pokeConfig.get("randomDelay");
   const startTime = (new Date()).getTime();
   const toDuration = require('../misc_functions/toDuration.js');
+  const LegendSpawn = require('./legendspawn.js');
   //if (guildInfo.pokeData.lastSpawn + minDelay > startTime) {return console.log("Attempted to run pokemon spawn at "+channel.name+" - "+channel.id+" but cancelled to prevent spawn spam. Last spawn was: "+toDuration(startTime-guildInfo.pokeData.lastSpawn)+" ago.")}
-  let spawnLegend = true;
-  if (guildInfo.pokeData.legend != 0 && Math.random() > 0.8) {
-    const LegendSpawn = require('./legendspawn.js');
-    const wildPokemon = await Pokedex.findById(pokeData.legend);
-    return LegendSpawn(wildPokemon, channel);
-  } else if (guildInfo.pokeData.legend != 0 || guildInfo.pokeData.spawnChannel != channel.id) {
-    spawnLegend = false;
-  }
+  let spawnLegend = guildInfo.pokeData.spawnChannel == channel.id;
   const options = {new: true};
   const query = {"_id": guildInfo._id, "pokeData._id": guildInfo.pokeData._id};
+  if (spawnLegend && guildInfo.pokeData.legend && guildInfo.pokeData.legend != 0) {
+    const lastLeg = guildInfo.pokeData.legendSpawns && guildInfo.pokeData.legendSpawns.length > 0 ? guildInfo.pokeData.legendSpawns.reduce((acc,cur)=>{if (acc>cur) {return acc} else {return cur}}) : 0;
+    const hourMS = 3600000;
+    const wait = (startTime - lastLeg) / hourMS; // number of hours since last legendary spawn
+    if (Math.random() > 1.2 - (wait/10)) {
+      const wildPokemon = await Pokedex.findById(guildInfo.pokeData.legend);
+      if (guildInfo.pokeData.legendSpawns && guildInfo.pokeData.legendSpawns.length > 0) {
+        guildInfo = await GuildData.findByIdAndUpdate(query,{"$push": {"pokeData.legendSpawns": startTime}, "$set": {"pokeData.lastSpawn": startTime} },options).exec();
+      } else {
+        guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legendSpawns": [startTime]} },options).exec();
+      }
+      return LegendSpawn(wildPokemon, guildInfo, channel);
+    } else {
+      spawnLegend = false;
+    }
+  }
   const wildPokemon = await Pokedex.randomWild(spawnLegend, Math.random());
   if (wildPokemon.legend) {
-    guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legend": wildPokemon.id} },options).exec();
-    const LegendSpawn = require('./legendspawn.js');
-    return LegendSpawn(wildPokemon, channel);
+    guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime, "pokeData.legend": wildPokemon.id, "pokeData.legendSpawns": [startTime]}},options).exec();
+    return LegendSpawn(wildPokemon, guildInfo, channel);
   }
   guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime}},options).exec();
   const imgPath = channel.client.pokeConfig.get("imgPath");
@@ -57,7 +66,7 @@ async function spawnPokemon(channel) {
   ctx.drawImage(mysteryIMG, 0, 0);
   const attachment1 = new Discord.MessageAttachment(canvas.toBuffer(), 'mystery-pokemon-encounter.png');
   ctx.drawImage(pokemonIMG, 20, 20);
-  const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + pokemonName + '.png');
+  const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + wildPokemon.name + '.png');
   const embed1 = new Discord.MessageEmbed()
     .setColor('#FF0000')
     .setDescription("Who\'s that Pokémon? Say its name to throw a pokeball and catch it!")
@@ -67,7 +76,7 @@ async function spawnPokemon(channel) {
     .setFooter('Hurry up before it gets away!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
   const embed2 = new Discord.MessageEmbed()
     .setColor('#FF0000')
-    .setImage('attachment://wild-' + pokemonName + '.png');
+    .setImage('attachment://wild-' + wildPokemon.name + '.png');
   channel.send({files: [attachment1], embed: embed1})
   .then( () => {
     const filter = async (m) => {

@@ -51,6 +51,7 @@ module.exports = {
       });
     }
     const unique = textArray.length;
+    const uniqueCaught = Object.entries(dexFormat).filter(p => p[1].caught > 0).length;
     const pages = Math.ceil(unique/50);
     if (pageNum < 1) {pageNum = 1}
     else if (pageNum > pages) {pageNum = pages};
@@ -68,12 +69,12 @@ module.exports = {
     };
 
     const totalPers = ((caught/total) * 100).toFixed(1) + '%';
-    const dexPers = ((caught/pokedexSize) * 100).toFixed(1) + '%';
+    const dexPers = ((uniqueCaught/pokedexSize) * 100).toFixed(1) + '%';
 
     if (unique) {
       desc = 'So far, a total of '+(total).toString()+' Pokémon have spawned, of which '+caught.toString() +' were caught.';
-      if (unique<pokedexSize) {
-        desc = desc + ' There are at least '+(pokedexSize-unique).toString()+' Pokémon that have yet to be discovered, so stay tuned and keep training!';
+      if (uniqueCaught<pokedexSize) {
+        desc = desc + ' There are at least '+(pokedexSize-uniqueCaught).toString()+' Pokémon that have yet to be discovered, so stay tuned and keep training!';
       }
     }
     var title = 'Pokémon Stats';
@@ -89,7 +90,7 @@ module.exports = {
       .setDescription(desc)
       .setThumbnail('https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
       .addField('Pokémon Catch Rate',caught+' of '+total+', '+totalPers+'.',true)
-      .addField('Global Pokédex Completion',''+unique+' of '+pokedexSize+', '+dexPers+'.',true)
+      .addField('Global Pokédex Completion',''+uniqueCaught+' of '+pokedexSize+', '+dexPers+'.',true)
       .addField('Top Pokémon',top[2]+': x'+top[0],true)
       .addField('Column 1',col1,true)
       .addField('Column 2',col2,true)

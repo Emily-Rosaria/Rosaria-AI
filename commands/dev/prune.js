@@ -32,7 +32,7 @@ module.exports = {
     let left = []; // IDs of users who left
     let fetched = []; // member objects of users we could find paired with their lurker objects [m, L] basically.
     const cache = guild.members.cache; // bot's cache
-    const lurkers = guildConfig.lurkers.filter(L=>L.lastPing+dayMS<now); // gets lurkers with no recent ping
+    const lurkers = guildConfig.lurkers.filter(L=> L.lastPing+dayMS<now); // gets lurkers with no recent ping
     lurkers.forEach(L=>{
       if (!cache.has(L._id)) {unFound.push(L)}
       else {
@@ -45,7 +45,7 @@ module.exports = {
       }
     });
     unFound = unFound.filter(async (L) => {
-      m = await guild.member(L._id).catch((err)=>{console.error(err); return false;});
+      m = await guild.member(L._id);
       if (m && !m.deleted) {
         fetched.push([m, L]);
         return false;
@@ -57,6 +57,7 @@ module.exports = {
       }
     });
     const lastFetch = await guild.members.fetch({ user: unFound, force: true}).then((members)=>members.map(m=>{
+      console.log([m.user.id,m.user.username,m.deleted]);
       if (m && !m.deleted) {
         let temp = {};
         temp._id = m.id;
@@ -71,7 +72,6 @@ module.exports = {
         return false;
       }
     }).filter(m => m != false)).catch((err)=>{console.error(err); return [];});
-
     unFound = unFound.filter(u=>!(lastFetch && lastFetch.find(f=>f._id == u)));
     fetched = !!lastFetch && lastFetch.length > 0 ? fetched.concat(lastFetch) : fetched;
 
@@ -89,7 +89,7 @@ module.exports = {
         } else {
           warnText = warnText+"th";
         }
-        return `<@${u._id}> joined \`${joinedAt}\` ago${lastPing}. This would be their \`${warnings}\` activity ping.`;
+        return `<@${u._id}> joined \`${joinedAt}\` ago${lastPing}. This would be their \`${warnText}\` activity ping.`;
       }).join('\n'),{split: true});
     }
     let noLurk = []; // member objects of users who are no longer lurkers
@@ -126,11 +126,19 @@ module.exports = {
       await message.author.send("Here are the IDs of previously warned users who are no longer lurkers: `"+noLurk.map(m => `<@${m[0].user.id}>`).join(' ')+"`.");
     }
 
-    const remove = left.concat(noLurk);
+    const remove = left.concat(noLurk.map(m=>m.id));
     await GuildData.findByIdAndUpdate({_id: guild.id},{"$pull": {"lurkers": {"_id": {"$in": remove}}}}).exec();
 
-    const pinged = unFound.concat(finalLurkers.map(m => m[1]._id));
-    const newData = await GuildData.findByIdAndUpdate({_id: guild.id},{"lurkers": {"_id": {"$in": pinged}}, {"$inc": {warnings: 1}}, {"$set": {lastPing: (new Date()).getTime()}}},{new: true}).exec();
-    console.log(newData.lurkers);
+    const pinged = unFound.map(u=>u._id).concat(finalLurkers.map(m => m[1]._id));
+    const update = {"$inc" : {"lurkers.$.warnings" : 1}, "$set" : {"lurkers.$.lastPing" : (new Date()).getTime()}};
+    const newData = await GuildData.findOneAndUpdate({_id: guild.id, "lurkers._id" : {"$in" : pinged}},update,{new: true}).exec();
+    /*
+    const newData = await GuildData.findByIdAndUpdate({_id: guild.id},{
+      "lurkers.$":
+        {"_id": {"$in": pinged},
+        "$inc": {warnings: 1},
+        "$set": {lastPing: (new Date()).getTime()}
+      }},{new: true}).exec();
+    */
   },
 };

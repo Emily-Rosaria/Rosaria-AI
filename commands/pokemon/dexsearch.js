@@ -37,7 +37,7 @@ module.exports = {
         .setFooter('Keep training and one day you\'ll catch \'em all!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
       const legendText = pokemon ? (pokemon.legend ? "legendary " : "") : "";
       if (trainer && trainer.pokemon && trainer.pokemon.length > 0) {
-        const caught = trainer.pokemon.filter(p=>p.id==pokemon.id);
+        const caught = trainer.pokemon.filter(p=>p.id==pokemonID);
         if (caught.length > 0) {
           if (caught.length > 1) {
             const sort = caught.sort((p1,p2)=>p1.captureDate - p2.captureDate);

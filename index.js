@@ -32,7 +32,7 @@ var database = "rose"; // Database name
 
 const spawnPokemon = require('./pokemon/loadspawners.js');
 
-const client = new Discord.Client(); // Initiates the client
+const client = new Discord.Client({ partials: ['USER', 'GUILD_MEMBER'] }); // Initiates the client
 
 client.commands = new Discord.Collection(); // Creates an empty list in the client object to store all commands
 const getAllCommands = function (dir, cmds) {

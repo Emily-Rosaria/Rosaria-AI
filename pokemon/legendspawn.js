@@ -6,44 +6,48 @@ const GuildData = require('./../database/models/guilds.js');
 const PokeSpawns = require('./../database/models/spawnedpokemon.js');
 
 async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment, embed) {
-  const {trainerPokemon} = trainer.addPokemon(legend, shinyOdds);
-  const caughtAt = trainerPokemon.captureDate;
-  wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
-  const shiny = trainerPokemon.shiny;
-  embed.setDescription('<@' + user.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Legendary Pokémon Caught!').setAuthor(user.username, user.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png').setImage('attachment://legendary-' + wildPokemon.name + '.png');
-  channel.send({files: [attachment], embed: embed});
-  await PokeSpawns.create({
-    id: legend.id,
-    name: legend.name,
-    escaped: false, // whether or not it escaped
-    legend: true, // whether or not the pokemon was legendary
-    source: "wild",
-    time: caughtAt, // unix time of escape/capture
-    guild: channel.guild.id, // server ID on discord where it appeared
-    catcherID: user.id, // discord id of user who caught pokemon
-    shiny: shiny
-  });
-  if (shiny) {
-    channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
-  }
-  if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
-  guildInfo = await GuildData.findByIdAndUpdate(channel.guild.id,{"$set": {"pokeData.legendSpawns": [], "pokeData.legend": 0} },{new: true}).exec();
+  try {
+    const {trainerPokemon} = trainer.addPokemon(legend, shinyOdds);
+    const caughtAt = trainerPokemon.captureDate;
+    wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
+    const shiny = trainerPokemon.shiny;
+    embed.setDescription('<@' + user.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Legendary Pokémon Caught!').setAuthor(user.username, user.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png').setImage('attachment://legendary-' + legend.name + '.png');
+    channel.send({files: [attachment], embed: embed});
+    await PokeSpawns.create({
+      id: legend.id,
+      name: legend.name,
+      escaped: false, // whether or not it escaped
+      legend: true, // whether or not the pokemon was legendary
+      source: "wild",
+      time: caughtAt, // unix time of escape/capture
+      guild: channel.guild.id, // server ID on discord where it appeared
+      catcherID: user.id, // discord id of user who caught pokemon
+      shiny: shiny
+    });
+    if (shiny) {
+      channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
+    }
+    if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
+    guildInfo = await GuildData.findByIdAndUpdate(channel.guild.id,{"$set": {"pokeData.legendSpawns": [], "pokeData.legend": 0} },{new: true}).exec();
+  } catch (err) {console.error(err)}
 }
 
 async function giveEgg(trainer, shinyOdds) {
-  const eggPoke = await Pokedex.randomEgg(Math.random());
-  const trainerEgg = {
-    id: eggPoke.id, //pokedex Number of the pokemon it will be
-    dateObtained: (new Date()).getTime(), // unix time of capture
-    shinyOdds: shinyOdds, // shiny chance, as a decimal
-    inclubating: false, // if the egg is being incubated
-    startedIncubating: -1 // when incubation began, unix time, -1 if never started
-  };
-  if (trainer.eggs && trainer.eggs.length > 0) {
-    await Trainers.findByIdAndUpdate(trainer.id, { $push: { eggs: trainerEgg }});
-  } else {
-    await Trainers.findByIdAndUpdate(trainer.id, { $set: { eggs: [trainerEgg] }});
-  }
+  try{
+    const eggPoke = await Pokedex.randomEgg(Math.random());
+    const trainerEgg = {
+      id: eggPoke.id, //pokedex Number of the pokemon it will be
+      dateObtained: (new Date()).getTime(), // unix time of capture
+      shinyOdds: shinyOdds, // shiny chance, as a decimal
+      inclubating: false, // if the egg is being incubated
+      startedIncubating: -1 // when incubation began, unix time, -1 if never started
+    };
+    if (trainer.eggs && trainer.eggs.length > 0) {
+      await Trainers.findByIdAndUpdate(trainer.id, { $push: { eggs: trainerEgg }});
+    } else {
+      await Trainers.findByIdAndUpdate(trainer.id, { $set: { eggs: [trainerEgg] }});
+    }
+  } catch (err) {console.error(err)}
 }
 
 async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath) {
@@ -207,7 +211,7 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
     .setColor('#FF0000')
 
   // Legendary catch chance
-  const catchChance = guildInfo.legendSpawns ? Math.random() > 0.9 ** guildInfo.legendSpawns.length : Math.random() > 0.9;
+  const catchChance = guildInfo.legendSpawns ? Math.random() > 0.15 + (0.8 ** guildInfo.legendSpawns.length) : Math.random() > 0.95;
 
   channel.send({files: [attachment1], embed: embed1})
   .then( () => {
@@ -243,7 +247,7 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
           .setTitle('The Mysterious Pokémon flees... but something is left behind!')
           .setFooter('Use `r!eggs` to view your eggs!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [eggAttachment], embed: eggEmbed});
-      } else if (random<0.6) {
+      } else if (random<0.7) {
         await giveChoice(winner, wtrainer, guildInfo, shinyOdds, channel, imgPath);
       } else { // tokens
         try {

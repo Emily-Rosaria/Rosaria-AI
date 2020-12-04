@@ -9,7 +9,7 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment,
   try {
     const {trainerPokemon} = trainer.addPokemon(legend, shinyOdds);
     const caughtAt = trainerPokemon.captureDate;
-    wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
+    await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
     const shiny = trainerPokemon.shiny;
     embed.setDescription('<@' + user.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Legendary Pokémon Caught!').setAuthor(user.username, user.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png').setImage('attachment://legendary-' + legend.name + '.png');
     channel.send({files: [attachment], embed: embed});
@@ -168,7 +168,7 @@ async function giveTokens(trainer) {
   } else {
     const tokenMap = new Map();
     tokenMap.set("tokens",awardTokens);
-    newTrainer = await Trainers.findByIdAndUpdate(trainer.id, { "$set": { "tokens": tokenMap }},{new: true});
+    newTrainer = await Trainers.findByIdAndUpdate(trainer.id, { "$set": { "currency": tokenMap }},{new: true});
   }
   const newTokens = newTrainer.currency.get("tokens");
   return [awardTokens, newTokens];

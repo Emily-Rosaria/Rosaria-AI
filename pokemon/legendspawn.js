@@ -52,9 +52,9 @@ async function giveEgg(trainer, shinyOdds) {
 
 async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath) {
   const cooldown = channel.client.pokeConfig.get("cooldown");
-  pokeChoices = await Pokedex.randomWilds([Math.random(),Math.random(),Math.random()],false);
-  pokeNames = pokeChoices.map(p=>p.name);
-  imgs = pokeChoices.map(p=>imgPath+p.img); // each is 475x475
+  let pokeChoices = await Pokedex.randomWilds([Math.random(),Math.random(),Math.random()],false);
+  let pokeNames = pokeChoices.map(p=>p.name);
+  let imgs = pokeChoices.map(p=>imgPath+p.img); // each is 475x475
   const grassCanvas = Canvas.createCanvas(1030, 640);
   const grassCtx = grassCanvas.getContext('2d');
   const grassBackground = await Canvas.loadImage('./bot_assets/background-grass.png');
@@ -211,7 +211,7 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
     .setColor('#FF0000')
 
   // Legendary catch chance
-  const catchChance = guildInfo.legendSpawns ? Math.random() > 0.15 + (0.8 ** guildInfo.legendSpawns.length) : Math.random() > 0.95;
+  const catchChance = !!guildInfo.pokeData.legendSpawns && guildInfo.pokeData.legendSpawns.length > 0 ? Math.random() > 0.15 + (0.8 ** guildInfo.pokeData.legendSpawns.length) : Math.random() > 0.95;
 
   channel.send({files: [attachment1], embed: embed1})
   .then( () => {

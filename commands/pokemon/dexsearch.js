@@ -10,7 +10,7 @@ module.exports = {
     allowDM: true,
     usage: '<pokemon-name OR pokemon-id>', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
-      const imgPath = message.client.pokeConfig.get("imgPath");
+      const imgPath = "./../../";
       const pokeCount = await Pokedex.countDocuments({});
       let query = (args.length == 0 || args[0] == 'random' || args[0] == 'r' || args[0] == '0') ? (Math.ceil(Math.random() * pokeCount)) : (isNaN(args.join('-')) ? args.join('-').toLowerCase() : Number(args[0]));
       const noResult = isNaN(query) ? {name: query, id: "#???"} : {name: "??????", id: ("#"+query)}
@@ -18,18 +18,20 @@ module.exports = {
       const trainer = await Trainers.findById(message.author.id).exec();
 
       const pokemonName = pokemon ? pokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-') : noResult.name;
-      const pokemonImage = pokemon ? imgPath + pokemon.img : 'https://cdn.dribbble.com/users/621155/screenshots/2835314/simple_pokeball.gif';
+      const pokemonImage = pokemon ? imgPath + pokemon.imgs.normal : 'https://cdn.dribbble.com/users/621155/screenshots/2835314/simple_pokeball.gif';
       const pokemonAbilities = pokemon ? pokemon.abilities.map((ability) => ability.name.split(' ').map(word => (word[0].toUpperCase() + word.slice(1))).join(' ')) : ["`[unknown]`"];
       const pokemonTypes = pokemon ? pokemon.types : ['???','???'];
       const pokemonID = pokemon ? pokemon.id : noResult.id;
       const pokemonHeight = pokemon ? pokemon.height.toString()+'m' : '???';
       const pokemonWeight = pokemon ? pokemon.weight.toString()+'kg' : '???';
+      const pokemonDesc = pokemon ? pokemon.description : '??? ??? ???';
       const embed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Pokédex Entry #'+pokemonID+' - '+pokemonName)
         .setAuthor(message.author.username, message.author.displayAvatarURL())
         .setThumbnail('https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
         .addField('Pokémon Abilities',pokemonName+' can have the following abiliies: '+pokemonAbilities.join(', ')+'.',false)
+        .addField('Pokédex Data',pokemonDesc,false)
         .addField('Height',pokemonHeight,true)
         .addField('Weight',pokemonWeight,true)
         .setImage(pokemonImage)

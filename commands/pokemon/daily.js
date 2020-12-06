@@ -55,15 +55,19 @@ module.exports = {
         }, 7500, message,legendaryCatch);
         setTimeout(async (message, msg, dailyPokemon) => {
           const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
-          const imgPath = message.client.pokeConfig.get("imgPath");
+          const imgPath = "./../../";
           const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Daily Pokémon: #'+trainerPokemon.id+' '+trainerPokemon.nickname+'!')
             .setAuthor(message.author.username, message.author.displayAvatarURL())
             .setDescription('Wow, <@'+message.author.id+'> just recieved a '+trainerPokemon.nickname+' from the daily Pokémon roulette!')
-            .setImage(imgPath+dailyPokemon.img)
             .setTimestamp()
             .setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
+          if (trainerPokemon.shiny) {
+            embed.setImage(imgPath+dailyPokemon.imgs.shiny)
+          } else {
+            embed.setImage(imgPath+dailyPokemon.imgs.normal)
+          }
           await msg.edit(embed);
           shinyText = trainerPokemon.shiny ? '\n... wait a second! Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`' : '';
           await message.reply('Your Pokémon has arrived! We hope '+trainerPokemon.nickname+' has a good time in your care. You can view your recent Pokémon with `r!latest`.');

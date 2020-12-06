@@ -2,11 +2,6 @@ const mongoose = require("mongoose"); // Import mongoose library
 const Schema = mongoose.Schema; // Define Schema method
 
 // Schema
-var SpriteSchema = new Schema({
-  normal: String, // e.g. X.png
-  shiny: String // e.g. shiny/X.png
-});
-
 var AbilitySchema = new Schema({
   name: String, // Ability name
   hidden: Boolean // if the ability is hidden, or whatevs. usually false
@@ -26,8 +21,9 @@ var StatsSchema = new Schema({
 var WildPokemonSchema = new Schema({
     _id: Number, //pokedex Number
     name: String, // species name
-    img: String, // e.g.  other/official-artwork/X.png
-    sprites: SpriteSchema,
+    description: String, // species info text
+    imgs: {normal: String, shiny: String}, //e.g. poke-imgs/normal/${poke.id}.png
+    sprites: {normal: String, shiny: String},
     types: [String], // e.g. ["grass","fighting"]
     abilities: [AbilitySchema],// ability list
     height: Number, // height in metres

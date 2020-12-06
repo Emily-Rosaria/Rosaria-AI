@@ -46,10 +46,10 @@ async function spawnPokemon(channel) {
     return LegendSpawn(wildPokemon, guildInfo, channel);
   }
   guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime}},options).exec();
-  const imgPath = channel.client.pokeConfig.get("imgPath");
+  const imgPath = "./../";
   var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
   console.log(pokemonName+" just spawned on "+channel.guild.name+".");
-  const pokemonURL = imgPath+wildPokemon.img;
+  const pokemonURL = imgPath+wildPokemon.imgs.normal;
   const lingerTime = channel.client.pokeConfig.get("lingerTime");
   const cooldown = channel.client.pokeConfig.get("cooldown");
   const shinyOdds = channel.client.pokeConfig.get("shinyOdds");
@@ -65,8 +65,6 @@ async function spawnPokemon(channel) {
   ctx2.fillRect(0, 0, 960, 540);
   ctx.drawImage(mysteryIMG, 0, 0);
   const attachment1 = new Discord.MessageAttachment(canvas.toBuffer(), 'mystery-pokemon-encounter.png');
-  ctx.drawImage(pokemonIMG, 20, 20);
-  const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + wildPokemon.name + '.png');
   const embed1 = new Discord.MessageEmbed()
     .setColor('#FF0000')
     .setDescription("Who\'s that Pokémon? Say its name to throw a pokeball and catch it!")
@@ -104,6 +102,9 @@ async function spawnPokemon(channel) {
         const caughtAt = trainerPokemon.captureDate;
         wtrainer = await Trainers.findByIdAndUpdate({ _id: wtrainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
         const shiny = trainerPokemon.shiny;
+        const img2 = shiny ? await Canvas.loadImage(imgPath+wildPokemon.imgs.shiny) : await Canvas.loadImage(imgPath+wildPokemon.imgs.normal);
+        ctx.drawImage(img2, 20, 20);
+        const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + wildPokemon.name + '.png');
         embed2.setDescription('<@' + winner.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Pokémon Caught!').setAuthor(winner.username, winner.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [attachment2], embed: embed2});
         await PokeSpawns.create({
@@ -125,6 +126,8 @@ async function spawnPokemon(channel) {
     } catch (err) {console.error(err)}
     })
     .catch( async (collected) => {
+      ctx.drawImage(pokemonIMG, 20, 20);
+      const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + wildPokemon.name + '.png');
       embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
       channel.send({files: [attachment2], embed: embed2});
       console.log(wildPokemon.name+" fled from " +channel.guild.name+ " before it could be caught...");

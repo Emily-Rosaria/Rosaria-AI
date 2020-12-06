@@ -19,19 +19,20 @@ module.exports = {
     var latestPokemon = trainer.pokemon.sort((a,b)=>b.captureDate - a.captureDate);
     const now = (new Date()).getTime();
     const toDuration = require('./../../misc_functions/toDuration.js');
-    const imgPath = message.client.pokeConfig.get("imgPath");
+    const imgPath = "./../../";
     if (latestPokemon.length > 25) {latestPokemon = latestPokemon.slice(0,25)}
     const dexData = await Pokedex.find({ _id: { $in: latestPokemon.map(p=>p.id) }}).exec()
     const pokemonArray = latestPokemon.map((p,i) => {
-      const dex = dexData.filter(d=>d.id==p.id)[0];
+      const dex = dexData.find(d=>d._id==p.id);
       let temp = {};
       temp.name = p.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
       temp.nickname = p.nickname;
       temp.id = p.id.toString();
       temp.legend = p.legend;
       temp.shiny = p.shiny;
+      temp.description = dex.description;
       temp.gender = p.gender;
-      temp.img = imgPath + dex.img;
+      temp.img = p.shiny ? imgPath + dex.imgs.shiny : imgPath + dex.imgs.normal;
       temp.types = dex.types.map(t=>t[0].toUpperCase()+t.slice(1)).join('/');
       temp.duration = toDuration(now - p.captureDate, 3);
       temp.date = new Date(p.captureDate);
@@ -43,12 +44,13 @@ module.exports = {
       const poke = pokemonArray[pg];
       const shinyTest = poke.shiny ? "✨" : "";
       const legendTest = poke.legend ? " They are a legendary Pokémon!" : "";
-      const desc = `<@${user.id}> caught ${shinyTest}${poke.nickname} about \`${poke.duration}\` ago. ${shinyTest}${poke.nickname} is ${poke.gender}, and is a ${poke.types} type Pokémon.${legendTest}`;
+      const desc = `<@${user.id}> caught ${poke.nickname}${shinyTest} about \`${poke.duration}\` ago. ${poke.nickname}${shinyTest} is ${poke.gender}, and is a ${poke.types} type Pokémon.${legendTest}`;
       const nameString = (poke.name == poke.nickname) ? (shinyTest + poke.name) : `${shinyTest}${poke.name} (AKA: ${shinyTest}${poke.nickname})`
       const embed = new Discord.MessageEmbed()
         .setColor('#ff5959')
-        .setTitle(nick+"'s "+nameString)
+        .setTitle(nick+"'s "+nameString+shinyTest)
         .setDescription(desc)
+        .addField("Pokédex Data",poke.description)
         .setImage(poke.img)
         .setTimestamp(poke.date)
         .setFooter(`Latest Pokémon of ${nick} -- ${pg+1} / ${pages}`, user.displayAvatarURL());

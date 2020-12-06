@@ -5,7 +5,7 @@ const Pokedex = require('./../database/models/pokedex.js');
 const GuildData = require('./../database/models/guilds.js');
 const PokeSpawns = require('./../database/models/spawnedpokemon.js');
 
-async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment, embed) {
+async function giveLegend(user, trainer, legend, shinyOdds, channel, canvas, ctx) {
   try {
     const {trainerPokemon} = trainer.addPokemon(legend, shinyOdds);
     const caughtAt = trainerPokemon.captureDate;
@@ -13,7 +13,18 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment,
     const cooldown = channel.client.pokeConfig.get("cooldown");
     await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
     const shiny = trainerPokemon.shiny;
-    embed.setDescription('<@' + user.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.').setTimestamp().setTitle('Legendary Pokémon Caught!').setAuthor(user.username, user.displayAvatarURL()).setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png').setImage('attachment://legendary-' + legend.name + '.png');
+    const pokemonIMG = shiny ? await Canvas.loadImage("./../"+legend.imgs.shiny) : await Canvas.loadImage("./../"+legend.imgs.normal);
+    ctx.drawImage(pokemonIMG, 20, 20);
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'legendary-' + wildPokemon.name + '.png');
+    const embed = new Discord.MessageEmbed()
+      .setColor('#FF0000')
+      .setImage('attachment://legendary-' + legend.name + '.png')
+      .setDescription('<@' + user.id + '> caught a ' + pokemonName + '! Use `r!latest` to see your most recent Pokémon.')
+      .setTimestamp()
+      .setTitle('Legendary Pokémon Caught!')
+      .setAuthor(user.username, user.displayAvatarURL())
+      .setFooter('Use `r!dex` to see all the Pokémon you\'ve discovered.','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
+
     channel.send({files: [attachment], embed: embed});
     await PokeSpawns.create({
       id: legend.id,
@@ -27,7 +38,7 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment,
       shiny: shiny
     });
     if (shiny) {
-      channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
+      channel.send('Something looks a little different about this Pokémon... ✨')
     }
     if (!shiny) { console.log(user.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(user.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
     guildInfo = await GuildData.findByIdAndUpdate(channel.guild.id,{"$set": {"pokeData.legendSpawns": [], "pokeData.legend": 0} },{new: true}).exec();
@@ -56,20 +67,19 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
   const cooldown = channel.client.pokeConfig.get("cooldown");
   let pokeChoices = await Pokedex.randomWilds([Math.random(),Math.random(),Math.random()],false);
   let pokeNames = pokeChoices.map(p=>p.name);
-  let imgs = pokeChoices.map(p=>imgPath+p.img); // each is 475x475
+  let imgs = pokeChoices.map(p=>p.imgs); // each is 475x475
   const grassCanvas = Canvas.createCanvas(1030, 640);
   const grassCtx = grassCanvas.getContext('2d');
   const grassBackground = await Canvas.loadImage('./bot_assets/background-grass.png');
   grassCtx.drawImage(grassBackground, 0, 0, grassCanvas.width, grassCanvas.height);
   const mysteryPokes = Canvas.createCanvas(1030, 640);
   const shadowCtx = mysteryPokes.getContext('2d');
-  const poke1 = await Canvas.loadImage(imgs[0]);
+  const poke1 = await Canvas.loadImage("./../"+imgs[0].normal);
   shadowCtx.drawImage(poke1, 20, 177, 285, 285);
-  const poke2 = await Canvas.loadImage(imgs[1]);
+  const poke2 = await Canvas.loadImage("./../"+imgs[1].normal);
   shadowCtx.drawImage(poke2, 372, 177, 285, 285);
-  const poke3 = await Canvas.loadImage(imgs[2]);
+  const poke3 = await Canvas.loadImage("./../"+imgs[2].normal);
   shadowCtx.drawImage(poke3, 724, 177, 285, 285);
-  const pokeImgs = [poke1,poke2,poke3];
   shadowCtx.globalCompositeOperation = 'source-in';
   shadowCtx.fillRect(0, 0, 1030, 640);
   grassCtx.drawImage(mysteryPokes, 0, 0);
@@ -90,6 +100,7 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
       const msg = collected.first();
       let wildPokemon = false;
       let xPos = 0;
+      let choiceNum = -1;
       let loadedImg = false;
       for (var i in pokeNames) {
         const cleamMSG = msg.content.toLowerCase().replace(/[ \-.'":]/gi, '');
@@ -97,7 +108,7 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
         if (cleamMSG.startsWith(cleanName) && (wildPokemon == false || wildPokemon.name.length < pokeNames[i].length)) {
           wildPokemon = pokeChoices[i];
           xPos = 20 + i*352;
-          loadedImg = pokeImgs[i];
+          choiceNum = i;
         }
       }
       if (wildPokemon == false) {
@@ -116,7 +127,8 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
           const caughtAt = trainerPokemon.captureDate;
           const newTrainer = await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
           const shiny = trainerPokemon.shiny;
-          grassCtx.drawImage(loadedImg, xPos, 177, 285, 285);
+          const finalImg = shing ? await Canvas.loadImage("./../"+imgs[choiceNum].shiny) : await Canvas.loadImage("./../"+imgs[choiceNum].normal);
+          grassCtx.drawImage(finalImg, xPos, 177, 285, 285);
           const catchFile = new Discord.MessageAttachment(grassCanvas.toBuffer(), 'caught-'+wildPokemon.name+'-group.png');
           const catchEmbed = new Discord.MessageEmbed()
             .setColor('#FF0000')
@@ -139,7 +151,7 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
             shiny: shiny
           });
           if (shiny) {
-            channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
+            channel.send('Something looks a little different about this Pokémon... ✨');
           }
           if (!shiny) { console.log(user.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(user.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
         } catch (err) {console.error(err)}
@@ -178,14 +190,13 @@ async function giveTokens(trainer) {
 
 module.exports = async function (wildPokemon, guildInfo, channel) {
   const PokemonSpawn = require('./pokemon.js');
-  const imgPath = channel.client.pokeConfig.get("imgPath");
   var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
   console.log(pokemonName+", a legendary pokemon, just spawned on "+channel.guild.name+".");
   const minDelay = channel.client.pokeConfig.get("minDelay");
   const randomDelay = channel.client.pokeConfig.get("randomDelay");
   const nextDelay = minDelay+Math.floor(Math.random()*randomDelay);
   const startTime = (new Date()).getTime();
-  const pokemonURL = imgPath+wildPokemon.img;
+  const pokemonURL = "./../"+wildPokemon.img.normal;
   const lingerTime = channel.client.pokeConfig.get("lingerTime");
   const shinyOdds = channel.client.pokeConfig.get("shinyOdds");
   const canvas = Canvas.createCanvas(960, 540);
@@ -209,8 +220,6 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
     .setTimestamp()
     .setTitle('A wild Pokémon appears... It has a mysterious aura about it...')
     .setFooter('Hurry up before it gets away!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
-  const embed2 = new Discord.MessageEmbed()
-    .setColor('#FF0000')
 
   // Legendary catch chance
   const catchChance = !!guildInfo.pokeData.legendSpawns && guildInfo.pokeData.legendSpawns.length > 0 ? Math.random() > 0.15 + (0.8 ** guildInfo.pokeData.legendSpawns.length) : Math.random() > 0.95;
@@ -233,7 +242,7 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
       let wtrainer = await Trainers.findById(winner.id).exec();
       const random = Math.random();
       if (catchChance) {
-        await giveLegend(winner, wtrainer, wildPokemon, shinyOdds, channel, attachment2, embed2);
+        await giveLegend(winner, wtrainer, wildPokemon, shinyOdds, channel, canvas, ctx);
       } else if (random<0.25) {
         giveEgg(wtrainer, shinyOdds*2);
         const eggCanvas = Canvas.createCanvas(806, 991);
@@ -250,7 +259,7 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
           .setFooter('Use `r!eggs` to view your eggs!', 'https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
         channel.send({files: [eggAttachment], embed: eggEmbed});
       } else if (random<0.7) {
-        await giveChoice(winner, wtrainer, guildInfo, shinyOdds, channel, imgPath);
+        await giveChoice(winner, wtrainer, guildInfo, shinyOdds, channel, "./../");
       } else { // tokens
         try {
           const tokens = await giveTokens(wtrainer);

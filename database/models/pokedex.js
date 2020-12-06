@@ -109,12 +109,12 @@ WildPokemonSchema.statics.randomDaily = async function (trainer, randomNums) {
   const allPokemon = trainer.unique >= pokeCount;
   if (pokeCount < trainer.unique) {console.log("ERROR: Check the commands. `pokeCount count < user's unique count`.")};
   if (allPokemon) {
-    const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,5), legendary);
+    const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,5), true);
     const rare = dailyPokemonArray.filter(p=>p.legend);
     if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
     else {return {dailyPokemon: dailyPokemonArray[0], unique: false, tier: 3}}
   }
-  const legendIDs = await this.find({ legendary: true }).then((data) => data.id);
+  const legendIDs = await this.find({ legend: true }).then((data) => data.id);
   const caughtLegends = trainer.legends;
   const legendary = caughtLegends.length > 0 ? legendIDs.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
   const tierVal = legendary ? 2 : 1;

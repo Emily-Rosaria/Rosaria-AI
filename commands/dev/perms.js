@@ -9,7 +9,7 @@ module.exports = {
   async execute(message, args) {
     var client = message.client;
     const guild = message.guild;
-    const guildConfig = await GuildData.findByIdAndUpdate(guild.id,{"pokeData.legend": 0, "pokeData.legendSpawns":[]},{new: true}).exec();
+    const guildConfig = await GuildData.findByIdAndUpdate(guild.id,{"$set": {"pokeData.legend": 0, "pokeData.legendSpawns":[]}},{new: true}).exec();
     console.log(guildConfig);
   },
 };

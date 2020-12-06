@@ -81,7 +81,7 @@ client.on('message', async message => {
     let gData = {prefix: ["r!","!","?","p!"]};
     if (message.channel.type != "dm") {
       gID = message.guild.id;
-      gData = await GuildData.findById(gID).exec();
+      gData = await GuildData.findById(gID).exec() || gData;
     }
 
     // Ignore bot messages and messages that dont start with the prefix defined in the config data

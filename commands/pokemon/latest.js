@@ -45,10 +45,10 @@ module.exports = {
       const shinyTest = poke.shiny ? "✨" : "";
       const legendTest = poke.legend ? " They are a legendary Pokémon!" : "";
       const desc = `<@${user.id}> caught ${poke.nickname}${shinyTest} about \`${poke.duration}\` ago. ${poke.nickname}${shinyTest} is ${poke.gender}, and is a ${poke.types} type Pokémon.${legendTest}`;
-      const nameString = (poke.name == poke.nickname) ? (shinyTest + poke.name) : `${shinyTest}${poke.name} (AKA: ${shinyTest}${poke.nickname})`
+      const nameString = (poke.name == poke.nickname) ? (poke.name + shinyTest) : `${poke.name}${shinyTest} (AKA: ${poke.nickname}${shinyTest})`
       const embed = new Discord.MessageEmbed()
         .setColor('#ff5959')
-        .setTitle(nick+"'s "+nameString+shinyTest)
+        .setTitle(nick+"'s "+nameString)
         .setDescription(desc)
         .addField("Pokédex Data",poke.description)
         .setImage(poke.img)

@@ -1,5 +1,0 @@
-run = "npm run start"
-language = "nodejs"
-[packager]
-ignoredPaths = ["../../../usr/lib/node_modules/node"]
-ignoredPackages = ["node"]

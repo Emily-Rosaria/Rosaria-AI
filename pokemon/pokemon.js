@@ -46,7 +46,7 @@ async function spawnPokemon(channel) {
     return LegendSpawn(wildPokemon, guildInfo, channel);
   }
   guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime}},options).exec();
-  const imgPath =  "./../"; //using local file instead of channel.client.pokeConfig.get("imgPath");
+  const imgPath =  "./"; //using local file instead of channel.client.pokeConfig.get("imgPath");
   var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
   console.log(pokemonName+" just spawned on "+channel.guild.name+".");
   const pokemonURL = imgPath+wildPokemon.imgs.normal;

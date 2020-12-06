@@ -64,7 +64,7 @@ async function giveEgg(trainer, shinyOdds) {
   } catch (err) {console.error(err)}
 }
 
-async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath) {
+async function giveChoice(user, trainer, guildInfo, shinyOdds, channel) {
   const cooldown = channel.client.pokeConfig.get("cooldown");
   let pokeChoices = await Pokedex.randomWilds([Math.random(),Math.random(),Math.random()],false);
   let pokeNames = pokeChoices.map(p=>p.name);

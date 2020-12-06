@@ -64,14 +64,14 @@ const x = async () => {
   const options = {new: true, upsert: true, setDefaultsOnInsert: true, overwrite: true};
   await NewPokeData.forEach(async (poke) => {
     await Pokemon.findByIdAndUpdate(poke._id, poke, options).exec();
-  }).then(async ()=>{
-    console.log("Done, now sending random pokemon to your location!");
-    console.log(await Pokemon.randomWild());
-    mongoose.disconnect();
-  }).catch((err)=>{
-    console.error(err);
-    mongoose.disconnect();
   });
 };
 
-x();
+x().then(async ()=>{
+  console.log("Done, now sending random pokemon to your location!");
+  console.log(await Pokemon.randomWild());
+  mongoose.disconnect();
+}).catch((err)=>{
+  console.error(err);
+  mongoose.disconnect();
+});

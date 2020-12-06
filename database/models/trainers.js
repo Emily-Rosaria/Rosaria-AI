@@ -72,6 +72,11 @@ TrainersSchema.virtual('legends').get(function() {
   return this.pokemon.filter(p=>p.legend);
 });
 
+TrainersSchema.virtual('legendIDs').get(function() {
+  const legends = this.pokemon.filter(p=>p.legend);
+  return legends.map(p=>p.id);
+});
+
 TrainersSchema.virtual('unique').get(function() {
   let arr = [];
   this.pokemon.forEach(p=>{
@@ -80,11 +85,19 @@ TrainersSchema.virtual('unique').get(function() {
   return arr.length;
 });
 
+TrainersSchema.virtual('uniqueIDs').get(function() {
+  let arr = [];
+  this.pokemon.forEach(p=>{
+    if (!arr.includes(p.id)) {arr.push(p.id)}
+  });
+  return arr;
+});
+
 TrainersSchema.method('addPokemon', function(PokemonDoc, shinyOdds) {
   const shinyNum = shinyOdds === 0 ? 0 : shinyOdds || 0.0005;
   const addToParty = this.party.length<6;
   let newPoke = {
-    id: PokemonDoc.id,
+    id: PokemonDoc._id,
     name: PokemonDoc.name,
     nickname: PokemonDoc.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-'),
     gender: PokemonDoc.randomGender(Math.random()),

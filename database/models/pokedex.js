@@ -51,13 +51,13 @@ WildPokemonSchema.statics.randomWild = async function (allowLegends, randomNum) 
       let temp = {};
       acc = (100/el.rarity) + acc;
       temp.chance = acc;
-      temp.id = el.id;
+      temp._id = el._id;
       return temp;
     })
   );
   const sum = chances.slice(-1)[0].chance;
   const rand = randomNum >= 0 && randomNum < 1 ? randomNum * sum : Math.random() * sum;
-  const id = chances.find(el => el.chance > rand).id;
+  const id = chances.find(el => el.chance > rand)._id;
   return await this.findById(id).exec();
 }
 
@@ -72,7 +72,7 @@ WildPokemonSchema.statics.randomWilds = async function (randomNums, allowLegends
       let temp = {};
       acc = (100/el.rarity) + acc;
       temp.chance = acc;
-      temp.id = el.id;
+      temp._id = el._id;
       return temp;
     })
   );
@@ -80,7 +80,7 @@ WildPokemonSchema.statics.randomWilds = async function (randomNums, allowLegends
   let array = [];
   for (var i = 0; i < loops; i++) {
     const rand = randomNums[i] ? randomNums[i] * sum : Math.random() * sum;
-    const id = chances.find(el => el.chance > rand).id;
+    const id = chances.find(el => el.chance > rand)._id;
     const newPoke = await this.findById(id).exec();
     array.push(newPoke);
   }
@@ -94,13 +94,13 @@ WildPokemonSchema.statics.randomEgg = async function (randomNum) {
       let temp = {};
       acc = (100/el.rarity) + acc;
       temp.chance = acc;
-      temp.id = el.id;
+      temp._id = el._id;
       return temp;
     })
   );
   const sum = chances.slice(-1)[0].chance;
   const rand = randomNum ? randomNum * sum : Math.random() * sum;
-  const id = chances.find(el => el.chance > rand).id;
+  const id = chances.find(el => el.chance > rand)._id;
   return this.findById(id).exec();
 }
 
@@ -114,12 +114,13 @@ WildPokemonSchema.statics.randomDaily = async function (trainer, randomNums) {
     if (rare.length>0) {return {dailyPokemon: rare[0], unique: false, tier: 3}}
     else {return {dailyPokemon: dailyPokemonArray[0], unique: false, tier: 3}}
   }
-  const legendIDs = await this.find({ legend: true }).then((data) => data.id);
-  const caughtLegends = trainer.legends;
+  const legendIDs = await this.find({ legend: true }).then((data) => data.map(p=>p._id));
+  const caughtLegends = trainer.legendIDs;
   const legendary = caughtLegends.length > 0 ? legendIDs.reduce((acc,cur)=>acc && caughtLegends.includes(cur),true) : false;
   const tierVal = legendary ? 2 : 1;
   const dailyPokemonArray = await this.randomWilds(randomNums.slice(0,3), legendary);
-  const newPokes = dailyPokemonArray.filter(p => !trainer.pokemon.includes(p.id));
+  const caughtIDs = trainer.uniqueIDs;
+  const newPokes = dailyPokemonArray.filter(p => !caughtIDs.includes(p._id));
   if (newPokes.length > 0) {return {dailyPokemon: newPokes[0], unique: true, tier: tierVal}}
   else {return {dailyPokemon: dailyPokemonArray[0], unique: true, tier: tierVal}}
 }
@@ -139,7 +140,7 @@ WildPokemonSchema.statics.nameToID = async function (name) {
   if (!temp) {
     return null;
   } else {
-    return temp.id;
+    return temp._id;
   }
 }
 

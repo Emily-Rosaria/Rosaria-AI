@@ -9,6 +9,7 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment,
   try {
     const {trainerPokemon} = trainer.addPokemon(legend, shinyOdds);
     const caughtAt = trainerPokemon.captureDate;
+    const pokemonName = trainerPokemon.nickname;
     const cooldown = channel.client.pokeConfig.get("cooldown");
     await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
     const shiny = trainerPokemon.shiny;

@@ -1,0 +1,10 @@
+{
+  "pokemon": {
+    "imgPath": "https://raw.githubusercontent.com/Emily-Rosaria/Rosaria-AI/mongo-main/",
+    "cooldown": 1800000,
+    "minDelay": 600000,
+    "randomDelay": 900000,
+    "lingerTime": 1200000,
+    "shinyOdds": 0.0025
+    }
+  }

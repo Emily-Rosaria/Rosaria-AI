@@ -1,19 +1,20 @@
 const Reddit = require('reddit'); // Redditz
 const Discord = require('discord.js'); // Image embed
-const { perms } = require('./../../config.json'); // Perms
+const dev = "247344219809775617";
 
 module.exports = {
   name: 'copypasta', // The name of the command
   description: 'Get a copypasta from r/copypasta', // The description of the command (for help text)
   perms: 'verified', //restricts to bot dev only (me)
   cooldown: 10,
+  allowDM: true,
   usage: '[day/week/month/year/all] [post-count, max=5] [nsfw/safe]', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, args) {
     const timeframe = [args.join(' ').match(/(day|week|month|year|all)/g) || 'week'][0];
     const numMatch = Number([args.join(' ').match(/\d+/) || 1][0]);
     let postCount = (numMatch > 5) ? 5 : numMatch;
-    if (message.author.id == perms.dev) {postCount = numMatch};
-    const nsfw = (message.channel.type == 'text') ? ((message.channel.nsfw && (!args.includes('safe') || !args.includes('sfw'))) || (message.author.id == perms.dev)) : ((message.channel.type == 'dm') && args.includes('nsfw'));
+    if (message.author.id == dev) {postCount = numMatch};
+    const nsfw = (message.channel.type == 'text') ? ((message.channel.nsfw && (!args.includes('safe') || !args.includes('sfw'))) || (message.author.id == dev || message.guild.id == '749880737712308274')) : ((message.channel.type == 'dm') && args.includes('nsfw'));
     const rating = nsfw ? 'NSFW posts are enabled.' : 'All posts should be (relatively) SFW.';
     const plural = (postCount==1) ? 'post' : 'posts';
     message.reply('Fetching '+postCount.toString()+' '+plural+' from r/copypasta/top?t='+timeframe+'. '+rating);

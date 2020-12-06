@@ -10,6 +10,7 @@ module.exports = {
     name: 'anime', // The name of the command
     description: 'Get random anime pics from safebooru!', // The description of the command (for help text)
     args: false, // Specified that this command doesn't need any data other than the command
+    allowDM: true,
     perms: 'verified', //restricts to users with the "verifed" role noted at config.json
     usage: '[image-tag 1] [image-tag 2] [...]', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {

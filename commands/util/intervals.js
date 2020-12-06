@@ -5,12 +5,13 @@
 
 module.exports = {
     name: 'intervals', // The name of the command
-    description: 'Lists all running intervals.', // The description of the command (for help text)
-    perms: 'verified', //restricts to verified users
-    client: true,
+    description: 'Lists all running timeouts and intervals.', // The description of the command (for help text)
+    perms: 'dev', //restricts to verified users
     usage: '', // Help text to explain how to use the command (if it had any arguments)
-    execute(message, client, args) {
-      keys = Array.from(client.intervals.keys());
-      message.channel.send('Current running intervals include...\n'+keys.join(', ')+'.');
+    allowDM: true,
+    execute(message, args) {
+      keys = Array.from(message.client.spawnloops.keys());
+      if (keys && keys.length > 0) {message.reply('Current running intervals include...\n`'+keys.join(', ')+'``.')}
+      else {message.reply('There are currently no running processes.')}
     },
 };

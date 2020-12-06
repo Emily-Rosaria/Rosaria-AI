@@ -14,7 +14,6 @@ const Pokemon = require("./models/pokedex.js");
 
 //db reset
 //Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
-Pokemon.db.dropDatabase(function(err, result) {console.log("Resetting wild pokemon database...")});
 
 const PokedexData = require("./../bot_assets/Pokedex.json");
 
@@ -58,9 +57,17 @@ const NewPokeData = PokedexData.map((poke)=>{
   return temp;
 });
 
-Pokemon.insertMany(NewPokeData, async (err, doc)=>{
-  if (err) {console.error(err)}
-  console.log("Done, now sending random pokemon to your location!");
-  console.log(await Pokemon.randomWild());
-  mongoose.disconnect();
-});
+const x = async () => {
+  await NewPokeData.forEach(async (poke) => {
+    await Pokemon.findByIdAndUpdate(poke._id, poke, options).exec();
+  }).then(()=>{
+    console.log("Done, now sending random pokemon to your location!");
+    console.log(await Pokemon.randomWild());
+    mongoose.disconnect();
+  }).catch((err)=>{
+    console.error(err);
+    mongoose.disconnect();
+  });
+};
+
+x();

@@ -29,7 +29,7 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, attachment,
     if (shiny) {
       channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
     }
-    if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
+    if (!shiny) { console.log(user.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(user.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
     guildInfo = await GuildData.findByIdAndUpdate(channel.guild.id,{"$set": {"pokeData.legendSpawns": [], "pokeData.legend": 0} },{new: true}).exec();
   } catch (err) {console.error(err)}
 }

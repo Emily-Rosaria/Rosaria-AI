@@ -5,16 +5,14 @@ const mongoose = require("mongoose");
 const connectDB = require("./connectDB.js");
 var database = "rose"; // Database name
 
-// Models
-//const Trainer = require("./models/trainers.js");
-
 // Connect to database
 connectDB("mongodb://localhost:27017/"+database);
 
+// Models
 const Pokemon = require("./models/pokedex.js");
-
 //const Trainers = require("./models/trainers.js");
 
+//db reset
 //Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
 Pokemon.db.dropDatabase(function(err, result) {console.log("Resetting wild pokemon database...")});
 
@@ -33,7 +31,7 @@ const femaleOnly = [113,115,124,238,241,242,29,30,31,314,380,413,416,440,478,549
 const NewPokeData = PokedexData.map((poke)=>{
   let rareNum = 1;
   if (starters.includes(poke.id)) {rareNum = 2}
-  if (poke.legend) {rareNum = 100}
+  if (poke.legend) {rareNum = 75}
   const isEgg = eggPokemon.includes(poke.id);
   let genderOdds = 0.5;
   if (genderlessArray.includes(poke.id)) {

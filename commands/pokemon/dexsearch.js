@@ -10,7 +10,7 @@ module.exports = {
     allowDM: true,
     usage: '<pokemon-name OR pokemon-id>', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
-      const imgPath = "./../../";
+      const imgPath = message.client.pokeConfig.get("imgPath");
       const pokeCount = await Pokedex.countDocuments({});
       let query = (args.length == 0 || args[0] == 'random' || args[0] == 'r' || args[0] == '0') ? (Math.ceil(Math.random() * pokeCount)) : (isNaN(args.join('-')) ? args.join('-').toLowerCase() : Number(args[0]));
       const noResult = isNaN(query) ? {name: query, id: "#???"} : {name: "??????", id: ("#"+query)}

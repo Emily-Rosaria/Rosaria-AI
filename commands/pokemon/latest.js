@@ -19,7 +19,7 @@ module.exports = {
     var latestPokemon = trainer.pokemon.sort((a,b)=>b.captureDate - a.captureDate);
     const now = (new Date()).getTime();
     const toDuration = require('./../../misc_functions/toDuration.js');
-    const imgPath = "./../../";
+    const imgPath = message.client.pokeConfig.get("imgPath");
     if (latestPokemon.length > 25) {latestPokemon = latestPokemon.slice(0,25)}
     const dexData = await Pokedex.find({ _id: { $in: latestPokemon.map(p=>p.id) }}).exec()
     const pokemonArray = latestPokemon.map((p,i) => {

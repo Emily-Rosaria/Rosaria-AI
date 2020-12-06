@@ -55,7 +55,7 @@ module.exports = {
         }, 7500, message,legendaryCatch);
         setTimeout(async (message, msg, dailyPokemon) => {
           const {trainerPokemon, newCount} = trainer.addPokemon(dailyPokemon, shinychance);
-          const imgPath = "./../../";
+          const imgPath = message.client.pokeConfig.get("imgPath");
           const embed = new Discord.MessageEmbed()
             .setColor('#0099ff')
             .setTitle('Daily Pokémon: #'+trainerPokemon.id+' '+trainerPokemon.nickname+'!')

@@ -15,7 +15,7 @@ const Pokemon = require("./models/pokedex.js");
 //db reset
 //Trainers.db.dropDatabase(function(err, result) {console.log("Resetting trainer database...")});
 
-const PokedexData = require("./../bot_assets/Pokedex.json");
+const PokedexData = require("./../bot_assets/pokedex.json");
 
 const PokeDescs = require("./../bot_assets/poke-info.json");
 

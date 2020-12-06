@@ -13,7 +13,8 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, canvas, ctx
     const cooldown = channel.client.pokeConfig.get("cooldown");
     await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
     const shiny = trainerPokemon.shiny;
-    const pokemonIMG = shiny ? await Canvas.loadImage("./../"+legend.imgs.shiny) : await Canvas.loadImage("./../"+legend.imgs.normal);
+    const imgPath = channel.client.pokeConfig.get("imgPath");
+    const pokemonIMG = shiny ? await Canvas.loadImage(imgPath+legend.imgs.shiny) : await Canvas.loadImage(imgPath+legend.imgs.normal);
     ctx.drawImage(pokemonIMG, 20, 20);
     const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'legendary-' + wildPokemon.name + '.png');
     const embed = new Discord.MessageEmbed()
@@ -68,17 +69,18 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
   let pokeChoices = await Pokedex.randomWilds([Math.random(),Math.random(),Math.random()],false);
   let pokeNames = pokeChoices.map(p=>p.name);
   let imgs = pokeChoices.map(p=>p.imgs); // each is 475x475
+  const imgPath = channel.client.pokeConfig.get("imgPath");
   const grassCanvas = Canvas.createCanvas(1030, 640);
   const grassCtx = grassCanvas.getContext('2d');
   const grassBackground = await Canvas.loadImage('./bot_assets/background-grass.png');
   grassCtx.drawImage(grassBackground, 0, 0, grassCanvas.width, grassCanvas.height);
   const mysteryPokes = Canvas.createCanvas(1030, 640);
   const shadowCtx = mysteryPokes.getContext('2d');
-  const poke1 = await Canvas.loadImage("./../"+imgs[0].normal);
+  const poke1 = await Canvas.loadImage(imgPath+imgs[0].normal);
   shadowCtx.drawImage(poke1, 20, 177, 285, 285);
-  const poke2 = await Canvas.loadImage("./../"+imgs[1].normal);
+  const poke2 = await Canvas.loadImage(imgPath+imgs[1].normal);
   shadowCtx.drawImage(poke2, 372, 177, 285, 285);
-  const poke3 = await Canvas.loadImage("./../"+imgs[2].normal);
+  const poke3 = await Canvas.loadImage(imgPath+imgs[2].normal);
   shadowCtx.drawImage(poke3, 724, 177, 285, 285);
   shadowCtx.globalCompositeOperation = 'source-in';
   shadowCtx.fillRect(0, 0, 1030, 640);
@@ -127,7 +129,7 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel, imgPath)
           const caughtAt = trainerPokemon.captureDate;
           const newTrainer = await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
           const shiny = trainerPokemon.shiny;
-          const finalImg = shing ? await Canvas.loadImage("./../"+imgs[choiceNum].shiny) : await Canvas.loadImage("./../"+imgs[choiceNum].normal);
+          const finalImg = shing ? await Canvas.loadImage(imgPath+imgs[choiceNum].shiny) : await Canvas.loadImage(imgPath+imgs[choiceNum].normal);
           grassCtx.drawImage(finalImg, xPos, 177, 285, 285);
           const catchFile = new Discord.MessageAttachment(grassCanvas.toBuffer(), 'caught-'+wildPokemon.name+'-group.png');
           const catchEmbed = new Discord.MessageEmbed()
@@ -194,9 +196,10 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
   console.log(pokemonName+", a legendary pokemon, just spawned on "+channel.guild.name+".");
   const minDelay = channel.client.pokeConfig.get("minDelay");
   const randomDelay = channel.client.pokeConfig.get("randomDelay");
+  const imgPath = channel.client.pokeConfig.get("imgPath"); // external image host path
   const nextDelay = minDelay+Math.floor(Math.random()*randomDelay);
   const startTime = (new Date()).getTime();
-  const pokemonURL = "./../"+wildPokemon.img.normal;
+  const pokemonURL = imgPath+wildPokemon.img.normal;
   const lingerTime = channel.client.pokeConfig.get("lingerTime");
   const shinyOdds = channel.client.pokeConfig.get("shinyOdds");
   const canvas = Canvas.createCanvas(960, 540);

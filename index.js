@@ -76,7 +76,7 @@ client.on('ready', async function() {
  */
 client.on('message', async message => {
     if (message.author.bot) {return}
-    const botPing = ["<@" + message.client.user.id + ">","<@!" + message.client.user.id + ">","<@" + message.client.user.id + "> ","<@!" + message.client.user.id + "> "]; // with and without a space
+    const botPing = ["<@" + message.client.user.id + ">","<@!" + message.client.user.id + ">"]; // with and without a space
     let gID = "dm";
     let gData = {prefix: ["r!","!","?","p!"]};
     if (message.channel.type != "dm") {
@@ -89,7 +89,7 @@ client.on('message', async message => {
     if (prefix.length == 0) {return}
 
     // Split commands and arguments from message so they can be passed to functions
-    const args = message.content.slice(prefix[0].length).split(/ +/);
+    const args = message.content.slice(prefix[0].length).trim().split(/ +/);
     const commandName = args.shift().toLowerCase().replace(/[-_]/,'');
 
     // If the command isn't in the  command folder, move on

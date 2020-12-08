@@ -15,7 +15,10 @@ module.exports = {
     usage: '[image-tag 1] [image-tag 2] [...]', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
         // Get image from the api.
-        tags = args || ['all'];
+        let tags = args.length > 0 ? args : ['all'];
+        if (tags.length > 3) {
+          tags = tags.slice(0,3);
+        }
         const image = await Booru.search('safebooru', tags, { limit: 1, random: true });
         const embed = new Discord.MessageEmbed()
         .setColor('#2e51a2')

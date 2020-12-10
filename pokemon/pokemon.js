@@ -48,7 +48,6 @@ async function spawnPokemon(channel) {
   guildInfo = await GuildData.findByIdAndUpdate(query,{"$set": {"pokeData.lastSpawn": startTime}},options).exec();
   const imgPath =  "./"; //using local file instead of channel.client.pokeConfig.get("imgPath");
   var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
-  console.log(pokemonName+" just spawned on "+channel.guild.name+".");
   const pokemonURL = imgPath+wildPokemon.imgs.normal;
   const lingerTime = channel.client.pokeConfig.get("lingerTime");
   const cooldown = channel.client.pokeConfig.get("cooldown");
@@ -121,7 +120,6 @@ async function spawnPokemon(channel) {
         if (shiny) {
           channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
         }
-        if (!shiny) { console.log(winner.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(winner.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
         nextSpawn(channel,minDelay+Math.floor(Math.random()*randomDelay));
     } catch (err) {console.error(err)}
     })
@@ -130,7 +128,6 @@ async function spawnPokemon(channel) {
       const attachment2 = new Discord.MessageAttachment(canvas.toBuffer(), 'wild-' + wildPokemon.name + '.png');
       embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... It was a ' + pokemonName + '.').setTimestamp().setTitle('Wild '+pokemonName+' Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png');
       channel.send({files: [attachment2], embed: embed2});
-      console.log(wildPokemon.name+" fled from " +channel.guild.name+ " before it could be caught...");
       const spawnData = await PokeSpawns.create({
         id: wildPokemon.id,
         name: wildPokemon.name,

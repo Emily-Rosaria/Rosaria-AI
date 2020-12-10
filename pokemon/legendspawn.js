@@ -41,7 +41,6 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, canvas, ctx
     if (shiny) {
       channel.send('Something looks a little different about this Pokémon... ✨')
     }
-    if (!shiny) { console.log(user.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(user.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
     guildInfo = await GuildData.findByIdAndUpdate(channel.guild.id,{"$set": {"pokeData.legendSpawns": [], "pokeData.legend": 0} },{new: true}).exec();
   } catch (err) {console.error(err)}
 }
@@ -155,7 +154,6 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel) {
           if (shiny) {
             channel.send('Something looks a little different about this Pokémon... ✨');
           }
-          if (!shiny) { console.log(user.username+" caught a "+pokemonName+ " on "+channel.guild.name) } else { console.log(user.username+" caught a SHINY "+pokemonName+ " on "+channel.guild.name) }
         } catch (err) {console.error(err)}
       }
     })
@@ -193,7 +191,6 @@ async function giveTokens(trainer) {
 module.exports = async function (wildPokemon, guildInfo, channel) {
   const PokemonSpawn = require('./pokemon.js');
   var pokemonName = wildPokemon.name.split('-').map(word => (word[0].toUpperCase() + word.slice(1))).join('-');
-  console.log(pokemonName+", a legendary pokemon, just spawned on "+channel.guild.name+".");
   const minDelay = channel.client.pokeConfig.get("minDelay");
   const randomDelay = channel.client.pokeConfig.get("randomDelay");
   const imgPath = channel.client.pokeConfig.get("imgPath"); // external image host path

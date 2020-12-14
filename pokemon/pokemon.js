@@ -118,6 +118,7 @@ async function spawnPokemon(channel) {
       if (shiny) {
         channel.send('Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`')
       }
+      nextSpawn(channel,minDelay+Math.floor(Math.random()*randomDelay));
     })
     .catch( async (collected) => {
       ctx.drawImage(pokemonIMG, 20, 20);
@@ -134,8 +135,6 @@ async function spawnPokemon(channel) {
         time: (new Date()).getTime(), // unix time of escape/capture
         guild: channel.guild.id // server ID on discord where it appeared
       });
-    })
-    .finally(()=>{
       nextSpawn(channel,minDelay+Math.floor(Math.random()*randomDelay));
     })
   })

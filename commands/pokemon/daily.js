@@ -70,7 +70,7 @@ module.exports = {
           }
           await msg.edit(embed);
           shinyText = trainerPokemon.shiny ? '\n... wait a second! Something looks a little different about this Pokémon... ✨\n`This Pokémon is shiny. Currently, the sprites are work-in-progess, but you can still feel cool about it!`' : '';
-          await message.reply('Your Pokémon has arrived! We hope '+trainerPokemon.nickname+' has a good time in your care. You can view your recent Pokémon with `r!latest`.');
+          await message.reply('Your Pokémon has arrived! We hope '+trainerPokemon.nickname+' has a good time in your care. You can view your recent Pokémon with `r!latest`.'+shinyText);
           trainer = Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.daily": nextReset.getTime()} }, {new: true}).exec();
           await PokeSpawns.create({
             id: trainerPokemon.id,

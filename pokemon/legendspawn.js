@@ -128,7 +128,7 @@ async function giveChoice(user, trainer, guildInfo, shinyOdds, channel) {
           const caughtAt = trainerPokemon.captureDate;
           const newTrainer = await Trainers.findByIdAndUpdate({ _id: trainer._id},{ $push: { pokemon: trainerPokemon }, $set: {"cooldowns.pokecatch": caughtAt+cooldown} }, {new: true}).exec();
           const shiny = trainerPokemon.shiny;
-          const finalImg = shing ? await Canvas.loadImage(imgPath+imgs[choiceNum].shiny) : await Canvas.loadImage(imgPath+imgs[choiceNum].normal);
+          const finalImg = shiny ? await Canvas.loadImage(imgPath+imgs[choiceNum].shiny) : await Canvas.loadImage(imgPath+imgs[choiceNum].normal);
           grassCtx.drawImage(finalImg, xPos, 177, 285, 285);
           const catchFile = new Discord.MessageAttachment(grassCanvas.toBuffer(), 'caught-'+wildPokemon.name+'-group.png');
           const catchEmbed = new Discord.MessageEmbed()

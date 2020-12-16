@@ -277,7 +277,14 @@ module.exports = async function (wildPokemon, guildInfo, channel) {
       PokemonSpawn.execute(channel,nextDelay);
     })
     .catch( async (collected) => {
-      embed2.setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... I wonder what it could have been...').setTimestamp().setTitle('Wild Pokémon Fled').setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png').setImage('attachment://mystery-pokemon-encounter.png');
+      const embed2 = new Discord.MessageEmbed()
+        .setColor('#FF0000')
+        .setTimestamp()
+        .setDescription('Oh no... the wild Pokémon excaped before anyone could catch it... I wonder what it could have been...')
+        .setTimestamp()
+        .setTitle('Wild Pokémon Fled')
+        .setFooter('Better luck next time...','https://www.ssbwiki.com/images/7/7b/Pok%C3%A9_Ball_Origin.png')
+        .setImage('attachment://mystery-pokemon-encounter.png');
       channel.send({files: [attachment1], embed: embed2});
       PokemonSpawn.execute(channel,nextDelay);
     });

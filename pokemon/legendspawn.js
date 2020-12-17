@@ -16,7 +16,7 @@ async function giveLegend(user, trainer, legend, shinyOdds, channel, canvas, ctx
     const imgPath = channel.client.pokeConfig.get("imgPath");
     const pokemonIMG = shiny ? await Canvas.loadImage(imgPath+legend.imgs.shiny) : await Canvas.loadImage(imgPath+legend.imgs.normal);
     ctx.drawImage(pokemonIMG, 20, 20);
-    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'legendary-' + wildPokemon.name + '.png');
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'legendary-' + legend.name + '.png');
     const embed = new Discord.MessageEmbed()
       .setColor('#FF0000')
       .setImage('attachment://legendary-' + legend.name + '.png')

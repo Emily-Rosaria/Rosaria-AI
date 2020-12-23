@@ -9,7 +9,6 @@ module.exports = {
     const toDuration = require('./../../misc_functions/toDuration.js');
     const launchTime = message.client.bootTime;
     const now = (new Date()).getTime();
-    console.log([now,launchTime]);
     const diffString = toDuration(now - launchTime);
     message.channel.send("The bot has been up for `"+diffString+"`.");
   },

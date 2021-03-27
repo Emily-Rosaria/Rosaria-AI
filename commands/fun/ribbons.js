@@ -1,6 +1,6 @@
 
 /**
- * This class responds to anyone that types r!hentai with an anime ribbondage lewd.
+ * This class responds to anyone that types r!ribbons with an anime ribbondage lewd.
  *
  */
 
@@ -23,6 +23,6 @@ module.exports = {
         .setFooter('Image from: '+engine)
         await Booru.search(engine, ['ribbon_bondage'], { limit: 1, random: true })
         .then(img => message.reply(embed.setImage(img[0].fileUrl).setTimestamp()))
-        .catch( function(error) {message.reply('Unable to fetch image'); console.error(error);}); // Replies to the user with a random image
+        .catch( function(error) {message.reply('Unable to fetch an image. Try again in a few minutes.');}); // Replies to the user with a random image
     },
 };

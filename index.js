@@ -158,8 +158,13 @@ client.on('message', async message => {
         if (gID == "727569853405200474" && gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
           return message.reply(command.reject);
         }
+
+        if (command.perms == "dev") {
+          return message.reply("You do not have the required permissions to use this command; this command is only for the bot dev.");
+        }
+
         // check perms for admin commands
-        if ((command.perms == "botcommander" || command.perms == "admin") && (!gData.perms.botcommander.some(r => roleCache.has(r)) || !message.member.hasPermission("ADMINISTRATOR") || !message.member.hasPermission("MANAGE_GUILD"))) {
+        else if ((command.perms == "botcommander" || command.perms == "admin") && (!gData.perms.botcommander.some(r => roleCache.has(r)) || !message.member.hasPermission("ADMINISTRATOR") || !message.member.hasPermission("MANAGE_GUILD"))) {
           return message.reply("You do not have the required permissions to use this command; this command is only for moderators.");
         }
 

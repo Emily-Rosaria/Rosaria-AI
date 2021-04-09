@@ -37,7 +37,6 @@ module.exports = async function (client) {
         }
         return false;
       });
-      var reminder = "Remember to post at <#728070251077566464> to get full server access. If you need help, be sure to first read <#728070078008000592> and then ask your questions at <#728072324372365362>. To prevent an inflated or inaccurate member count, you'll be automatically kicked about 5 or so days after you've joined if you haven't made a reasonable attempt to gain access.";
       var lurkersNew = [];
       var lurkersOld = [];
       lurkers.each((lurker)=>{

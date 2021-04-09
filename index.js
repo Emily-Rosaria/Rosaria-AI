@@ -19,6 +19,7 @@ const Discord = require('discord.js');                  // Loads the discord API
 const Canvas = require('canvas'); // Pretty pictures
 const readline = require('readline');
 const {google} = require('googleapis');
+var cron = require('node-cron'); // run regular scheduled tasks
 
 const globalconfig = require('./globalconfig.json')
 

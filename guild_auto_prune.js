@@ -33,7 +33,6 @@ module.exports = async function (client) {
     guild.members.fetch().then((members)=>{
       var lurkers = members.filter((member)=>{
         if (!member.user.bot && (!member.roles || !member.roles.hoist || ![...member.roles.cache.keys()].some(rID=>verified_roles.includes(""+rID)))) {
-          console.log(member.user.username + " - " + member.user.id);
           return true;
         }
         return false;

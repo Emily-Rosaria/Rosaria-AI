@@ -32,7 +32,7 @@ var database = "rose"; // Database name
 
 const spawnPokemon = require('./pokemon/loadspawners.js');
 
-const client = new Discord.Client({ retryLimit: 3, restRequestTimeout: 25000, partials: ['USER', 'GUILD_MEMBER'] }); // Initiates the client
+const client = new Discord.Client({ {ws: { intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING'] }, retryLimit: 3, restRequestTimeout: 25000}); // Initiates the client
 
 client.commands = new Discord.Collection(); // Creates an empty list in the client object to store all commands
 const getAllCommands = function (dir, cmds) {
@@ -69,6 +69,14 @@ client.on('ready', async function() {
     client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
     console.log(`${client.user.username} is up and running! Launched at: ${(new Date()).toUTCString()}.`);
     await spawnPokemon(client);
+    cron.schedule('0 0,12 * * *', async () => {
+      var prune = require('./guild_auto_prune.js');
+      try {
+        prune(client);
+      } catch (err) {
+        console.error(err);
+      }
+    });
 });
 
 /**
@@ -194,48 +202,11 @@ client.on('message', async message => {
 });
 
 client.on('guildMemberAdd', async member => {
-    const guildConfig = await GuildData.findById(member.guild.id).exec();
-    if (guildConfig && guildConfig.perms && guildConfig.perms.purge >= 0) {
-        try {
-            if (guildConfig.lurkers && guildConfig.lurkers.length > 0) {
-              const oldLurker = guildConfig.lurkers.find(L=>L._id == member.user.id);
-              if (oldLurker) {
-                const newWarns = Math.min(oldLurker.warnings, guildConfig.perms.purge);
-                const newLastWarn = member.joinedAt.getTime();
-                const update = {"lurkers.$.warnings" : newWarns, "lurkers.$.lastPing" : newLastWarn};
-                const newGuildConfig = await GuildData.findOneAndUpdate({_id: member.guild.id, "lurkers._id" : member.user.id},{"$set": update},{new: true}).exec();
-              } else {
-                const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$push": { lurkers: {_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}}},{new: true}).exec();
-              }
-            } else if (guildConfig.lurkers && guildConfig.lurkers.length == 0) {
-              const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$push": { lurkers: {_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}}},{new: true}).exec();
-            } else {
-              const newGuildConfig = await GuildData.findByIdAndUpdate(member.guild.id,{ "$set": {lurkers: [{_id: member.user.id, joinedAt: member.joinedAt.getTime(), warnings: 0, lastPing: member.joinedAt.getTime()}]}},{new: true}).exec();
-            }
-        } catch (err) {
-            console.error(err);
-            const devUser = client.users.cache.get(dev);
-            const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
-            devUser.send('Error adding lurker data on `guildMemberAdd. Fully error report:\n```'+errmsg+'```');
-        }
-    };
+  // on member add
 });
 
 client.on('guildMemberRemove', async member => {
-    const guildConfig = await GuildData.findById(member.guild.id).exec();
-    if (guildConfig && guildConfig.lurkers && guildConfig.lurkers.length > 0) {
-        const oldLurker = guildConfig.lurkers.find(L=>L._id == member.user.id);
-        if (oldLurker) {
-            try {
-                const newGuildConfig = await GuildData.findByIdAndUpdate({_id: member.guild.id},{"$pull": {"lurkers": {"_id": oldLurker.id}}},{new: true}).exec();
-            } catch (err) {
-              console.error(err);
-              const devUser = client.users.cache.get(dev);
-              const errmsg = (error.stack.toString().length > 1800) ? err.stack.toString().slice(0,1800) + '...' : err.stack;
-              devUser.send('Error deleting lurker data on `guildMemberRemove. Fully error report:\n```'+errmsg+'```');
-            }
-        }
-    };
+  // on member leave
 });
 
 connectDB("mongodb://localhost:27017/"+database);

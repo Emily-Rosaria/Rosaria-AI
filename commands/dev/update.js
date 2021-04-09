@@ -52,6 +52,8 @@ module.exports = {
         delete require.cache[require.resolve('./../../misc_functions/'+miscF.name)];
       });
 
+      delete require.cache[require.resolve('./../../guild_auto_prune.js')];
+
       console.log('Misc functions updated and cleaned! Now starting function loops (namely pokemon spawns).');
 
       // Time to reset the pokemon stuff!

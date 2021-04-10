@@ -21,7 +21,7 @@ module.exports = async function (client) {
         if (message.pinned || message.createdAt.getTime() + 14*oneDay < now.getTime()) {
           return false; // don't delete old or pinned messages
         }
-        if (message.createdAt.getTime() + 10*oneDay < now.getTime() || (message.author.bot && message.createdAt.getTime() + 3*oneDay > now.getTime()) || (message.author.id == client.user.id && message.createdAt.getTime() + oneDay > now.getTime())) {
+        if (message.createdAt.getTime() + 10*oneDay < now.getTime() || (message.author.bot && message.createdAt.getTime() + 3*oneDay > now.getTime()) || (message.author.id == client.user.id && message.createdAt.getTime() + 0.5*oneDay > now.getTime())) {
           return true;
         } else {
           return false;

@@ -87,7 +87,7 @@ client.on('message', async message => {
     if (message.author.bot) {return}
     const botPing = ["<@" + message.client.user.id + ">","<@!" + message.client.user.id + ">"]; // with and without a space
     let gID = "dm";
-    let gData = {prefix: ["r!","!","?","p!"]};
+    let gData = {prefix: ["$","r!","!","?","p!"]};
     if (message.channel.type != "dm") {
       gID = message.guild.id;
       gData = await GuildData.findById(gID).exec() || gData;

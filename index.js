@@ -21,7 +21,7 @@ const readline = require('readline');
 const {google} = require('googleapis');
 var cron = require('node-cron'); // run regular scheduled tasks
 
-const globalconfig = require('./globalconfig.json')
+const globalconfig = require('./globalconfig.json');
 
 const dev = "247344219809775617"; // my ID on Discord
 

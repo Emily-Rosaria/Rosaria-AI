@@ -2,7 +2,7 @@ const mongoose = require("mongoose"); // Import mongoose library
 const Schema = mongoose.Schema; // Define Schema method
 
 // Schema
-var LewdSchema = newSchema({
+var LewdSchema = new Schema({
     boobs: {type: Boolean, required: true},
     pussy: {type: Boolean, required: true},
     clit: {type: Boolean, required: true},
@@ -10,7 +10,7 @@ var LewdSchema = newSchema({
     dick: {type: Boolean, required: true}
 });
 
-var BindingSchema = newSchema({
+var BindingSchema = new Schema({
     type: {type: String, required: true}, // e.g. leather, rope, ribbon, etc.
     unlock: {type: Number, required: true}, // -1 means impossible, 0 is unlocked, 1+ means possible to unlock with lockpicks
     unclasp: {type: Number, required: true}, // difficulty to "undo" knots or buckles, etc.
@@ -18,7 +18,7 @@ var BindingSchema = newSchema({
     cut: {type: Number, required: true} // difficulty to cut through
 });
 
-var BondageSchema = newSchema({
+var BondageSchema = new Schema({
     blindfold: {type: BindingSchema},
     stuffing: {type: BindingSchema},
     gag: {type: BindingSchema},
@@ -33,14 +33,14 @@ var BondageSchema = newSchema({
     hips: {type: BindingSchema}
 });
 
-var SpellSchema = newSchema({
+var SpellSchema = new Schema({
     name: {type: String, required: true}, // name of the spell
     components: {type: String, required: true}, // body part required for casting, e.g. legs, arms, hands, etc.
     cost: {type: Number, required: true}, // stamina cost of the spell
     effect: {type: String, required: true} // effect of the spell, whether flavourful or otherwise
 });
 
-var StatusSchema = newSchema({
+var StatusSchema = new Schema({
     name: {type: String, required: true}, // name of the status
     duration: {type: Number, required: true} // timestamp of when the status will end
 });

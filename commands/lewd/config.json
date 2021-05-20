@@ -1,0 +1,20 @@
+{
+  "guildID":"727569853405200474",
+  "bindings":{
+    "blindfold":["ribbon","rope","cloth","leather","latex","tape"],
+    "stuffing":["panties","ribbons","cloth"],
+    "gag":["leather","ribbons","rope","cloth","tape","latex"],
+    "collar":["rope","ribbons","leather","metal"],
+    "arms":["rope","ribbons","leather","latex","metal","tape"],
+    "hands":["rope","ribbons","leather","latex","metal","tape"],
+    "thighs":["rope","ribbons","leather","latex","metal","tape"],
+    "legs":["rope","ribbons","leather","latex","metal","tape"],
+    "ankles":["rope","ribbons","leather","latex","metal","tape"],
+    "feet":["rope","ribbons","leather","latex","metal","tape"],
+    "torso":["rope","ribbons","leather","latex","metal","tape"],
+    "hips":["rope","ribbons","leather","latex","metal","tape"]
+  },
+  "material":["coils and coils of rope","lots of silky ribbons","leather straps and bindings",["restrictive latex attire","tight latex 'clothing'"],"a lot of tape","metal cuffs and devices",["strong grasping tentacles","smooth vines","silky spider's webbing","wires and cables"],["comfy blankets","soft scarves","scraps of fabric","various articles of clothing"],["disembodied ghostly arms","invisible magical bindings","plushies and fluffy toys"]],
+  "villain":[["friend","coworker","classmate"],["student","teacher"],["rogue","thief","spy"],["witch","wizard","sorcerer","magician"],["maid","butler","servant"],["guard","soldier"],["noble"],["performer","mime","actor"],["demon","devil"],["succubus","incubus"],["dryad","spirit","ghost"],["farmer","innkeeper","bartender"]],
+  "adjective":["an attractive","a charismatic","an eccentric","a seductive","an intelligent","a loving","a naughty","a bratty","a domineering","a sadistic","a playful","a ditzy","a horny"]
+}

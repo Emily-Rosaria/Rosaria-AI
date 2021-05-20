@@ -25,8 +25,8 @@ function resolve(a) {
 }
 
 module.exports = {
-    name: 'bind', // The name of the command
-    aliases: ['bondage','encounter'],
+    name: 'encounter', // The name of the command
+    aliases: ['bondage','bind','prompt'],
     description: 'Generate a random bondage trap/encounter!', // The description of the command (for help text)
     perms: 'verified', //restricts to bot dev only (me)
     usage: '<@user>', // Help text to explain how to use the command (if it had any arguments)
@@ -52,8 +52,9 @@ module.exports = {
       const name = member.displayName;
       const villain = resolve(config.villain);
       const adjective = resolve(config.adjective);
+      const verb = resolve(config.verb);
       const material = resolve(config.material);
-      const desc = `The ${villain} subdues (or plans to subdue) ${name} with... ${material}.`;
+      const desc = `The ${villain} tries to ${verb} ${name} with... ${material}.`;
       const avatar = member.user.avatarURL();
       const embed = new Discord.MessageEmbed()
         .setColor(member.displayHexColor)

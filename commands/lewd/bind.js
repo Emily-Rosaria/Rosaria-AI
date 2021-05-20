@@ -54,11 +54,17 @@ module.exports = {
       const adjective = resolve(config.adjective);
       const material = resolve(config.material);
       const desc = `The ${villain} subdues (or plans to subdue) ${name} with... ${material}.`;
+      const avatar = member.avatarURL();
       const embed = new Discord.MessageEmbed()
         .setColor(member.displayHexColor)
         .setTitle(`${name} encounters... ${adjective} ${villain}!`)
         .setDescription(desc)
         .setFooter("Use the `$encounter` command.");
+      if (avatar) {
+        embed.setAuthor(name,avatar);
+      } else {
+        embed.setAuthor(name);
+      }
       message.channel.send(embed);
     },
 };

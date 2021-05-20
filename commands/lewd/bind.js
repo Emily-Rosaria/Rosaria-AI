@@ -27,16 +27,13 @@ function resolve(a) {
 module.exports = {
     name: 'encounter', // The name of the command
     aliases: ['bondage','bind','prompt'],
-    description: 'Generate a random bondage trap/encounter!', // The description of the command (for help text)
+    description: 'Generate a random bondage encounter for Rosaria!', // The description of the command (for help text)
     perms: 'verified', //restricts to bot dev only (me)
     usage: '<@user>', // Help text to explain how to use the command (if it had any arguments)
-    allowDM: false,
+    allowDM: true,
     execute(message, args) {
-      if (!message.guild || message.guild.id != '727569853405200474') {
-        return;
-      }
       var member = message.member;
-      if (args && args.length > 0) {
+      if (args && args.length > 0 && message.channel.type != "dm") {
         var tempID = args[0].match(/\d{17,23}/);
         if (tempID && tempID.length > 0) {
           tempID = tempID[0];
@@ -46,18 +43,20 @@ module.exports = {
           }
         }
       }
+      var user = member ? member.user : message.author;
       //const bindings = config.bindings;
       //const options = shuffle(Object.keys(config.bindings));
       //const count = 3 + Math.floor(Math.random()*3);
-      const name = member.displayName;
+      const name = member ? member.displayName : user.username;
+      const avatar = user.avatarURL();
+      const color = member ? member.displayHexColor : "#f51d75";
       const villain = resolve(config.villain);
       const adjective = resolve(config.adjective);
       const verb = resolve(config.verb);
       const material = resolve(config.material);
       const desc = `The ${villain} tries to ${verb} ${name} with... ${material}.`;
-      const avatar = member.user.avatarURL();
       const embed = new Discord.MessageEmbed()
-        .setColor(member.displayHexColor)
+        .setColor(color)
         .setTitle(`${name} encounters... ${adjective} ${villain}!`)
         .setDescription(desc)
         .setFooter("Use the `$encounter` command.");

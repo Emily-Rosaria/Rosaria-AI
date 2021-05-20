@@ -54,7 +54,7 @@ module.exports = {
       const adjective = resolve(config.adjective);
       const material = resolve(config.material);
       const desc = `The ${villain} subdues (or plans to subdue) ${name} with... ${material}.`;
-      const avatar = member.avatarURL();
+      const avatar = member.user.avatarURL();
       const embed = new Discord.MessageEmbed()
         .setColor(member.displayHexColor)
         .setTitle(`${name} encounters... ${adjective} ${villain}!`)

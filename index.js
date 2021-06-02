@@ -69,7 +69,7 @@ client.on('ready', async function() {
     client.bootTime = (new Date()).getTime();
     client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
     console.log(`${client.user.username} is up and running! Launched at: ${(new Date()).toUTCString()}.`);
-    await spawnPokemon(client);
+    //await spawnPokemon(client);
     cron.schedule('0 20 * * *', async () => { // remind people at 8pm
       var prune = require('./guild_auto_prune.js');
       try {

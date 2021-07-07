@@ -55,9 +55,30 @@ module.exports = {
         delete require.cache[require.resolve('./../../misc_functions/'+miscF.name)];
       });
 
+
       delete require.cache[require.resolve('./../../guild_auto_prune.js')];
 
-      console.log('Misc functions updated and cleaned! Now starting function loops (namely pokemon spawns).');
+      console.log('Misc functions updated and cleaned! Now starting events.');
+
+      // Time to reset the event stuff!
+      const eventFunctions = fs.readdirSync('./events',{ withFileTypes: true }).filter((f)=>f.name.endsWith('.js'));
+      eventFunctions.forEach((eventF) => {
+        delete require.cache[require.resolve('./../../events/'+eventF.name)];
+        const event = require('./../../events/'+eventF.name);
+        client.events.set(event.name,event);
+      });
+
+      // Time to reset the button stuff!
+      const buttonFunctions = fs.readdirSync('./buttons',{ withFileTypes: true }).filter((f)=>f.name.endsWith('.js'));
+      buttonFunctions.forEach((buttonF) => {
+        delete require.cache[require.resolve('./../../buttons/'+buttonF.name)];
+        const button = require('./../../buttons/'+buttonF.name);
+        client.buttons.set(button.name,button);
+      });
+
+      console.log('Events done, now reloading config.');
+
+      delete require.cache[require.resolve('./../../config.json')];
 
       message.reply('Done! Database and core functions may require a reboot for the full changes to be pushed.');
       /*

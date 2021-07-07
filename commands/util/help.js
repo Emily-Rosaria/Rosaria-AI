@@ -33,7 +33,7 @@ module.exports = {
 
           const mapped = filtered.reduce((acc,cur)=>{
             let temp = acc;
-            const starred = !cur.allowDM ? '\*' : '';
+            const starred = !cur.allowDM ? '`*`' : '';
             if (cur.group) {
               temp[cur.group] = (temp[cur.group] || []).concat(cur.name+starred);
             } else {
@@ -103,6 +103,9 @@ module.exports = {
           embed.addField("Usage",`\`${prefix}${command.name} ${command.usage}\``);
         } else {
           embed.addField("Usage",`\`${prefix}${command.name}\``);
+        }
+        if (command.perms && !['basic','trusted'].includes(command.perms)) {
+          embed.addField("Perms",command.perms.charAt(0).toUpperCase() + command.perms.slice(1).toLowerCase());
         }
 
         message.channel.send(embed);

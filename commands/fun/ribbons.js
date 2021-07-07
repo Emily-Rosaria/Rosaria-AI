@@ -10,10 +10,9 @@ const Booru = require('booru'); // This lets me get stuff from weeb sites.
 module.exports = {
     name: 'ribbons', // The name of the command
     description: 'Get random anime girls... wrapped up with ribbons!', // The description of the command (for help text)
-    usage: '<lewd/safe, defaults to channel\'s nsfw rating>',
+    usage: '[lewd/safe, defaults to channel\'s nsfw rating>]',
     allowDM: true,
     perms: 'basic', //restricts to users with the "verifed" role noted at config.json
-    usage: '', // Help text to explain how to use the command (if it had any arguments)
     group: 'fun',
     rose: true,
     async execute(message, args) {

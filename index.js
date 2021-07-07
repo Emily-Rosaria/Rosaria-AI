@@ -32,6 +32,8 @@ var database = "rose"; // Database name
 
 const client = new Discord.Client({ws: { intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING'] }, retryLimit: 3, restRequestTimeout: 25000}); // Initiates the client
 
+require('discord-buttons')(client);
+
 client.commands = new Discord.Collection(); // Creates an empty list in the client object to store all commands
 const getAllCommands = function (dir, cmds) {
   files = fs.readdirSync(dir, { withFileTypes: true });
@@ -117,13 +119,13 @@ client.on('messageReactionRemoveAll', async (message) => {
 
 client.on('guildMemberAdd', async member => {
   if (member.guild.id == config.guild) {
-    client.events.get("onMemberAdd").event(message);
+    client.events.get("onMemberAdd").event(member);
   }
 });
 
 client.on('guildMemberRemove', async member => {
   if (member.guild.id == config.guild) {
-    client.events.get("onMemberRemove").event(message);
+    client.events.get("onMemberRemove").event(member);
   }
 });
 

@@ -31,7 +31,7 @@ module.exports = {
             return true;
           });
 
-          const mapped = filtered.reduce(acc,cur=>{
+          const mapped = filtered.reduce((acc,cur)=>{
             let temp = acc;
             const starred = !cur.allowDM ? '*' : '';
             if (cur.group) {
@@ -39,17 +39,18 @@ module.exports = {
             } else {
               temp.misc = (temp.misc || []).concat(cur.name+starred);
             }
+            return temp;
           },{});
 
           const embed = new Discord.MessageEmbed()
           .setColor('#f51d75')
           .setDescription(`Here\'s a list of all my available commands. You can send \`${prefix}help [command name]\` to get info on a specific command! Note, commands marked with a \`*\` are not available in DMs.`)
-          .setTitle(`${message.client.user.name}'s Command List`)
+          .setTitle(`${message.client.user.username}'s Command List`)
           .setTimestamp()
 
           for (const key of [...Object.keys(mapped)]) {
             const cmds = mapped[key].sort();
-            embed.addField(key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),cmds.join('\n'),true);
+            embed.addField(key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),cmds.join(', '));
           }
 
           return message.channel.send(embed);
@@ -65,13 +66,17 @@ module.exports = {
 
         const embed = new Discord.MessageEmbed()
         .setColor('#f51d75')
-        .setTitle(`${command.name.charAt(0).toUpperCase() + command.name.slice(1).toLowerCase()} Help`)
+        .setTitle(`Help: ${prefix}${command.name}`)
         .setTimestamp()
 
         if (command.description) embed.setDescription(command.description);
 
         if (command.aliases) embed.addField("Aliases",`${command.aliases.join(', ')}`);
-        if (command.usage) embed.addField("Usage",`${prefix}${command.name} ${command.usage}`);
+        if (command.usage) {
+          embed.addField("Usage",`\`${prefix}${command.name} ${command.usage}\``);
+        } else {
+          embed.addField("Usage",`\`${prefix}${command.name}\``);
+        }
 
         message.channel.send(embed);
     },

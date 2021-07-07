@@ -25,8 +25,8 @@ function resolve(a) {
 }
 
 module.exports = {
-    name: 'encounter', // The name of the command
-    aliases: ['bondage','bind','prompt'],
+    name: 'prompt', // The name of the command
+    aliases: ['bondage','bind','encounter'],
     description: 'Generate a random bondage encounter for Rosaria!', // The description of the command (for help text)
     perms: 'basic', //restricts to bot dev only (me)
     usage: '<@user>', // Help text to explain how to use the command (if it had any arguments)
@@ -61,7 +61,7 @@ module.exports = {
         .setColor(color)
         .setTitle(`${name} encounters... ${adjective} ${villain}!`)
         .setDescription(desc)
-        .setFooter("Use the `$encounter` command.");
+        .setFooter("Use the `prompt` command.");
       if (avatar) {
         embed.setAuthor(name,avatar);
       } else {

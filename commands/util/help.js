@@ -33,7 +33,7 @@ module.exports = {
 
           const mapped = filtered.reduce((acc,cur)=>{
             let temp = acc;
-            const starred = !cur.allowDM ? '*' : '';
+            const starred = !cur.allowDM ? '\*' : '';
             if (cur.group) {
               temp[cur.group] = (temp[cur.group] || []).concat(cur.name+starred);
             } else {
@@ -48,10 +48,37 @@ module.exports = {
           .setTitle(`${message.client.user.username}'s Command List`)
           .setTimestamp()
 
+          const fields = [];
+
           for (const key of [...Object.keys(mapped)]) {
             const cmds = mapped[key].sort();
-            embed.addField(key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),cmds.join(', '));
+            let order = 0;
+            if (key == 'dev') {
+              order = 99;
+            } else if (key == 'misc') {
+              order = 98;
+            } else if (key == 'util') {
+              order = 97;
+            }
+            fields.push({
+              name: key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),
+              value: cmds.join(', '),
+              order: order
+            });
           }
+
+          fields.sort((a,b)=>{
+            if (a.order != b.order) {
+              return a.order - b.order;
+            } else if (a.name.toLowerCase() < b.name.toLowerCase()) {
+              return 1;
+            } else if (a.name.toLowerCase() > b.name.toLowerCase()) {
+              return -1;
+            }
+            return 0;
+          });
+
+          embed.addFields(fields);
 
           return message.channel.send(embed);
         }

@@ -9,15 +9,21 @@ module.exports = {
       message.delete({ timeout: 1000 });
       const { MessageButton, MessageActionRow } = require('discord-buttons');
 
+      let pub = "";
+
+      if (args && args.length > 0 && ["pub","public","shame","share"].includes(args[0].toLowerCase())) {
+        pub = "_pub";
+      }
+
       let button = new MessageButton()
       .setStyle('red')
       .setLabel('Red Pill')
-      .setID('click_red')
+      .setID('click_red'+pub)
 
       let button2 = new MessageButton()
       .setStyle('blurple')
       .setLabel('Blue Pill')
-      .setID('click_blue')
+      .setID('click_blue'+pub)
 
       let row = new MessageActionRow()
       .addComponents(button, button2);

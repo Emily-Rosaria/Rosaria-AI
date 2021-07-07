@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node ./database/poketest.js",
     "start": "node index.js",
+	  "doc": "node doc-auth.js",
     "mongo": "node ./database/mongo-init.js",
     "mongo-poke": "node ./database/poke-init.js"
   },
@@ -15,6 +16,7 @@
     "@replit/database": "^2.0.0",
     "booru": "^2.4.0",
     "canvas": "^2.6.1",
+    "discord-buttons": "^4.0.0",
     "discord.js": "^12.0.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -24,6 +26,7 @@
     "mongoose": "^5.10.16",
     "nano": "^9.0.1",
     "node": "^12.19.1",
+    "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1",
     "pm2": "^4.5.0",
     "reddit": "^1.2.1",

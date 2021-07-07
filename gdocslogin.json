@@ -1,14 +1,1 @@
-{
-  "installed": {
-    "client_id": "xxx",
-    "project_id": "xxx",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_secret": "xxx",
-    "redirect_uris": [
-      "urn:ietf:wg:oauth:2.0:oob",
-      "http://localhost"
-    ]
-  }
-}
+{"installed":{"client_id":"64142409721-r7e3a2g7kg893qnlpja6fheskk1tanhp.apps.googleusercontent.com","project_id":"rosaria-ai-1606042958686","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"anj0DnG_cDwQ8rrNjq8yNzTy","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}

@@ -99,7 +99,7 @@ module.exports = async function(link) {
     .catch((err)=> {
       console.log('The API returned an error: ' + err);
       return null;
-      });
+    });
     return docData;
   }
   const docData = await getLogin(docID);

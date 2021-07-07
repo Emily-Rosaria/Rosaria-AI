@@ -21,17 +21,14 @@ const readline = require('readline');
 const {google} = require('googleapis');
 var cron = require('node-cron'); // run regular scheduled tasks
 
-const globalconfig = require('./globalconfig.json');
+const config = require('./config.json');
 
-const dev = "247344219809775617"; // my ID on Discord
+const dev = config.perms.dev[0];
 
 const mongoose = require("mongoose"); //database library
 
-const GuildData = require("./database/models/guilds.js"); // database with server configs
 const connectDB = require("./database/connectDB.js"); // Database connection
 var database = "rose"; // Database name
-
-const spawnPokemon = require('./pokemon/loadspawners.js');
 
 const client = new Discord.Client({ws: { intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING'] }, retryLimit: 3, restRequestTimeout: 25000}); // Initiates the client
 
@@ -57,149 +54,65 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 }
 
-client.pokeConfig = new Discord.Collection(); // for global config options about the pokemon shiz
-for (const i of Object.entries(globalconfig.pokemon)) {
-    client.pokeConfig.set(i[0],i[1]);
+// Creates an empty list for storing timeouts so people can't spam with commands
+const cooldowns = new Discord.Collection();
+
+// load the core events into client
+client.events = new Discord.Collection();
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    client.events.set(event.name, event);
 }
 
-const cooldowns = new Discord.Collection(); // Creates an empty list for storing timeouts so people can't spam with commands
 
 // Starts the bot and makes it begin listening for commands.
 client.on('ready', async function() {
-    client.bootTime = (new Date()).getTime();
-    client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
-    console.log(`${client.user.username} is up and running! Launched at: ${(new Date()).toUTCString()}.`);
-    //await spawnPokemon(client);
-    cron.schedule('0 20 * * *', async () => { // remind people at 8pm
-      var prune = require('./guild_auto_prune.js');
-      try {
-        prune(client);
-      } catch (err) {
-        console.error(err);
-      }
-    });
+  client.user.setPresence({ activity: { type: 'PLAYING', name: 'with my adorable subjects' }, status: 'online' });
+  console.log(`${client.user.username} is up and running! Launched at: ${(new Date()).toUTCString()}.`);
+  cron.schedule('0 20 * * *', async () => { // remind people at 8pm
+    var prune = require('./guild_auto_prune.js');
+    try {
+      prune(client);
+    } catch (err) {
+      console.error(err);
+    }
+  });
 });
 
-/**
- * This function controls how the bot reacts to messages it receives
- */
 client.on('message', async message => {
-    if (message.author.bot) {return}
-    const botPing = ["<@" + message.client.user.id + ">","<@!" + message.client.user.id + ">"]; // with and without a space
-    let gID = "dm";
-    let gData = {prefix: ["$","r!","!","?","p!"]};
-    if (message.channel.type != "dm") {
-      gID = message.guild.id;
-      gData = await GuildData.findById(gID).exec() || gData;
+    if (message && message.author && message.author.bot) {
+      return;
     }
+    client.events.get("onMessage").event(message);
+});
 
-    // Ignore bot messages and messages that dont start with the prefix defined in the config data
-    const prefix = gData.prefix.concat(botPing).filter(p => message.content.toLowerCase().startsWith(p));
-    if (prefix.length == 0) {return}
+client.on('messageDelete', async message => {
+    if (message.author && message.author.bot) {return} // don't respond to bots
+    client.events.get("onDelete").event(message);
+});
 
-    // Split commands and arguments from message so they can be passed to functions
-    const args = message.content.slice(prefix[0].length).trim().split(/ +/);
-    const commandName = args.shift().toLowerCase().replace(/[-_]/,'');
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+    if (newMessage.author && newMessage.author.bot) {return} // don't respond to bots
+    client.events.get("onEdit").event(oldMessage, newMessage);
+});
 
-    // If the command isn't in the  command folder, move on
-    const command = client.commands.get(commandName)
-        || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-    if(!command) return;
+client.on('messageReactionAdd', async (reaction, user) => {
+    if (user.bot) {return}
+    client.events.get("onReactionAdd").event(reaction, user);
+});
 
-        // If the command requires arguments, make sure they're there.
-        if (command.args && !args.length) {
-            let reply = 'That command requires more details!';
+client.on('messageReactionRemove', async (reaction, user) => {
+    if (user.bot) {return}
+    client.events.get("onReactionRemove").event(reaction, user);
+});
 
-            // If we have details on how to use the args, provide them
-            if (command.usage) {
-                reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
-            }
+client.on('messageReactionRemoveEmoji', async (reaction) => {
+    client.events.get("onReactionTake").event(reaction);
+});
 
-            // Send a reply from the bot about any error encountered
-            return message.channel.send(reply);
-        }
-
-    /**
-     * The following block of code handles "cooldowns" making sure that users can only use a command every so often.
-     * This is helpful for commands that require loading time or computation, like image requests.
-     */
-    if(!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
-    }
-
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3 ) * 1000;
-
-    if(!timestamps.has(message.author.id)) {
-        timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    } else {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-        if(now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`Whoa! You're sending commands too fast! Please wait ${timeLeft.toFixed(1)} more second(s) before running \`${command.name}\` again!`);
-        }
-
-        timestamps.set(message.author.id, now);
-        setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    }
-
-    /**
-     * End cooldown code, begin checking if the user has the right permissions. Possible perms include:
-     * User - all users may use it
-     * Basic - only users with basic access
-     * Advanced - only users with "verified" access
-     * Trusted - only users "trusted" by the server owner (i.e. given a role)
-     * Botcommander - given ability to use all commands
-     * Dev - only usable by me
-     * Owner - only useable by server owner
-     */
-
-    if(command.perms) {
-      if (message.channel.type == "dm") {
-        if (!command.allowDM) {
-          return message.reply("This command is not available for use in DMs.")
-        }
-      } else if (message.author.id != dev) {
-        const roleCache = message.member.roles.cache; // get role cache
-        if (gID == "727569853405200474" && gData.perms.allowAll === false && command.reject && !gData.perms[command.perms].some(r => roleCache.has(r))) {
-          return message.reply(command.reject);
-        }
-
-        if (command.perms == "dev") {
-          return message.reply("You do not have the required permissions to use this command; this command is only for the bot dev.");
-        }
-
-        // check perms for admin commands
-        else if ((command.perms == "botcommander" || command.perms == "admin") && (!gData.perms.botcommander.some(r => roleCache.has(r)) || !message.member.hasPermission("ADMINISTRATOR") || !message.member.hasPermission("MANAGE_GUILD"))) {
-          return message.reply("You do not have the required permissions to use this command; this command is only for moderators.");
-        }
-
-        // check perms for "allAll" applicable commands
-        else if (gData.perms.allowAll === false && ((command.perms == "basic" && !gData.perms.basic.some(r=>roleCache.has(r))) || (command.perms == "advanced" && !gData.perms.advanced.some(r=>roleCache.has(r))))) {
-          return message.reply("You do not have the required permissions to use this command.");
-        }
-
-        else if (command.perms == "owner" && message.guild.ownerID != message.author.id) {
-          return message.reply("You do not have the required permissions to use this command; only the guild owner can use this command.");
-        }
-      }
-    }
-
-    try {
-        // Run the command
-        await command.execute(message, args);
-    } catch(error) {
-        console.error(error);
-        message.reply('Sorry! I ran into an error trying to do that!');
-        const devUser = client.users.cache.get(dev);
-        const msg = (message.content.length > 200) ? message.content.slice(0,200) + ' [...]' : message.content;
-        const errmsg = (error.stack.toString().length > 1500) ? error.stack.toString().slice(0,1500) + '...' : error.stack;
-        const errLocation = message.channel.type == "dm" ? 'in `Direct Messages`' : 'from `'+message.guild.name+'`';
-        devUser.send('Error running command: `'+msg+'`\nSender: `'+message.author.username+'#'+message.author.discriminator+'` '+errLocation+'\nError Report:\n```'+errmsg+'```');
-    }
+client.on('messageReactionRemoveAll', async (message) => {
+    client.events.get("onReactionClear").event(message);
 });
 
 client.on('guildMemberAdd', async member => {

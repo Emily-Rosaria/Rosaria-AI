@@ -5,7 +5,7 @@ const dev = "247344219809775617";
 module.exports = {
   name: 'copypasta', // The name of the command
   description: 'Get a copypasta from r/copypasta', // The description of the command (for help text)
-  perms: 'verified', //restricts to bot dev only (me)
+  perms: 'basic', //restricts to bot dev only (me)
   cooldown: 10,
   allowDM: true,
   usage: '[day/week/month/year/all] [post-count, max=5] [nsfw/safe]', // Help text to explain how to use the command (if it had any arguments)

@@ -12,8 +12,9 @@ module.exports = {
     description: 'Get random anime girls... wrapped up with ribbons!', // The description of the command (for help text)
     usage: '<lewd/safe, defaults to channel\'s nsfw rating>',
     allowDM: true,
-    perms: 'verified', //restricts to users with the "verifed" role noted at config.json
+    perms: 'basic', //restricts to users with the "verifed" role noted at config.json
     usage: '', // Help text to explain how to use the command (if it had any arguments)
+    rose: true,
     async execute(message, args) {
         // Get image from the api.
         const nsfw = (message.channel.type == 'text') ? (message.channel.nsfw && !['sfw','safe'].includes(args[0])) : ((message.channel.type == 'dm') && ['lewd','nsfw','hental'].includes(args[0]));

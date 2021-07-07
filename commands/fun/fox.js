@@ -9,7 +9,7 @@ module.exports = {
     name: 'fox', // The name of the command
     description: 'Get random fox pics!', // The description of the command (for help text)
     args: false, // Specified that this command doesn't need any data other than the command
-    perms: 'verified', //restricts to users with the "verifed" role noted at config.json
+    perms: 'basic', //restricts to users with the "verifed" role noted at config.json
     allowDM: true,
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {

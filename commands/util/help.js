@@ -1,5 +1,3 @@
-const GuildData = require("./../../database/models/guilds.js"); // database with server configs
-
 /**
  * Runs the help command, explaining each available command to the user.
  */

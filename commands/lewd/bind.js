@@ -1,4 +1,4 @@
-const config = require('./config.json');
+const config = require('./lewd_prompts.json');
 const Discord = require('discord.js'); // Image embed
 
 function shuffle(a) {
@@ -31,6 +31,7 @@ module.exports = {
     perms: 'verified', //restricts to bot dev only (me)
     usage: '<@user>', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
+    rose: true,
     execute(message, args) {
       var member = message.member;
       if (args && args.length > 0 && message.channel.type != "dm") {

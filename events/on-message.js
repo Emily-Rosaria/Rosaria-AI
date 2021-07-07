@@ -113,6 +113,10 @@ module.exports = {
       }
     }
 
+    if (command.rose && message.guild && message.guild.id != config.guild) {
+      return;
+    }
+
     // Try to run the command!
     try {
       await command.execute(message, args);

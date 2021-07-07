@@ -116,11 +116,15 @@ client.on('messageReactionRemoveAll', async (message) => {
 });
 
 client.on('guildMemberAdd', async member => {
-  // on member add
+  if (member.guild.id == config.guild) {
+    client.events.get("onMemberAdd").event(message);
+  }
 });
 
 client.on('guildMemberRemove', async member => {
-  // on member leave
+  if (member.guild.id == config.guild) {
+    client.events.get("onMemberRemove").event(message);
+  }
 });
 
 connectDB("mongodb://localhost:27017/"+database);

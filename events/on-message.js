@@ -5,6 +5,8 @@ module.exports = {
   name: "onMessage",
   async event(message) {
 
+    const dev = config.perms.dev[0];
+
     // end if there's no content
     if (!message.content) {
       return;
@@ -17,10 +19,14 @@ module.exports = {
 
     const botPing = ["<@" + client.user.id + ">","<@!" + client.user.id + ">"];
 
-    const dmExtraPrefix = (message.channel.type == "dm") ? ["!","?","+","-"] : ["$"];
+    const dmExtraPrefix = (message.channel.type == "dm") ? ["!","?","+","-"] : ["r!"];
     // Find if message begins with a valid command prefix
-    const prefix = config.prefix.concat(botPing).concat(dmExtraPrefix).filter(p => message.content.toLowerCase().startsWith(p));
 
+    const prefix_arr = (message.guild && message.guild.id == "749880737712308274") ? ["r!","r?"] : config.prefix;
+
+    const prefix = prefix_arr.concat(botPing).concat(dmExtraPrefix).filter(p => message.content.toLowerCase().startsWith(p));
+
+    // If command wasn't used
     if (!prefix || prefix.length < 1) {
       return;
     }
@@ -65,12 +71,13 @@ module.exports = {
     if(!timestamps.has(message.author.id)) {
       timestamps.set(message.author.id, now);
       setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-    } else if (message.author.id != config.perms.dev) {
+    } else if (message.author.id != dev) {
       const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
       if(now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
-        return message.reply(`Whoa! You're sending commands too fast! Please wait ${timeLeft.toFixed(1)} more second(s) before running \`${command.name}\` again!`);
+        const msg = await message.reply(`Whoa! You're sending commands too fast! Please wait ${timeLeft.toFixed(1)} more second(s) before running \`${command.name}\` again!`);
+        return msg.delete({ timeout: 5000 });
       }
       timestamps.set(message.author.id, now);
       setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
@@ -80,34 +87,27 @@ module.exports = {
     if(command.perms) {
 
       //manage dev commands
-      if (command.perms == "dev" && message.author.id != config.perms.dev) {
+      if (command.perms == "dev" && !config.perms.dev.includes(message.author.id)) {
         return;
       }
 
-      //manage dm commands
-      if (message.channel.type == "dm") {
-        if (!command.allowDM) {
-          return message.reply("This command is not available for use in DMs.");
-        }
-        // manage non-dm command perms
+      if (message.channel.type == "dm" && !command.allowDM) {
+        // manage dm commands
+        return message.reply("This command is not available for use in DMs.");
       } else {
         // check perms for admin/mod commands where user isn't a dev
-        if (message.author.id != config.perms.dev) {
-          // only check further if user isn't an admin
-          if (!roleCache.includes(config.perms.admin) || !message.member.hasPermission("ADMINISTRATOR")) {
-            if (command.perms == "admin") {
-              return message.reply("You do not have the required permissions to use this command; this command is only for server admins.");
-              // only check further for non-mods (as mod is one down from admin)
-            } else if (!roleCache.includes(config.perms.mod)) {
-              if (command.perms == "mod") {
-                return message.reply("You do not have the required permissions to use this command; this command is only for server moderators.");
-              } else if (message.guild.id == config.guild && !roleCache.includes(config.perms.user)) {
-                if (command.perms == "user") {
-                  // don't do anything for non-vetted users
-                  return;
-                }
-              }
-            }
+        if (!config.perms.dev.includes(message.author.id)) {
+          if (command.perms == "basic" && message.guild.id != "749880737712308274" && !config.perms.basic.some(rID => roleCache.includes(rID)) && !config.perms.trusted.some(rID => roleCache.includes(rID))) {
+            return;
+          }
+          if (command.perms == "trusted" && message.guild.id != "749880737712308274" && !config.perms.trusted.some(rID => roleCache.includes(rID))) {
+            return;
+          }
+          if (command.perms == "mod" && !config.perms.mod.some(rID => roleCache.includes(rID))) {
+            return;
+          }
+          if (command.perms == "admin" && !config.perms.admin.some(rID => roleCache.includes(rID))) {
+            return;
           }
         }
       }
@@ -121,7 +121,7 @@ module.exports = {
       message.reply('Sorry! I ran into an error trying to do that!').then(m=>{
         m.delete({timeout:60*1000});
       });
-      const devUser = client.users.cache.get(config.perms.dev);
+      const devUser = client.users.cache.get(dev);
       const msg = (message.content.length > 200) ? message.content.slice(0,200) + ' [...]' : message.content;
       const errmsg = (error.stack.toString().length > 1500) ? error.stack.toString().slice(0,1500) + '...' : error.stack;
       const errLocation = message.channel.type == "dm" ? 'in `Direct Messages`' : 'from `'+message.channel.name+'`';

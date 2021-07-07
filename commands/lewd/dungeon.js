@@ -3,7 +3,7 @@ const Damsels = require('./../../database/models/damsels.js');
 module.exports = {
     name: 'dungeon', // The name of the command
     description: 'Provide help for entering the kinky dungeon on Rosaria!', // The description of the command (for help text)
-    perms: 'verified', //restricts to bot dev only (me)
+    perms: 'basic',
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     allowDM: false,
     rose: true,

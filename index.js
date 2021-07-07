@@ -129,5 +129,14 @@ client.on('guildMemberRemove', async member => {
   }
 });
 
+
+client.on('click_red', async (button) => {
+  await button.reply.defer('You took the red pill, so that means you are based!');
+});
+
+client.on('click_blue', async (button) => {
+  await button.reply.defer('You took the blue pill, so that means you are cringe!');
+});
+
 connectDB("mongodb://localhost:27017/"+database);
 client.login(process.env.TOKEN); // Log the bot in using the token provided in the .env file

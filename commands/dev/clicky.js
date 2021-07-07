@@ -23,13 +23,5 @@ module.exports = {
       .addComponents(button, button2);
 
       message.channel.send('What pill do you take?', row);
-
-      message.client.on('click_red', async (button) => {
-          await button.reply.send('You took the red pill, so that means you are based!', true)
-      });
-
-      message.client.on('click_blue', async (button) => {
-          await button.reply.send('You took the blue pill, so that means you are cringe!', true)
-      });
     },
 };

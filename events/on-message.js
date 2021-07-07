@@ -97,10 +97,10 @@ module.exports = {
       } else {
         // check perms for admin/mod commands where user isn't a dev
         if (!config.perms.dev.includes(message.author.id)) {
-          if (command.perms == "basic" && message.guild.id != "749880737712308274" && !config.perms.basic.concat(config.perms.trusted).some(rID => roleCache.includes(rID))) {
+          if (command.perms == "basic" && message.guild.id == config.guild && !config.perms.basic.concat(config.perms.trusted).some(rID => roleCache.includes(rID))) {
             return message.reply("You need to be an approved user to use this command!");
           }
-          if (command.perms == "trusted" && message.guild.id != "749880737712308274" && !config.perms.trusted.some(rID => roleCache.includes(rID))) {
+          if (command.perms == "trusted" && message.guild.id == config.guild && !config.perms.trusted.some(rID => roleCache.includes(rID))) {
             return message.reply("You're not cool enough to use this command!");
           }
           if (command.perms == "mod" && !config.perms.mod.some(rID => roleCache.includes(rID))) {

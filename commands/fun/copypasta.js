@@ -8,6 +8,7 @@ module.exports = {
   perms: 'basic', //restricts to bot dev only (me)
   cooldown: 10,
   allowDM: true,
+  group: 'fun',
   usage: '[day/week/month/year/all] [post-count, max=5] [nsfw/safe]', // Help text to explain how to use the command (if it had any arguments)
   async execute(message, args) {
     const timeframe = [args.join(' ').match(/(day|week|month|year|all)/g) || 'week'][0];

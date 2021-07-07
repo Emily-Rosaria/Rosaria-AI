@@ -31,6 +31,7 @@ module.exports = {
     perms: 'basic', //restricts to bot dev only (me)
     usage: '<@user>', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
+    group: 'lewd',
     rose: true,
     execute(message, args) {
       var member = message.member;

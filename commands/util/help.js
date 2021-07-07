@@ -1,6 +1,10 @@
 /**
  * Runs the help command, explaining each available command to the user.
  */
+
+const config = require('./../../config.json'); // load bot config
+const Discord = require('discord.js'); // Image embed
+
 module.exports = {
     name: 'help',
     description: 'List all available commands, or info about a specific command.',
@@ -9,31 +13,46 @@ module.exports = {
     usage: '<command name>',
     cooldown: 5,
     allowDM: true,
+    group: 'util',
     async execute(message, args) {
-        let gID = "dm";
-        let gData = {prefix: ["r!"]};
-        if (message.channel.type != "dm") {
-          gID = message.guild.id;
-          gData = await GuildData.findById(gID).exec();
-        }
-        const prefix = gData.prefix[0];
+        const prefix = message.guild && message.guild.id == "749880737712308274" ? "r!" : config.prefix[0];
+
         const { commands } = message.client;
-        data = [];
+
         // Send help data about ALL commands
         if(!args.length) {
-            data.push('Here\'s a list of all my commands:');
-            data.push(commands.filter(command=>!command.perms || command.perms != "dev").map(command => command.name).join(', '));
-            data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
+          const filtered = commands.filter(c=>{
+            if (c.rose && message.guild && message.guild.id != config.guild) {
+              return false;
+            }
+            if (c.perms && c.perms == 'dev' && !config.perms.dev.includes(message.author.id)) {
+              return false;
+            }
+            return true;
+          });
 
-            return message.author.send(data, { split: true })
-                .then(() => {
-                    if (message.channel.type === 'dm') return;
-                    message.reply('I\'ve sent you a DM with all my commands!');
-                })
-                .catch(error => {
-                    console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
-                    message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
-                });
+          const mapped = filtered.reduce(acc,cur=>{
+            let temp = acc;
+            const starred = !cur.allowDM ? '*' : '';
+            if (cur.group) {
+              temp[cur.group] = (temp[cur.group] || []).concat(cur.name+starred);
+            } else {
+              temp.misc = (temp.misc || []).concat(cur.name+starred);
+            }
+          },{});
+
+          const embed = new Discord.MessageEmbed()
+          .setColor('#f51d75')
+          .setDescription(`Here\'s a list of all my available commands. You can send \`${prefix}help [command name]\` to get info on a specific command! Note, commands marked with a \`*\` are not available in DMs.`)
+          .setTitle(`${message.client.user.name}'s Command List`)
+          .setTimestamp()
+
+          for (const key of [...Object.keys(mapped)]) {
+            const cmds = mapped[key].sort();
+            embed.addField(key.charAt(0).toUpperCase() + key.slice(1).toLowerCase(),cmds.join('\n'),true);
+          }
+
+          return message.channel.send(embed);
         }
 
         // Send help data about the specific command
@@ -41,17 +60,19 @@ module.exports = {
         const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
 
         if (!command) {
-            return message.reply('that\'s not a valid command!');
+          return message.reply('that\'s not a valid command!');
         }
 
-        data.push(`**Name:** ${command.name}`);
+        const embed = new Discord.MessageEmbed()
+        .setColor('#f51d75')
+        .setTitle(`${command.name.charAt(0).toUpperCase() + command.name.slice(1).toLowerCase()} Help`)
+        .setTimestamp()
 
-        if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
-        if (command.description) data.push(`**Description:** ${command.description}`);
-        if (command.usage) data.push(`**Usage:** ${prefix}${command.name} ${command.usage}`);
+        if (command.description) embed.setDescription(command.description);
 
-        data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
+        if (command.aliases) embed.addField("Aliases",`${command.aliases.join(', ')}`);
+        if (command.usage) embed.addField("Usage",`${prefix}${command.name} ${command.usage}`);
 
-        message.channel.send(data, { split: true });
+        message.channel.send(embed);
     },
 };

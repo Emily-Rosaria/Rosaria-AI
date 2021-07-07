@@ -7,6 +7,7 @@ module.exports = {
     perms: 'dev', //restricts to bot dev only (me)
     allowDM: true,
     usage: '', // Help text to explain how to use the command (if it had any arguments)
+    group: 'dev',
     execute(message, args) {
       var client = message.client;
       console.log("Updating commands and functions...");

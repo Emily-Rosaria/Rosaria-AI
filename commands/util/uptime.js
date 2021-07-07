@@ -5,11 +5,10 @@ module.exports = {
   aliases: ['boottime'],
   args: false,
   allowDM: true,
+  group: 'util',
   async execute(message, args) {
     const toDuration = require('./../../misc_functions/toDuration.js');
-    const launchTime = message.client.bootTime;
-    const now = (new Date()).getTime();
-    const diffString = toDuration(now - launchTime);
-    message.channel.send("The bot has been up for `"+diffString+"`.");
+    const launchTime = message.client.uptime;
+    message.channel.send("The bot has been up for `"+toDuration(launchTime)+"`.");
   },
 };

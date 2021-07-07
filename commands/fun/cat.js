@@ -12,6 +12,7 @@ module.exports = {
     allowDM: true,
     perms: 'basic', //restricts to users with the "verifed" role noted at config.json
     usage: '', // Help text to explain how to use the command (if it had any arguments)
+    group: 'fun',
     async execute(message, args) {
 
         // Get cat from the random.cat api.

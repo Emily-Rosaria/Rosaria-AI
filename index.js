@@ -55,7 +55,7 @@ for (const file of commandFiles) {
 }
 
 // Creates an empty list for storing timeouts so people can't spam with commands
-const cooldowns = new Discord.Collection();
+client.cooldowns = new Discord.Collection();
 
 // load the core events into client
 client.events = new Discord.Collection();

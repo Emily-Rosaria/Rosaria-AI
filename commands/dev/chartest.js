@@ -18,5 +18,6 @@ module.exports = {
           reply.push(`**${key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:** ${data[key].trim()}\n`);
         }
       }
+      message.channel.send(reply,{split: true});
     },
 };

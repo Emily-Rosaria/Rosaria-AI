@@ -18,7 +18,7 @@ module.exports = async function(sheet) {
   const matches = sheet.match(re);
   for (const match of matches) {
     const fieldValue = match.split(':');
-    const field = Object.keys(fields).reduce(f=>fields[f].includes(fieldValue[0].toLowerCase().trim()));
+    const field = Object.keys(fields).filter(f=>fields[f].includes(fieldValue[0].toLowerCase().trim()));
     if (field && field[0]) {
       if (!data[field]) {
         data[field] = fieldValue[1].trim();

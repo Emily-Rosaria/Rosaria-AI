@@ -9,6 +9,8 @@ var CharacterSchema = new Schema({ // Create Schema
     age: {type: String, default: ""},
     pronouns: {type: String, default: ""}, // pronouns, e.g. "she/her/her", "he/him/his", "they/them/their"
     gender: {type: String, default: ""},
+    sexuality: {type: String, default: ""},
+    role: {type: String, default: ""},
     appearance: {type: String, default: ""},
     personality: {type: String, default: ""},
     kinks: {type: String, default: ""},

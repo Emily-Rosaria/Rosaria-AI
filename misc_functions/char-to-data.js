@@ -14,7 +14,7 @@ module.exports = async function(sheet) {
     "role":["role"]
   };
   const all_fields = Object.keys(fields).map(f=>fields[f]).flat();
-  const re = new RegExp(`(${all_fields.join('|')}) *: *([^:]*)(?!\n.+:)`, 'gi');
+  const re = new RegExp(`(${all_fields.join('|')}) *: *([^:]*)(?!.*:)`, 'gi');
   const matches = sheet.match(re);
   for (const match of matches) {
     const fieldValue = match.split(':');

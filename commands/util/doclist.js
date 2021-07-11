@@ -220,11 +220,11 @@ module.exports = {
         } else {
           embed.setDescription(pages[pagenum]);
         }
+        const plural = documents.length == 1 ? "" : "s";
         if (pagecount == 1) {
-          embed.setFooter(`${documents.length} Documents`);
+          embed.setFooter(`${documents.length} Document${plural}`);
           return embed;
         } else {
-          const plural = documents.length == 1 ? "" : "s";
           embed.setFooter(`Page ${pagenum+1}/${pagecount} • ${documents.length} Document${plural}`);
           return embed;
         }

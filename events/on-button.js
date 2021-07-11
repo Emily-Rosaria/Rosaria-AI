@@ -1,3 +1,5 @@
+const Discord = require('discord.js'); // Loads the discord API library
+
 module.exports = {
   name: "onButton",
   async event(button) {
@@ -11,15 +13,15 @@ module.exports = {
 
     // manage cooldowns if relevant
     if (clicked.cooldown && clicked.cooldown > 0) {
-      const cooldowns = message.client.cooldowns;
+      const cooldowns = client.cooldowns;
       if(!cooldowns.has("btn_"+clicked.name)) {
         cooldowns.set("btn_"+clicked.name, new Discord.Collection());
       }
 
       // get cooldown duration
       const now = Date.now();
-      const timestamps = cooldowns.get(clicked.name);
-      const cooldownAmount = Math.max(1,(command.cooldown || 3 )) * 1000;
+      const timestamps = cooldowns.get("btn_"+clicked.name);
+      const cooldownAmount = Math.max(1,(clicked.cooldown || 3 )) * 1000;
 
       // get user ID
       await button.clicker.fetch();

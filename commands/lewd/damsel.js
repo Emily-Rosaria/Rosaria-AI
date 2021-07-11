@@ -9,7 +9,7 @@ module.exports = {
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
     rose: true,
-    execute(message, args) {
+    async execute(message, args) {
 
       const template = {
         _id: message.author.id,
@@ -42,6 +42,7 @@ module.exports = {
       const embed = new Discord.MessageEmbed()
       .setColor('f51d75')
       .setTitle("Damsel Creation!")
-      .setDescription()
+      .setDescription("Work in progress");
+      message.reply(embed);
     },
 };

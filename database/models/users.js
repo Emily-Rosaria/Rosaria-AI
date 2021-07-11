@@ -10,8 +10,12 @@ var UserSchema = new Schema({ // Create Schema
     quick_chars: {type: [String], default: []}, // array of message IDs
     characters: {
       type: Map,
-      of: mongoose.ObjectId
-    } // map of character's they've made sheets for, name mapped to the sheets key
+      of: String // map of character's they've made sheets for, name mapped to the sheets key (which defaults to the ID of the discord message that created the character)
+    },
+    documents: {
+      type: Map,  // key-value pairs of a string (that invokes the command)
+      of: String // and a string "ID", the _id of the document and the id of the discord message that created it
+    }
 });
 
 // Model

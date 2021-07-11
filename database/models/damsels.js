@@ -14,7 +14,7 @@ var LewdSchema = new Schema({
 
 var ToySchema = new Schema({
     type: {type: String, required: true}, // e.g. vibrator, butt plug, etc.
-    remove: {type: Number, required: true}, // difficulty to remove, -1 = impossible
+    difficulty: {type: Number, required: true}, // difficulty to remove, -1 = impossible
     charge: {type: Number, required: true}, // current 'charge', if -1 then it can't be charged
     recharge: {type: Boolean, required: true}, // whether or not it can be recharged through magic
     power: {type: Number, required: true}, // how strong it is (influences lewd things and how fast it uses charge)

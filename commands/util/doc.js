@@ -10,6 +10,7 @@ module.exports = {
     perms: 'basic',
     allowDM: true,
     group: 'notes',
+    cooldown: 5,
     args: true,
     usage: '<doc-name>', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {

@@ -1,5 +1,6 @@
 module.exports = {
   name: "click_red_pub",
+  cooldown: 3,
   async click(button) {
     await button.clicker.fetch();
     const uID = button.clicker.user.id;

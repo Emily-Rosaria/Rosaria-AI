@@ -11,6 +11,7 @@ module.exports = {
     allowDM: true,
     group: 'notes',
     args: false,
+    cooldown: 5,
     usage: '[@user|all] [n(name)|t(timestamp)|p(popularity)] [a(accending)|d(descending)] [r(repeats)] [page-number]', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
 

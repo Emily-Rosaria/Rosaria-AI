@@ -185,7 +185,9 @@ module.exports = {
         }
         for (var j = 0; j<cap; j++) {
           const index = (i*20)+j+1;
-          const userText = uID != 'all' ? "" : repeats ? " • <@" + documents[(i*20)+j].user + ">" : " (" + documents[(i*20)+j].count + " users)";
+          const count = uID == "all" && !repeats ? documents[(i*20)+j].count : "";
+          const userCount = !count ? "" : count == 1 ? ` (${count} user)` : ` (${count} users)`;
+          const userText = uID != 'all' ? "" : repeats ? " • <@" + documents[(i*20)+j].user + ">" : userCount;
           page = page + "**" + index + ".** " + documents[(i*20)+j].name + userText + "\n";
         }
         pages.push(page.trim());
@@ -222,7 +224,8 @@ module.exports = {
           embed.setFooter(`${documents.length} Documents`);
           return embed;
         } else {
-          embed.setFooter(`Page ${pagenum+1}/${pagecount} • ${documents.length} Documents`);
+          const plural = documents.length == 1 ? "" : "s";
+          embed.setFooter(`Page ${pagenum+1}/${pagecount} • ${documents.length} Document${plural}`);
           return embed;
         }
       }

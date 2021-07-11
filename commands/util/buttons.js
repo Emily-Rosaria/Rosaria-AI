@@ -5,8 +5,8 @@ module.exports = {
     aliases: ['button','newbutton','notebutton'],
     args: true, // Specified that this command doesn't need any data other than the command
     perms: 'basic', //restricts to users with the "verifed" role noted at config.json
-    allowDM: false,
-    usage: '<message-text>\n<button-1-text> <button-1-note|button-1-url> [button-1-style|"url"]\n<button-2-text> <button-2-note|button-2-url> [button-2-style|"url"]\n...', // Help text to explain how to use the command (if it had any arguments)
+    allowDM: true,
+    usage: '<message-text>\n<button-1-label> <button-1-note|button-1-url> [button-1-style|"url"]\n<button-2-label> <button-2-note|button-2-url> [button-2-style|"url"]\n...', // Help text to explain how to use the command (if it had any arguments)
     execute(message, args) {
       const { MessageButton, MessageActionRow } = require('discord-buttons');
       message.delete({timeout:1000});

@@ -99,13 +99,13 @@ module.exports = {
         if (command.description) embed.setDescription(command.description);
 
         if (command.aliases) embed.addField("Aliases",`${command.aliases.join(', ')}`);
-        if (command.usage) {
-          embed.addField("Usage",`\`${prefix}${command.name} ${command.usage}\``);
-        } else {
-          embed.addField("Usage",`\`${prefix}${command.name}\``);
-        }
         if (command.perms && !['basic','trusted'].includes(command.perms)) {
           embed.addField("Perms",command.perms.charAt(0).toUpperCase() + command.perms.slice(1).toLowerCase());
+        }
+        if (command.usage) {
+          embed.addField("Usage","```\n"+prefix+command.name+" "+command.usage+"\n```");
+        } else {
+          embed.addField("Usage","```\n"+prefix+command.name+"\n```");
         }
 
         message.channel.send(embed);

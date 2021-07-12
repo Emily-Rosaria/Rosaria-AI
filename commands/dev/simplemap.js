@@ -1,7 +1,6 @@
 var seedrandom = require('seedrandom');
 var Jimp = require('jimp');
 const Discord = require('discord.js'); // Image embed
-const config = require('./../../config.json'); // load bot config
 
 function random_unit_vector(rng,amp) {
     let theta = rng() * 2 * Math.PI;
@@ -43,56 +42,53 @@ function pickHex(color1, color2, weight) {
 }
 
 module.exports = {
-    name: 'heightmap', // The name of the command
-    description: 'Test the heightmap code for potential worldgen. Write array arguments in the format of `[a,b,c,...]`. An offset of [0,1] generates a map that\'s "above" the default map, while [1,0] generates one to the "right". Currently, only integer offsets are supported. A good example node and amplitude combination is `[32,16,6,4]` and `[0.2,0.3,0.7,0.8]`.', // The description of the command (for help text)
+    name: 'simplemap', // The name of the command
+    description: 'Test the heightmap code for potential worldgen. The simpler version of the `heightmap` command.', // The description of the command (for help text)
     args: 1, // Specified that this command doesn't need any data other than the command
     perms: 'basic', //restricts to users with the "verifed" role noted at config.json
-    usage: '<seed> [width/height] [nodes|node-array] [amplitude-array] [offset-array]', // Help text to explain how to use the command (if it had any arguments)
-    cooldown: 15,
+    usage: '<seed> [parameters=a|b] [x-offset] [y-offset]', // Help text to explain how to use the command (if it had any arguments)
+    cooldown: 10,
     allowDM: true,
     async execute(message, args) {
       const seed = args[0];
 
-      let size = args.length > 1 ? Math.floor(Number(args[1])) || 600 : 600;
+      const params = {
+        a: {
+          nodes: [16,8,4,2],
+          amps: [0.2,0.3,0.7,0.8]
+        },
+        b: {
+          nodes: [32,16,6,4],
+          amps: [0.2,0.3,0.7,0.8]
+        }
+      };
+      let type = 'a';
+      const size = 600;
 
-      if (!config.perms.dev.includes(message.author.id)) {
-        size = Math.min(size,600);
-      } else {
-        size = Math.min(size,2048);
+      let nodes = params.a.nodes;
+      let amps = params.a.amps;
+
+      if (args.length > 1) {
+        if (args[1].startsWith('b')) {
+          nodes = params.b.nodes;
+          amps = params.b.amps;
+          type = 'b';
+        }
       }
-      size = Math.max(size,64);
-
-      let nodes = [8];
-      let amps = [1];
 
       let offsets = [0,0];
 
       if (args.length > 2) {
-        const temp_nodes = args.slice(2).join(' ').match(/^(\[ ?\d[ \d,.;:]*\]|[\d.]+)/g);
-        if (temp_nodes && temp_nodes.length > 0) {
-          nodes = temp_nodes[0].replace(/[\[\]]/g,"").trim().split(/[,;: ]+/g).map(n=>Math.floor(Math.min(64,Math.max(2,Math.abs(Number(n))))));
-        }
-        if (nodes.length > 1) {
-          const temp_amps = args.slice(2).join(' ').slice(temp_nodes[0].length).trim().match(/(\[ ?[\d.][ \d,.;:\-]*\])/g);
-          if (temp_amps && temp_amps.length > 0) {
-            amps = temp_amps[0].replace(/[\[\]]/g,"").trim().split(/[,;: ]+/g).map(a=>Math.abs(Number(a))).filter(a=>!isNaN(a));
-            if (temp_amps.length > 1) {
-              offsets = temp_amps[1].replace(/[\[\]]/g,"").trim().split(/[,;: ]+/g).map(a=>Math.floor(Number(a))).filter(a=>!isNaN(a));
-              if (offsets.length > 2) {
-                offsets = offsets.slice(0,2);
-              } else if (offsets.length < 2) {
-                offsets = offsets.concat([...new Array(2-offsets.length)].map(a=>0));
-              }
-              offsets[1] = -offsets[1]; // make the positive y axis go "up" instead of down
-            }
-          }
-          if (nodes.length > amps.length) {
-            amps = amps.concat([...new Array(amps.length-nodes.length)].map(a=>1));
-          } else if (amps.length > nodes.length) {
-            amps = amps.slice(0,nodes.length);
-          }
-        }
+        offsets[0] = Number(args[2]);
       }
+      if (args.length > 3) {
+        offsets[1] = -Number(args[3]);
+      }
+      offsets = offsets.filter(a=>!isNaN(a));
+      if (offsets.length < 2) {
+        offsets = offsets.concat([...new Array(2-offsets.length)].map(a=>0));
+      }
+      offsets = offsets.map(a=>Math.floor(a));
 
       const layers = nodes.length;
       const maxAmp = amps.reduce((a,b)=>a+b,0);
@@ -168,7 +164,7 @@ module.exports = {
           .setColor('#2e51a2')
           .setTitle(`Map of ${seed}`)
           .setImage('attachment://heightmap.png')
-          .setFooter(`x: ${offsets[0]}, y: ${offsets[1]}, layers: ${layers}`)
+          .setFooter(`x: ${offsets[0]}, y: ${offsets[1]}, type: ${type}`)
           .setTimestamp()
           message.channel.send({embed: embed, files: [attachment]});
         }).catch(err=>console.err(error));

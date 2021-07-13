@@ -66,7 +66,7 @@ module.exports = {
 
       let size = args.length > 1 ? Math.floor(Number(args[1])) || 600 : 600;
 
-      size = Match.max(100,Math.min(1200,size)));
+      size = Math.max(100,Math.min(1200,size));
 
       let nodes = params.nodes;
       let amps = params.amps;

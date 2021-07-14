@@ -4,7 +4,7 @@ const config = require('./../../config.json'); // load bot config
 
 module.exports = {
     name: 'setname', // The name of the command
-    aliases: ['myname'],
+    aliases: ['myname','name'],
     description: 'Set your name stored in the bot. Write what you\'d like to be refered to within the bot and Rosaria.', // The description of the command (for help text)
     perms: 'basic', //restricts to bot dev only (me)
     usage: '<name>', // Help text to explain how to use the command (if it had any arguments)

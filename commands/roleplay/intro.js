@@ -10,14 +10,15 @@ module.exports = {
     perms: 'basic', //restricts to bot dev only (me)
     usage: '<user-mention|user-id|username|nickname>', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
-    group: 'Work In Progress',
+    group: 'Community',
     rose: true,
     async execute(message, args) {
       if (args.length > 0) {
         let uID;
         let member;
         let data;
-        if (args.length > 1 || !args[0].match(/\d{15,23}/)) {
+        const reNum = new RegExp('\d{15,23}');
+        if (args.length > 1 || !reNum.test(args[0])) {
           const regex = new RegExp(`${args.join(' *')}.*`);
           data = await Users.findOne({name: { $regex: regex, $options: 'i' }}).exec();
           if (!data) {
@@ -43,7 +44,7 @@ module.exports = {
           const name = data.name || (member && member.id ? member.displayName : "Unknown User");
           const intro = data.intro;
           const embed = new Discord.MessageEmbed()
-          .setTitle(`Introduction of ${name}`)
+          .setTitle(`${name}'s Introduction`)
           .setDescription(data.intro)
           if (member && member.id) {
             embed.setAuthor(name, member.user.displayAvatarURL({size:64,format:'png'})).setColor(member.displayHexColor);
@@ -55,21 +56,20 @@ module.exports = {
           if (member && member.id) {
             return message.reply(`The user \`${member.user.tag}\` does not have an introduction stored in the bot. They'll need to use the \`$setintro\` command to set it.`);
           } else {
-            return message.reply(`I was unable to find a user with that name, tag, or ID on Rosaria or within my database. Are you sure you wrote their name correctly, and that they're still on the server.`);
+            return message.reply(`I was unable to find a user with that name, tag, or ID on Rosaria or within my database. Are you sure you wrote their name correctly? And that they're still on the server.`);
           }
         }
       } else {
         const data = await Users.findById({_id: message.author.id}).exec();
         if (data.intro && data.intro != '') {
-          let member = message.member
+          let member = message.member;
           if (!member) {
-            member = await message.client.guilds.resolve(config.guild).members.fetch({user: uID});
+            member = await message.client.guilds.resolve(config.guild).members.fetch({user: message.author});
           }
           const name = data.name || (member ? member.displayName : message.author.username);
           const intro = data.intro;
           const embed = new Discord.MessageEmbed()
-          .setColor(member.displayHexColor)
-          .setTitle(`Introduction of ${name}`)
+          .setTitle(`${name}'s Introduction`)
           .setDescription(data.intro)
           .setAuthor(name, message.author.displayAvatarURL({size:64,format:'png'}));
           if (member) {
@@ -77,7 +77,7 @@ module.exports = {
           }
           return message.reply(embed);
         } else {
-          return message.reply(`Use this command to access the introduction of stored in the bot! For example, \`${config.prefix[0]}intro Emily Rose\` will try to find someone called "Emily Rose" and their corresponding introduction. To set your own intro, do \`${config.prefix[0]}setintro [introduction]\` without the \`[]\`.`);
+          return message.reply(`Use this command to access the introduction of stored in the bot! For example, \`${config.prefix[0]}intro Emily Rose\` will try to find someone called "Emily Rose" and their corresponding introduction. To set your own intro, do \`${config.prefix[0]}setintro <introduction>\` without the \`<>\`.`);
         }
       }
     },

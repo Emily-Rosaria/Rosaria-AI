@@ -9,7 +9,7 @@ module.exports = {
     perms: 'basic', //restricts to bot dev only (me)
     usage: '<name>', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
-    group: 'Work In Progress',
+    group: 'Community',
     rose: true,
     execute(message, args) {
       var userID = message.author.id;
@@ -22,7 +22,7 @@ module.exports = {
         const data = Users.findOneAndUpdate({_id: message.author.id},update,options).exec();
         return message.reply(`Your name has been updated! It will be shown when someone uses \`${config.prefix[0]}intro\` command to view your intro, and with some other similar commands.`);
       } else {
-        return message.reply(`Use this command to update your name stored in the bot! For example, \`$setname Emily\`. It will then be shown in the \`$intro\` command, as well as some other locations.`);
+        return message.reply(`Use this command to update your name stored in the bot! For example, \`${config.prefix[0]}setname Emily\`. It will then be shown in the \`$intro\` command, as well as some other locations.`);
       }
     },
 };

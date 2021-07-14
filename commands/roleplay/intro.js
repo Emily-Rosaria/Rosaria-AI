@@ -17,8 +17,7 @@ module.exports = {
         let uID;
         let member;
         let data;
-        const reNum = new RegExp('\d{15,23}');
-        if (args.length > 1 || !reNum.test(args[0])) {
+        if (args.length > 1 || args[0].search(/\d{15,23}/) == -1) {
           const regex = new RegExp(`${args.join(' *')}.*`);
           data = await Users.findOne({name: { $regex: regex, $options: 'i' }}).exec();
           if (!data) {
@@ -30,11 +29,11 @@ module.exports = {
             }
           } else {
             uID = data._id;
-            member = await message.guilds.resolve(config.guild).members.fetch({user: uID});
+            member = await message.client.guilds.resolve(config.guild).members.fetch({user: uID});
           }
         } else {
           uID = args[0].match(/\d{15,23}/);
-          if (uID) {
+          if (uID && Number(uID) < Number(message.id)) {
             uID = uID[0];
             member = await message.client.guilds.resolve(config.guild).members.fetch({user: uID});
             data = await Users.findById({_id: uID}).exec();

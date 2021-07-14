@@ -1,4 +1,4 @@
-const Docs = require("./../../database/models/documents.js"); // users model
+const Users = require("./../../database/models/users.js"); // users model
 const mongoose = require("mongoose"); //database library
 const config = require('./../../config.json'); // load bot config
 

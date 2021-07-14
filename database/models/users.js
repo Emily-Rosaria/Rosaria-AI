@@ -4,6 +4,7 @@ const Schema = mongoose.Schema; // Define Schema method
 // Schema
 var UserSchema = new Schema({ // Create Schema
     _id: {type: String, required: true}, // ID of user on Discord
+    name: {type: String, default: ""},
     intro: {type: String, default: ""},
     kinks: {type: String, default: ""},
     blacklist: {type: String, default: ""},

@@ -44,6 +44,9 @@ module.exports = {
     if (!command) {
       return;
     }
+    if (message.channel.type != "dm" && config.ignore_channels.includes(message.channel.id) && !config.perms.dev.includes(message.author.id)) {
+      return;
+    }
 
     if (command.args && (!args.length || command.args > args.length)) {
       let reply = 'That command requires more details!';

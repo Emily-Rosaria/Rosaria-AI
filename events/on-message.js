@@ -77,7 +77,9 @@ module.exports = {
       if(now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
         const msg = await message.reply(`Whoa! You're sending commands too fast! Please wait ${timeLeft.toFixed(1)} more second(s) before running \`${command.name}\` again!`);
-        return msg.delete({ timeout: 5000 });
+        if (message.channel.type != "dm") {
+          return msg.delete({ timeout: 5000 });
+        }
       }
       timestamps.set(message.author.id, now);
       setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);

@@ -91,9 +91,11 @@ module.exports = {
         return;
       }
 
-      if (message.channel.type == "dm" && !command.allowDM) {
+      if (message.channel.type == "dm") {
         // manage dm commands
-        return message.reply("This command is not available for use in DMs.");
+        if (!command.allowDM) {
+          return message.reply("This command is not available for use in DMs.");
+        }
       } else {
         // check perms for admin/mod commands where user isn't a dev
         if (!config.perms.dev.includes(message.author.id)) {

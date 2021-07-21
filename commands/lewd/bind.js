@@ -28,7 +28,6 @@ module.exports = {
     name: 'prompt', // The name of the command
     aliases: ['bondage','bind','encounter'],
     description: 'Generate a random bondage encounter for Rosaria!', // The description of the command (for help text)
-    perms: 'basic', //restricts to bot dev only (me)
     usage: '[@user]', // Help text to explain how to use the command (if it had any arguments)
     allowDM: true,
     group: 'lewd',

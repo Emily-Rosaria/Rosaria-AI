@@ -44,7 +44,9 @@ module.exports = {
     if (!command) {
       return;
     }
-    if (message.channel.type != "dm" && config.ignore_channels.includes(message.channel.id) && !config.perms.dev.includes(message.author.id)) {
+
+    // dont do commands in set channels if user isn't a dev
+    if (message.channel.type != "dm" && config.noparse.includes(message.channel.id) && !config.perms.dev.includes(message.author.id)) {
       return;
     }
 

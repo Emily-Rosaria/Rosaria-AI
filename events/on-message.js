@@ -17,6 +17,12 @@ module.exports = {
     // get cached roles of a user
     const roleCache = message.channel.type != "dm" && message.member && message.member.roles && message.member.roles.cache ? [...message.member.roles.cache.keys()] || [] : [];
 
+    // heart intros
+    if (message.channel.id == "729760752898146336") {
+      const hearts = ["❤️","💜","💙"];
+      message.react(hearts[Math.floor(Math.random()*3)]);
+    }
+
     const botPing = ["<@" + client.user.id + ">","<@!" + client.user.id + ">"];
 
     const dmExtraPrefix = (message.channel.type == "dm") ? ["!","?","+","-"] : ["r!"];
@@ -42,11 +48,17 @@ module.exports = {
 
     // return if command isn't valid
     if (!command) {
+      // if no command, check if it's a roleplay message
+      /*
+      if (message.channel.type != "dm" && message.guild.id == config.guild && config.channels.rp.includes(message.channel.id)) {
+        client.event.get("onRoleplay").event(message);
+      }
+      */
       return;
     }
 
     // dont do commands in set channels if user isn't a dev
-    if (message.channel.type != "dm" && config.noparse.includes(message.channel.id) && !config.perms.dev.includes(message.author.id)) {
+    if (message.channel.type != "dm" && config.channels.noparse.includes(message.channel.id) && !config.perms.dev.includes(message.author.id)) {
       return;
     }
 

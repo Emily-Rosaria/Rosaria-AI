@@ -1,8 +1,8 @@
 const mongoose = require("mongoose"); // Import mongoose library
 const Schema = mongoose.Schema; // Define Schema method
 
-// Schema
-var UserSchema = new Schema({ // Create Schema
+// Create Schema
+var UserSchema = new Schema({
     _id: {type: String, required: true}, // ID of user on Discord
     name: {type: String, default: ""},
     intro: {type: String, default: ""},
@@ -16,7 +16,10 @@ var UserSchema = new Schema({ // Create Schema
     documents: {
       type: Map,  // key-value pairs of a string (that invokes the command)
       of: String // and a string "ID", the _id of the document and the id of the discord message that created it
-    }
+    },
+    xp: {type: Number, default: 0},
+    gold: {type: Number, default: 0},
+    daily: {type: Number, default: 0} // last daily gold bonus (timestamp)
 });
 
 // Model

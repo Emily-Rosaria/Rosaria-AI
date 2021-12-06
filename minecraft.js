@@ -13,8 +13,9 @@ const statJSON = {
 };
 
 module.exports = async function(logChannel, serverName) {
-    const {Client} = require('exaroton');
     require('dotenv').config(); //for .env file
+    const {Client} = require('exaroton');
+    const config = require('./config.json');
     const mcClient = new Client(process.env.MCTOKEN);
     let account = await mcClient.getAccount();
     console.log("My exaroton account is " + account.name + " and I have " + account.credits + " credits.");
@@ -26,7 +27,7 @@ module.exports = async function(logChannel, serverName) {
 
     var msgObj = null;
 
-    const pingRole = config.pings.status[server.name.replace(/Rose/,"").toLowerCase()];
+    const pingRole = config.pings.mc;
     const title = server.name;
     const footer = server.address;
 

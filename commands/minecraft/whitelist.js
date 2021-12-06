@@ -30,7 +30,7 @@ module.exports = {
       }
 
       try {
-        const name = args.join('_').trim();
+        const name = args[0].startsWith('.') ? args.join(' ').trim() : args.join('_').trim();
         let list = server.getPlayerList("whitelist");
         await list.addEntry(name); // add just one entry
         const whitelist = await list.getEntries();

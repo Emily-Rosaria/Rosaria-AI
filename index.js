@@ -19,8 +19,10 @@ const Discord = require('discord.js');                  // Loads the discord API
 const Canvas = require('canvas'); // Pretty pictures
 const readline = require('readline');
 const {google} = require('googleapis');
+const {Client} = require('exaroton');
 var cron = require('node-cron'); // run regular scheduled tasks
 
+const minecraft = require('./minecraft.js');
 const config = require('./config.json');
 
 const dev = config.perms.dev[0];
@@ -87,6 +89,8 @@ client.on('ready', async function() {
       console.error(err);
     }
   });
+  const mcChannel = client.guilds.resolve(config.guild).channels.resolve(config.channels.minecraft);
+  minecraft(mcChannel,config.mc.server);
 });
 
 client.on('message', async message => {

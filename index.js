@@ -90,7 +90,7 @@ client.on('ready', async function() {
     }
   });
   const mcChannel = client.guilds.resolve(config.guild).channels.resolve(config.channels.minecraft);
-  minecraft(mcChannel,config.mc.server);
+  minecraft(mcChannel,config.minecraft.server);
 });
 
 client.on('message', async message => {

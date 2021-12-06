@@ -120,5 +120,5 @@ module.exports = async function(logChannel, serverName) {
         } else {
           players = [];
         }
-    }
+    });
 };

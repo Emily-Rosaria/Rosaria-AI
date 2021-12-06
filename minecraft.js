@@ -1,3 +1,5 @@
+const Discord = require('discord.js'); // Embed
+
 const statJSON = {
   "0": ["🔴","Offline","#FF0000","Offline"],
   "1": ["🟢","Online","#37d53f","Online"],

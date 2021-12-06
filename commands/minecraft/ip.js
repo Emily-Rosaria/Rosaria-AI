@@ -29,13 +29,13 @@ module.exports = {
         "9": ["","???","#000000","Pending"],
         "10": ["🟠","Preparing","#fa7f26","Starting"]
       };
-      await message.reply(`${server.name}`)
+      // await message.reply(`${server.name}`)
       const title = server.name;
       const status = statJSON[""+server.status];
       const embed = new Discord.MessageEmbed()
-      .setTitle(title + " - Server Address")
-      .setFooter(footer)
-      .setDescription(`You should be able to join this server at ${server.address}!`)
+      .setTitle(title + " - Server Status")
+      .setFooter(server.address)
+      .setDescription(`You should be able to join this server at \`${server.address}!\``)
       .setColor(status[2])
       .addField("Status",`${status[0]} ${status[1]}`,true)
       .addField("Players",`${server.players.count}/${server.players.max}`,true)

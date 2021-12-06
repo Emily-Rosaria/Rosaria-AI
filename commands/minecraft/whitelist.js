@@ -9,7 +9,7 @@ module.exports = {
     description: 'Adds your minecraft account to the server whitelist! Put a period (.) before any bedrock usernames to distinguish them from Java ones.', // The description of the command (for help text)
     perms: 'basic',
     allowDM: false,
-    cooldown: 10,
+    cooldown: 5,
     usage: '[username]', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
       const serverName = config.minecraft.server;

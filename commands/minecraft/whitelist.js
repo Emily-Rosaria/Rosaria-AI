@@ -12,7 +12,7 @@ module.exports = {
     cooldown: 10,
     usage: '[username]', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
-
+      const serverName = config.minecraft.server;
       const mcClient = new Client(process.env.MCTOKEN);
       let account = await mcClient.getAccount();
       let server = [...await mcClient.getServers()].find(s=>serverName.toLowerCase()==s.name.toLowerCase());

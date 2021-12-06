@@ -1,6 +1,7 @@
 const Discord = require('discord.js'); // Embed
 const {Client} = require('exaroton');
 require('dotenv').config(); //for .env file
+const config = require('./../../config.json'); // load bot config
 
 module.exports = {
     name: 'start', // The name of the command
@@ -11,6 +12,7 @@ module.exports = {
     cooldown: 30,
     usage: '', // Help text to explain how to use the command (if it had any arguments)
     async execute(message, args) {
+      const serverName = config.minecraft.server;
       const mcClient = new Client(process.env.MCTOKEN);
       let account = await mcClient.getAccount();
       let server = [...await mcClient.getServers()].find(s=>serverName.toLowerCase()==s.name.toLowerCase());

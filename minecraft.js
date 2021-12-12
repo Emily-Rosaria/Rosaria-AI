@@ -56,7 +56,7 @@ module.exports = async function(logChannel, serverName) {
             } else {
               embed.setDescription(`**${server.name}** is ${statusArr[1]}...`);
             }
-            if (["5","0","6","2"].includes(""+server.status) && msgObj[num] != null) {
+            if (["5","0","6","2","3","10"].includes(""+server.status) && msgObj[num] != null) {
               msgObj = await msgObj.edit({embed: embed});
             } else {
               msgObj = await logChannel.send({embed: embed});
@@ -76,14 +76,13 @@ module.exports = async function(logChannel, serverName) {
         // do posts for players joining/leaving
         if (server.players.list || players.length > 0) {
           const serverlist = server.players.list || [];
-          // get players in the old list who aren't in the new one
-          const leftPlayers = players.filter(p=>serverlist.indexOf(p) === -1);
-          // get players in the new list who weren't in the old one
-          const joinedPlayers = serverlist.filter(p=>players.indexOf(p) === -1);
           // server status text
           const statusArr = statJSON[""+server.status];
 
+          // get players in the old list who aren't in the new one
+          // const leftPlayers = players.filter(p=>serverlist.indexOf(p) === -1);
           // post for players who left
+          /*
           if (server.status == "1") {
             for (let left of leftPlayers) {
               const embed = new Discord.MessageEmbed()
@@ -94,8 +93,12 @@ module.exports = async function(logChannel, serverName) {
               logChannel.send({embed: embed});
             }
           }
+          */
 
+          // get players in the new list who weren't in the old one
+          // const joinedPlayers = serverlist.filter(p=>players.indexOf(p) === -1);
           // post for players who joined
+          /*
           for (let joined of joinedPlayers) {
             const embed = new Discord.MessageEmbed()
             .setFooter(footer)
@@ -104,6 +107,7 @@ module.exports = async function(logChannel, serverName) {
             .setTimestamp();
             logChannel.send({embed: embed});
           }
+          */
 
           players = serverlist;
 

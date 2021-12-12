@@ -80,7 +80,7 @@ module.exports = async function(logChannel, serverName) {
           const statusArr = statJSON[""+server.status];
 
           // get players in the old list who aren't in the new one
-          // const leftPlayers = players.filter(p=>serverlist.indexOf(p) === -1);
+          const leftPlayers = players.filter(p=>serverlist.indexOf(p) === -1);
           // post for players who left
           /*
           if (server.status == "1") {

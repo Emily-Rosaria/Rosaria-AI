@@ -56,7 +56,7 @@ module.exports = async function(logChannel, serverName) {
             } else {
               embed.setDescription(`**${server.name}** is ${statusArr[1]}...`);
             }
-            if (["5","0","6","2","3","10"].includes(""+server.status) && msgObj[num] != null) {
+            if (["5","0","6","2"].includes(""+server.status) && msgObj != null) {
               msgObj = await msgObj.edit({embed: embed});
             } else {
               msgObj = await logChannel.send({embed: embed});

@@ -4,7 +4,7 @@ require('dotenv').config(); //for .env file
 const config = require('./../../config.json'); // load bot config
 
 module.exports = {
-    name: 'status', // The name of the command
+    name: 'ip', // The name of the command
     description: 'Shows you the server status and IP!', // The description of the command (for help text)
     aliases: ['address','ip'],
     allowDM: true,

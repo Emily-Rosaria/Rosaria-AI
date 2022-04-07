@@ -79,7 +79,7 @@ module.exports = {
           } else {
             embed.addField("Notice",`I was unable to find <@${data._id}> on the Rosaria discord. This may be due to lag, but it's possible that they have left.`);
           }
-          return message.reply(embed);
+          return message.reply({ embeds: [embed]});
         } else {
           if (member && member.id) {
             return message.reply(`The user \`${member.user.tag}\` does not have an introduction stored in the bot. They'll need to use the \`$setintro\` command to set it.`);
@@ -112,7 +112,7 @@ module.exports = {
               fields.push({name:"Kinks",value:kinks});
             }
           } else {
-            fields.push({name:"Kinks",value:"This user has not provided any information about their kinks/turnons."});
+            fields.push({name:"Kinks",value:"This user has not provided any information about their kinks/turn-ons."});
           }
           if (limits) {
             if (limits.length > 1020 || desc) {
@@ -125,14 +125,14 @@ module.exports = {
               fields.push({name:"Limits & Turnoffs",value:limits});
             }
           } else {
-            fields.push({name:"Limits & Turnoffs",value:"This user has not provided any information about their limits/turnoffs."});
+            fields.push({name:"Limits & Turnoffs",value:"This user has not provided any information about their limits/turn-offs."});
           }
           if (desc) {
             embed.setDescription(desc.substring(0,4096));
           } else {
             embed.addFields(fields);
           }
-          return message.reply(embed);
+          return message.reply({ embeds: [embed]});
         } else {
           return message.reply(`Use this command to access the kink/limit introduction of someone stored in the bot! For example, \`${config.prefix[0]}kinky Emily Rose\` will try to find someone called "Emily Rose" and their corresponding kink information. To set your own info, do \`${config.prefix[0]}setkinks <kink-info>\` and \`${config.prefix[0]}setlimits <kink-info>\` without the \`<>\`.`);
         }

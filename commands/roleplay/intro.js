@@ -74,7 +74,7 @@ module.exports = {
           if (member) {
             embed.setColor(member.displayHexColor);
           }
-          return message.reply(embed);
+          return message.reply({ embeds: [embed]});
         } else {
           return message.reply(`Use this command to access the introduction of stored in the bot! For example, \`${config.prefix[0]}intro Emily Rose\` will try to find someone called "Emily Rose" and their corresponding introduction. To set your own intro, do \`${config.prefix[0]}setintro <introduction>\` without the \`<>\`.`);
         }

@@ -43,6 +43,6 @@ module.exports = {
       .setColor('f51d75')
       .setTitle("Damsel Creation!")
       .setDescription("Work in progress");
-      message.reply(embed);
+      message.reply({ embeds: [embed]});
     },
 };

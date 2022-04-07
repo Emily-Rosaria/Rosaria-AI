@@ -34,6 +34,16 @@ module.exports = {
           }
       }
 
+      const slashFiles = fs.readdirSync('./music/commands',{ withFileTypes: true }).filter((file) => file.name.endsWith(".js")).map(file => './../../music/commands/'+file.name);
+      // Loops over each file in the music commands folder and sets the commands to respond to their name
+      for (const file of slashFiles) {
+          delete require.cache[require.resolve(file)];
+          if (file.endsWith('.js')) {
+            const command = require(file);
+            client.slashCommands.set(command.data.name, command);
+          }
+      }
+
       // Deletes commands that don't exist
       const keys = Array.from(client.commands.keys());
       const validCommands = commandFiles.filter(file => file.endsWith('.js')).map(x => require(x).name);

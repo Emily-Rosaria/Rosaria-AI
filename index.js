@@ -97,7 +97,7 @@ client.on('ready', async function() {
   startMusic(client);
 });
 
-client.on('message', async message => {
+client.on('messageCreate', async message => {
     if (message && message.author && message.author.bot) {
       return;
     }

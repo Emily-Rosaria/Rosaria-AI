@@ -23,7 +23,7 @@ module.exports = {
         .setColor('#f98ed1')
         .setFooter('Image from: '+engine)
         await Booru.search(engine, ['ribbon_bondage'], { limit: 1, random: true })
-        .then(img => message.reply({ embeds: [embed.setImage(img[0].fileUrl).setTimestamp()}))
+        .then(img => message.reply({ embeds: [embed.setImage(img[0].fileUrl).setTimestamp()]}))
         .catch( function(error) {message.reply('Unable to fetch an image. Try again in a few minutes.');}); // Replies to the user with a random image
     },
 };

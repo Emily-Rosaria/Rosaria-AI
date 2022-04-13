@@ -1,5 +1,5 @@
 .env
 node_modules
 gdocslogin.json
-google-tts-api-key.json
+tts-api-key.json
 package.json

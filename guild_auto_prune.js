@@ -4,14 +4,14 @@ const Discord = require('discord.js'); // Loads the discord API library
 // function reminds users again between 3 and 4 days after they joined
 // function kicks users once they've been on the server for 5+ days
 
-const guildID = ['727569853405200474'];
+const guildID = '727569853405200474';
 const verified_roles = ['727570445360169000','776927641789661204','776927643319795763'];
 const rejected_role = '830226022174949386'; // role for people who submitted something and/or were rejected
 const lurk_channel = '775926318033928222';
 const oneDay = 24 * 60 * 60 * 1000; // one day in milliseconds
 
 module.exports = async function (client) {
-    var guild = await client.guilds.fetch(guildID);
+    var guild = await client.guilds.resolve(guildID);
     var channel = await guild.channels.resolve(lurk_channel);
     const now = new Date();
 
@@ -44,8 +44,9 @@ module.exports = async function (client) {
           return; // joined less than 48 hours ago
         }
         if (lurker.joinedAt.getTime() + oneDay*6.2 < now.getTime()) {
+          lurkersOld.push(lurker.user.id); // delete once we kick again
           if (!lurker.roles.cache.has(rejected_role)) {
-            lurker.kick("Inactivity. Joined over 6 days ago."); // kick lurker if no recent submission attempt was made
+            // lurker.kick("Inactivity. Joined over 6 days ago."); // kick lurker if no recent submission attempt was made
           }
           return; // don't remind people who made a submission that prevented them from being kicked
         }

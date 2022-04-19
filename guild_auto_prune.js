@@ -40,21 +40,19 @@ module.exports = async function (client) {
       var lurkersNew = [];
       var lurkersOld = [];
       lurkers.each((lurker)=>{
-        if (lurker.joinedAt.getTime() + oneDay*2 > now.getTime()) {
-          return; // joined less than 48 hours ago
+        if (lurker.joinedAt.getTime() + oneDay*2 > now.getTime() || lurker.roles.cache.has(rejected_role)) {
+          return; // joined less than 48 hours ago OR recently made a submission
         }
         if (lurker.joinedAt.getTime() + oneDay*6.2 < now.getTime()) {
-          lurkersOld.push(lurker.user.id); // delete once we kick again
-          if (!lurker.roles.cache.has(rejected_role)) {
-            // lurker.kick("Inactivity. Joined over 6 days ago."); // kick lurker if no recent submission attempt was made
-          }
-          return; // don't remind people who made a submission that prevented them from being kicked
+          lurker.kick("Inactivity. Joined over 6 days ago."); // kick lurker if no recent submission attempt was made
+          return;
         }
         if (lurker.joinedAt.getTime() + oneDay*4.1 > now.getTime()) {
           lurkersNew.push(lurker.user.id); // newer lurkers who joined less than 4 days ago
           return;
         } else {
           lurkersOld.push(lurker.user.id); // lurkers who will be kicked soon
+          return;
         }
       });
       lurkersNew = !lurkersNew || lurkersNew.length == 0 ? "" : "**Newer Members** - If you're pinged here, you have a good few days to get approved.\n" + lurkersNew.map(l=>`> <@${l}>`).join('\n') + "\n";

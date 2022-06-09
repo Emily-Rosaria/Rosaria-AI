@@ -15,6 +15,7 @@ const statJSON = {
 };
 
 module.exports = async function(logChannel, serverName) {
+  try {
     require('dotenv').config(); //for .env file
     const {Client} = require('exaroton');
     const config = require('./config.json');
@@ -128,4 +129,7 @@ module.exports = async function(logChannel, serverName) {
           players = [];
         }
     });
+  } catch (e) {
+    console.error(e);
+  }
 };

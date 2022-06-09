@@ -63,6 +63,10 @@ for (const file of commandFiles) {
 // Creates an empty list for storing timeouts so people can't spam with commands
 client.cooldowns = new Discord.Collection();
 
+// creates a list of people to ping for bump reminders
+client.bumpPings = new Discord.Collection();
+client.bumpPings.set("0",(new Date()).getTime());
+
 // load the core events into client
 client.events = new Discord.Collection();
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
@@ -91,15 +95,29 @@ client.on('ready', async function() {
       console.error(err);
     }
   });
-  const mcChannel = client.guilds.resolve(config.guild).channels.resolve(config.channels.minecraft);
-  minecraft(mcChannel,config.minecraft.server);
-  const startMusic = require("./music/setup.js");
-  startMusic(client);
+  cron.schedule('*/5 * * * *', async () => { // check every 5 minutes if a reminder is needed
+    var bumpReminder = require('./bump_reminder.js');
+    try {
+      bumpReminder(client);
+    } catch (err) {
+      console.error(err);
+    }
+  });
+  try {
+    const mcChannel = client.guilds.resolve(config.guild).channels.resolve(config.channels.minecraft);
+    //minecraft(mcChannel,config.minecraft.server);
+    const startMusic = require("./music/setup.js");
+    startMusic(client);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 client.on('messageCreate', async message => {
     if (message && message.author && message.author.bot) {
-      return;
+      if (message.channel.id == "728288393217179648" && message.author.id =="302050872383242240") {
+        client.events.get("onBump").event(message);
+      }
     }
     client.events.get("onMessage").event(message);
 });

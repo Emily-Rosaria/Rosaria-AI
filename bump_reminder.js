@@ -9,7 +9,19 @@ module.exports = async function (client) {
   const oneHour = 1000*60*60;
 
   var lastBumps = client.bumpPings;
-  var latest = Math.max(...[...lastBumps.values()]);
+  var latest = 0;
+  var repeat = false;
+  lastBumps.forEach((timestamp, uID) => {
+    if (latest < timestamp) {
+      latest = timestamp;
+      if (uID == "0") {
+        repeat = true;
+      } else {
+        repeat = false;
+      }
+    }
+  });
+
   if (now.getTime() - latest < 2*oneHour) {
     return; // recent bump
   }
@@ -18,15 +30,15 @@ module.exports = async function (client) {
   var channel = await guild.channels.resolve(channelID);
 
   var ping = [];
-  lastBumps.forEach(async (timestamp, uID) => {
+  lastBumps.forEach((timestamp, uID) => {
     // keep
     if (uID == "0") {
       return;
     }
     if (now.getTime() - timestamp < 5*oneHour) {
-      const member = guild.members.resolve(uID);
-      if (guild.members.resolve(uID)) {
-        if([...member.roles.cache.keys()].includes(roleID)) {
+      if (!repeat) {
+        const member = guild.members.resolve(uID);
+        if(member && [...member.roles.cache.keys()].includes(roleID)) {
           ping.push(uID);
         }
       }
@@ -35,10 +47,11 @@ module.exports = async function (client) {
       client.bumpPings.delete(uID);
     }
   });
+
   // make next reminder be in 1 hour unless someone bumps sooner
   client.bumpPings.set("0",now.getTime() - oneHour);
   const pingText = ping.length > 0 ? "<@" + ping.join(">, <@") + ">" : "";
-  channel.send({
+  await channel.send({
     content:`${pingText}\nRemember to bump the server with the \`/bump\` command. If you'd like to be pinged and reminded to do this, opt-in to the <@&${roleID}> role over at <#728277621598584973>.`,
     allowedMentions: {
       parse:["users"]

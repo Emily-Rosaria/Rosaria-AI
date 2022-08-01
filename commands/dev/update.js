@@ -68,6 +68,7 @@ module.exports = {
 
       delete require.cache[require.resolve('./../../guild_auto_prune.js')];
       delete require.cache[require.resolve('./../../bump_reminder.js')];
+      delete require.cache[require.resolve('./../../auto_delete.js')];
 
       console.log('Misc functions updated and cleaned! Now starting events.');
 

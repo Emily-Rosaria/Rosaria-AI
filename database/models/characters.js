@@ -1,9 +1,12 @@
 const mongoose = require("mongoose"); // Import mongoose library
 const Schema = mongoose.Schema; // Define Schema method
 
+// Character messages are all posted in the 728297407976177816 (character-reference) channel
+
 // Schema
 var CharacterSchema = new Schema({ // Create Schema
-    writer: {type: String, required: true}, // ID of character owner on Discord
+    _id: {type: String, required: true}, // ID of the character message
+    author: {type: String, required: true}, // ID of character owner on Discord
     name: {type: String, required: true}, // name of the character
     nicknames: {type: [String], default: []},
     age: {type: String, default: ""},

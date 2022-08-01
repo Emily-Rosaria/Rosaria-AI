@@ -36,7 +36,7 @@ const botIntents = new Discord.Intents();
 botIntents.add(Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_VOICE_STATES, Discord.Intents.FLAGS.GUILD_MEMBERS, Discord.Intents.FLAGS.GUILD_MESSAGES, Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Discord.Intents.FLAGS.GUILD_MESSAGE_TYPING, Discord.Intents.FLAGS.DIRECT_MESSAGES, Discord.Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Discord.Intents.FLAGS.DIRECT_MESSAGE_TYPING);
 
 
-const client = new Discord.Client({intents: botIntents, partials: ["CHANNEL"], allowedMentions: { parse: ['users', 'roles'], repliedUser: true}}); // Initiates the client
+const client = new Discord.Client({intents: botIntents, partials: ["CHANNEL","MESSAGE"], allowedMentions: { parse: ['users', 'roles'], repliedUser: true}}); // Initiates the client
 
 client.commands = new Discord.Collection(); // Creates an empty list in the client object to store all commands
 const getAllCommands = function (dir, cmds) {
@@ -62,7 +62,7 @@ for (const file of commandFiles) {
 
 // Creates an empty list for storing timeouts so people can't spam with commands
 client.cooldowns = new Discord.Collection();
-
+client.automods = new Discord.Collection();
 // creates a list of people to ping for bump reminders
 client.bumpPings = new Discord.Collection();
 client.bumpPings.set("0",(new Date()).getTime());
@@ -103,6 +103,14 @@ client.on('ready', async function() {
       console.error(err);
     }
   });
+  cron.schedule('*/10 * * * *', async () => { // check every 5 minutes if a reminder is needed
+    var autoDelete = require('./auto_delete.js');
+    try {
+      autoDelete(client);
+    } catch (err) {
+      console.error(err);
+    }
+  });
   try {
     const mcChannel = client.guilds.resolve(config.guild).channels.resolve(config.channels.minecraft);
     //minecraft(mcChannel,config.minecraft.server);
@@ -118,6 +126,9 @@ client.on('messageCreate', async message => {
       if (message.channel.id == "728288393217179648" && message.author.id =="302050872383242240") {
         client.events.get("onBump").event(message);
       }
+    }
+    if (message && message.channel && message.channel.id == "728297467292024973") {
+      //client.events.get("onPrune").event(message);
     }
     client.events.get("onMessage").event(message);
 });
@@ -152,13 +163,13 @@ client.on('messageReactionRemoveAll', async (message) => {
 
 client.on('guildMemberAdd', async member => {
   if (member.guild.id == config.guild) {
-    client.events.get("onMemberAdd").event(member);
+    client.events.get("onJoin").event(member);
   }
 });
 
 client.on('guildMemberRemove', async member => {
   if (member.guild.id == config.guild) {
-    client.events.get("onMemberRemove").event(member);
+    client.events.get("onLeave").event(member);
   }
 });
 

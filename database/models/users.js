@@ -8,6 +8,11 @@ var UserSchema = new Schema({
     intro: {type: String, default: ""},
     kinks: {type: String, default: ""},
     blacklist: {type: String, default: ""},
+    bot: {type: Boolean, default: false},
+    wordcounts: {
+      type: Map,  // key-value pairs of a string (word/phrase)
+      of: Number // and a number (how many times it's said)
+    },
     quick_chars: {type: [String], default: []}, // array of message IDs
     characters: {
       type: Map,
@@ -19,7 +24,10 @@ var UserSchema = new Schema({
     },
     xp: {type: Number, default: 0},
     gold: {type: Number, default: 0},
-    daily: {type: Number, default: 0} // last daily gold bonus (timestamp)
+    daily: {type: Number, default: 0}, // last daily gold bonus (timestamp)
+    bumps: {type: Number, default: 0},
+    totalWords: {type: Number, default: 0}, // total words written by this users
+    totalChars: {type: Number, default: 0} // character count - as in total letters written by this user
 });
 
 // Model
